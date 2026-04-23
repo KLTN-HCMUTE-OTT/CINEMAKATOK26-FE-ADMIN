@@ -23,7 +23,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
 
 // API Imports
-import { directorControllerFindOne, directorControllerRemove } from '@/api/directors'
+import { directorsControllerGetDirectorById, directorsControllerDeleteDirector } from '@/api/directors'
 
 interface DirectorDetailPageProps {
   params: {
@@ -47,7 +47,7 @@ const DirectorDetailPage = ({ params }: DirectorDetailPageProps) => {
       try {
         setLoading(true)
         setError(null)
-        const response = await directorControllerFindOne({ id: params.id })
+        const response = await directorsControllerGetDirectorById({ id: params.id })
         setDirector(response.data.data)
       } catch (err: any) {
         console.error('Error fetching director:', err)
@@ -64,7 +64,7 @@ const DirectorDetailPage = ({ params }: DirectorDetailPageProps) => {
   const handleDelete = async () => {
     try {
       setDeleting(true)
-      await directorControllerRemove({ id: params.id })
+      await directorsControllerDeleteDirector({ id: params.id })
       router.push('/person/directors')
     } catch (err: any) {
       console.error('Error deleting director:', err)

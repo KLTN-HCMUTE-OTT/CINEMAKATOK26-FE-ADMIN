@@ -29,7 +29,7 @@ import { useReviews } from '@/hooks/useReviews'
 // API Imports
 import { reviewControllerDeleteReview } from '@/api/reviews'
 import { episodeReviewControllerDeleteReview } from '@/api/episodeReviews'
-import { reportControllerBanItem, reportControllerUnbanItem } from '@/api/reports'
+import { reportControllerBan, reportControllerUnban } from '@/api/reports'
 import { reviewReplyControllerDeleteReply } from '@/api/reviewReplies'
 import { title } from 'process'
 
@@ -139,13 +139,13 @@ const ReviewsPage = () => {
     try {
       switch (actionDialog.action) {
         case 'ban':
-          await reportControllerBanItem({
+          await reportControllerBan({
             type: actionDialog.type,
             id: actionDialog.id
           })
           break
         case 'unban':
-          await reportControllerUnbanItem({
+          await reportControllerUnban({
             type: actionDialog.type,
             id: actionDialog.id
           })
@@ -198,12 +198,12 @@ const ReviewsPage = () => {
   const handleReplyAction = async (action: 'ban' | 'unban', replyId: string) => {
     try {
       if (action === 'ban') {
-        await reportControllerBanItem({
+        await reportControllerBan({
           type: 'REVIEW_REPLY',
           id: replyId
         })
       } else {
-        await reportControllerUnbanItem({
+        await reportControllerUnban({
           type: 'REVIEW_REPLY',
           id: replyId
         })
@@ -514,7 +514,7 @@ const ReviewsPage = () => {
                   color='error'
                   onClick={async () => {
                     try {
-                      await reportControllerBanItem({
+                      await reportControllerBan({
                         type: viewModal.review.type,
                         id: viewModal.review.id
                       })
@@ -533,7 +533,7 @@ const ReviewsPage = () => {
                   color='success'
                   onClick={async () => {
                     try {
-                      await reportControllerUnbanItem({
+                      await reportControllerUnban({
                         type: viewModal.review.type,
                         id: viewModal.review.id
                       })

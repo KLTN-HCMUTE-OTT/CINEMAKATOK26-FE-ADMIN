@@ -22,7 +22,7 @@ import {
   Tooltip
 } from '@mui/material'
 
-import { tvSeriesControllerFindOne, tvSeriesControllerRemove } from '@/api/tvSeries'
+import { tvSeriesControllerGetTvSeriesById, tvSeriesControllerDeleteTvSeries } from '@/api/tvSeries'
 import { DialogTrailer } from '@/components/movies/DialogTrailer'
 import { DialogVideo } from '@/components/movies/DialogVideo' // ✅ Import DialogVideo
 import { ContentDirectors } from '@/components/content/ContentDirectors'
@@ -60,7 +60,7 @@ const TVSeriesDetailPage = () => {
       setLoading(true)
       setError(null)
 
-      const response = await tvSeriesControllerFindOne({ id })
+      const response = await tvSeriesControllerGetTvSeriesById({ id })
 
       setTVSeries(response.data.data)
     } catch (err: any) {
@@ -77,7 +77,7 @@ const TVSeriesDetailPage = () => {
     }
 
     try {
-      await tvSeriesControllerRemove({ id })
+      await tvSeriesControllerDeleteTvSeries({ id })
       router.push('/content/tvseries')
     } catch (err: any) {
       console.error('Error deleting TV series:', err)

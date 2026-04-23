@@ -5,7 +5,7 @@ import {
   userControllerUpdateUserInfo,
   userControllerBanUser,
   userControllerUnbanUser
-} from '@/api/user'
+} from '@/api/users'
 
 type User = API.UserDto
 type UserDetail = API.UserDetailDto

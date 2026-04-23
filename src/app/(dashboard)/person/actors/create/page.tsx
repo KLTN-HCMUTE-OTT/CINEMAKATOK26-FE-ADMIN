@@ -21,7 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Avatar from '@mui/material/Avatar'
 
 // API Imports
-import { actorControllerCreate } from '@/api/actors'
+import { actorsControllerCreateActor } from '@/api/actors'
 
 // Config Imports
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
@@ -99,7 +99,7 @@ const CreateActorPage = () => {
         nationality: nationality.trim()
       }
 
-      await actorControllerCreate(actorData)
+      await actorsControllerCreateActor(actorData)
 
       // Redirect to actors list
       router.push('/person/actors')

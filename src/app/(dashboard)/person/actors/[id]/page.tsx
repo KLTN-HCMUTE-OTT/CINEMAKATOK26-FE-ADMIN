@@ -23,7 +23,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
 
 // API Imports
-import { actorControllerFindOne, actorControllerRemove } from '@/api/actors'
+import { actorsControllerGetActorById, actorsControllerDeleteActor } from '@/api/actors'
 
 interface ActorDetailPageProps {
   params: {
@@ -47,7 +47,7 @@ const ActorDetailPage = ({ params }: ActorDetailPageProps) => {
       try {
         setLoading(true)
         setError(null)
-        const response = await actorControllerFindOne({ id: params.id })
+        const response = await actorsControllerGetActorById({ id: params.id })
         setActor(response.data.data)
       } catch (err: any) {
         console.error('Error fetching actor:', err)
@@ -64,7 +64,7 @@ const ActorDetailPage = ({ params }: ActorDetailPageProps) => {
   const handleDelete = async () => {
     try {
       setDeleting(true)
-      await actorControllerRemove({ id: params.id })
+      await actorsControllerDeleteActor({ id: params.id })
       router.push('/person/actors')
     } catch (err: any) {
       console.error('Error deleting actor:', err)

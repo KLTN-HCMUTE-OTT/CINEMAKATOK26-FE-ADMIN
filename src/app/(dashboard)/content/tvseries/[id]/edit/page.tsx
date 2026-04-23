@@ -17,10 +17,10 @@ import {
   CircularProgress
 } from '@mui/material'
 
-import { tvSeriesControllerFindOne, tvSeriesControllerUpdate } from '@/api/tvSeries'
+import { tvSeriesControllerGetTvSeriesById, tvSeriesControllerUpdateTvSeries } from '@/api/tvSeries'
 import SeasonManagement from '@/components/tvseries/SeasonManagement'
-import { actorControllerFindOne } from '@/api/actors'
-import { directorControllerFindOne } from '@/api/directors'
+import { actorsControllerGetActorById } from '@/api/actors'
+import { directorsControllerGetDirectorById } from '@/api/directors'
 import TVSeriesMetadataForm from '@/components/tvseries/TVSeriesMetadataForm'
 import TVSeriesReview from '@/components/tvseries/TVSeriesReview'
 
@@ -55,7 +55,7 @@ const EditTVSeriesPage = () => {
       setLoading(true)
       setError(null)
 
-      const response = await tvSeriesControllerFindOne({ id })
+      const response = await tvSeriesControllerGetTvSeriesById({ id })
       const tvSeries = response.data.data
 
       setOriginalTVSeries(tvSeries)
@@ -157,7 +157,7 @@ const EditTVSeriesPage = () => {
       // Fetch full actor data
       const actorPromises = (metadata.actors || [])
         .filter((actor: any) => actor?.id)
-        .map((actor: any) => actorControllerFindOne({ id: actor.id }))
+        .map((actor: any) => actorsControllerGetActorById({ id: actor.id }))
 
       const actorResponses = await Promise.all(actorPromises)
 
@@ -180,7 +180,7 @@ const EditTVSeriesPage = () => {
       // Fetch full director data
       const directorPromises = (metadata.directors || [])
         .filter((director: any) => director?.id)
-        .map((director: any) => directorControllerFindOne({ id: director.id }))
+        .map((director: any) => directorsControllerGetDirectorById({ id: director.id }))
 
       const directorResponses = await Promise.all(directorPromises)
 
@@ -254,7 +254,7 @@ const EditTVSeriesPage = () => {
         seasons: updateSeasons
       }
 
-      await tvSeriesControllerUpdate({ id }, updateData)
+      await tvSeriesControllerUpdateTvSeries({ id }, updateData)
 
       handleNext()
     } catch (error: any) {

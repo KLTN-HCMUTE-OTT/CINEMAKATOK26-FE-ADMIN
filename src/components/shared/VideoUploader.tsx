@@ -12,10 +12,10 @@ import MetadataForm from './video-uploader/MetadataForm'
 import UploadProgress from './video-uploader/UploadProgress'
 
 // API Imports
-import { categoryControllerFindAll } from '@/api/categories'
-import { tagControllerFindAll } from '@/api/tags'
-import { actorControllerFindAll } from '@/api/actors'
-import { directorControllerFindAll } from '@/api/directors'
+import { categoriesControllerGetCategories } from '@/api/categories'
+import { tagsControllerGetTags } from '@/api/tags'
+import { actorsControllerGetActors } from '@/api/actors'
+import { directorsControllerGetDirectors } from '@/api/directors'
 
 // Hooks
 import { useVideoUpload } from '@/hooks/useVideoUpload'
@@ -106,10 +106,10 @@ const VideoUploader = ({
 
       try {
         const [categoriesRes, tagsRes, actorsRes, directorsRes] = await Promise.all([
-          categoryControllerFindAll({ limit: 100, page: 1 }),
-          tagControllerFindAll({ limit: 100, page: 1 }),
-          actorControllerFindAll({ limit: 100, page: 1 }),
-          directorControllerFindAll({ limit: 100, page: 1 })
+          categoriesControllerGetCategories({ limit: 100, page: 1 }),
+          tagsControllerGetTags({ limit: 100, page: 1 }),
+          actorsControllerGetActors({ limit: 100, page: 1 }),
+          directorsControllerGetDirectors({ limit: 100, page: 1 })
         ])
 
         if (categoriesRes?.data) setCategories(categoriesRes.data.data || [])

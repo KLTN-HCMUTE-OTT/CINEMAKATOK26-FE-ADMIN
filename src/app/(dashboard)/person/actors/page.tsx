@@ -30,7 +30,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
 
 // API Imports
-import { actorControllerFindAll, actorControllerRemove } from '@/api/actors'
+import { actorsControllerGetActors, actorsControllerDeleteActor } from '@/api/actors'
 
 const ActorsPage = () => {
   // States
@@ -53,7 +53,7 @@ const ActorsPage = () => {
       setLoading(true)
       setError(null)
 
-      const response = await actorControllerFindAll({
+      const response = await actorsControllerGetActors({
         page: page + 1,
         limit: rowsPerPage,
         search: activeSearch || undefined
@@ -104,7 +104,7 @@ const ActorsPage = () => {
 
     try {
       setDeleting(true)
-      await actorControllerRemove({ id: actorToDelete })
+      await actorsControllerDeleteActor({ id: actorToDelete })
       setDeleteDialogOpen(false)
       setActorToDelete(null)
       fetchActors() // Refresh list

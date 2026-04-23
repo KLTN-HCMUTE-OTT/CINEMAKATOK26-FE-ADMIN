@@ -30,7 +30,7 @@ import {
 } from '@mui/material'
 
 // API Imports
-import { tvSeriesControllerFindAll, tvSeriesControllerRemove } from '@/api/tvSeries'
+import { tvSeriesControllerGetTvSeries, tvSeriesControllerDeleteTvSeries } from '@/api/tvSeries'
 
 const TVseriesPage = () => {
   const router = useRouter()
@@ -54,7 +54,7 @@ const TVseriesPage = () => {
     setError(null)
 
     try {
-      const response = await tvSeriesControllerFindAll({
+      const response = await tvSeriesControllerGetTvSeries({
         page: page + 1,
         limit: rowsPerPage,
         search: searchQuery || undefined
@@ -105,7 +105,7 @@ const TVseriesPage = () => {
     if (!confirm('Are you sure you want to delete this TV series?')) return
 
     try {
-      const result = await tvSeriesControllerRemove({ id })
+      const result = await tvSeriesControllerDeleteTvSeries({ id })
 
       if (result.data.statusCode === 200) {
         console.log('TV series deleted successfully')

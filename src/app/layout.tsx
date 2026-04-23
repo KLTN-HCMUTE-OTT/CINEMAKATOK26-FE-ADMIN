@@ -10,6 +10,12 @@ import '@/app/globals.css'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
+// Env validation
+import { validatePublicEnv } from '@/configs/env'
+
+// Validate environment variables at startup
+validatePublicEnv()
+
 export const metadata = {
   title: 'StreamAdmin - OTT Platform Admin Dashboard',
   description:

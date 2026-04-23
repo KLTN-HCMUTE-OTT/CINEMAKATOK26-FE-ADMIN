@@ -84,35 +84,35 @@ async function apiCall<T>(endpoint: string, method: string, data?: any): Promise
 export const authApi = {
   // Login
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiCall<LoginResponse>('/auth/login', 'POST', credentials)
+    const response = await apiCall<LoginResponse>('/api/v1/auth/login', 'POST', credentials)
     return response.data
   },
 
   // Forgot Password - Send OTP
   forgotPassword: async (data: ForgotPasswordRequest): Promise<OTPResponse> => {
-    const response = await apiCall<OTPResponse>('/auth/forgot-password', 'POST', data)
+    const response = await apiCall<OTPResponse>('/api/v1/auth/forgot-password', 'POST', data)
     return response.data
   },
 
   // Reset Password with OTP
   resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
-    await apiCall<null>('/auth/reset-password', 'POST', data)
+    await apiCall<null>('/api/v1/auth/reset-password', 'POST', data)
   },
 
   // Resend OTP for password reset
   resendOtp: async (email: string): Promise<OTPResponse> => {
-    const response = await apiCall<OTPResponse>(`/auth/resend-otp?email=${encodeURIComponent(email)}`, 'POST')
+    const response = await apiCall<OTPResponse>(`/api/v1/auth/resend-otp?email=${encodeURIComponent(email)}`, 'POST')
     return response.data
   },
 
   // Refresh token
   refreshToken: async (refreshToken: string): Promise<TokenResponse> => {
-    const response = await apiCall<TokenResponse>('/auth/refresh', 'POST', { refreshToken })
+    const response = await apiCall<TokenResponse>('/api/v1/auth/refresh', 'POST', { refreshToken })
     return response.data
   },
 
   // Logout
   logout: async (refreshToken: string): Promise<void> => {
-    await apiCall<null>('/auth/logout', 'POST', { refreshToken })
+    await apiCall<null>('/api/v1/auth/logout', 'POST', { refreshToken })
   }
 }

@@ -75,7 +75,7 @@ async function apiCall<T>(endpoint: string, method: string, data?: any, params?:
 export const categoryApi = {
   // Get all categories with pagination
   getAll: async (query?: PaginationQuery): Promise<PaginatedResponse<Category>> => {
-    const response = await apiCall<PaginatedResponse<Category>>('/categories', 'GET', undefined, query)
+    const response = await apiCall<PaginatedResponse<Category>>('/api/v1/categories', 'GET', undefined, query)
     // Backend returns { data: PaginatedResponse }
     // apiCall already extracts response.data, so we return it directly
     return response as any as PaginatedResponse<Category>
@@ -83,24 +83,24 @@ export const categoryApi = {
 
   // Get category by ID
   getById: async (id: string): Promise<Category> => {
-    const response = await apiCall<Category>(`/categories/${id}`, 'GET')
+    const response = await apiCall<Category>(`/api/v1/categories/${id}`, 'GET')
     return response.data
   },
 
   // Create new category
   create: async (data: CreateCategoryDto): Promise<Category> => {
-    const response = await apiCall<Category>('/categories', 'POST', data)
+    const response = await apiCall<Category>('/api/v1/categories', 'POST', data)
     return response.data
   },
 
   // Update category
   update: async (id: string, data: UpdateCategoryDto): Promise<Category> => {
-    const response = await apiCall<Category>(`/categories/${id}`, 'PUT', data)
+    const response = await apiCall<Category>(`/api/v1/categories/${id}`, 'PUT', data)
     return response.data
   },
 
   // Delete category
   delete: async (id: string): Promise<void> => {
-    await apiCall<null>(`/categories/${id}`, 'DELETE')
+    await apiCall<null>(`/api/v1/categories/${id}`, 'DELETE')
   }
 }

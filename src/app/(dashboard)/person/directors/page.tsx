@@ -30,7 +30,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
 
 // API Imports
-import { directorControllerFindAll, directorControllerRemove } from '@/api/directors'
+import { directorsControllerGetDirectors, directorsControllerDeleteDirector } from '@/api/directors'
 
 const DirectorsPage = () => {
   // States
@@ -53,7 +53,7 @@ const DirectorsPage = () => {
       setLoading(true)
       setError(null)
 
-      const response = await directorControllerFindAll({
+      const response = await directorsControllerGetDirectors({
         page: page + 1,
         limit: rowsPerPage,
         search: activeSearch || undefined
@@ -104,7 +104,7 @@ const DirectorsPage = () => {
 
     try {
       setDeleting(true)
-      await directorControllerRemove({ id: directorToDelete })
+      await directorsControllerDeleteDirector({ id: directorToDelete })
       setDeleteDialogOpen(false)
       setDirectorToDelete(null)
       fetchDirectors() // Refresh list

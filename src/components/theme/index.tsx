@@ -16,6 +16,9 @@ import CssBaseline from '@mui/material/CssBaseline'
 import type {} from '@mui/material/themeCssVarsAugmentation' //! Do not remove this import otherwise you will get type errors while making a production build
 import type {} from '@mui/lab/themeAugmentation' //! Do not remove this import otherwise you will get type errors while making a production build
 
+// Toast Imports
+import { Toaster } from 'sonner'
+
 // Type Imports
 import type { ChildrenType, Direction } from '@core/types'
 
@@ -85,6 +88,7 @@ const ThemeProvider = (props: Props) => {
         <>
           <ModeChanger />
           <CssBaseline />
+          <Toaster position='top-right' richColors closeButton />
           {children}
         </>
       </CssVarsProvider>

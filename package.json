@@ -4,9 +4,9 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3005",
+    "dev": "next dev -p 3011",
     "build": "next build",
-    "start": "next start -p 3005",
+    "start": "next start -p 3011",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -48,6 +48,7 @@
     "react-perfect-scrollbar": "^1.5.8",
     "react-use": "^17.5.0",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.7",
     "swr": "^2.3.6",
     "validator": "^13.15.15"
   },

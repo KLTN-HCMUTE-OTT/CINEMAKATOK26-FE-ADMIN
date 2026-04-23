@@ -21,7 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Avatar from '@mui/material/Avatar'
 
 // API Imports
-import { directorControllerCreate } from '@/api/directors'
+import { directorsControllerCreateDirector } from '@/api/directors'
 
 // Config Imports
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
@@ -99,7 +99,7 @@ const CreateDirectorPage = () => {
         nationality: nationality.trim()
       }
 
-      await directorControllerCreate(directorData)
+      await directorsControllerCreateDirector(directorData)
 
       // Redirect to directors list
       router.push('/person/directors')

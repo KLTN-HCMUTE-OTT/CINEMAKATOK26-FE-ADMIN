@@ -21,7 +21,7 @@ import {
   FormHelperText
 } from '@mui/material'
 
-import { newsControllerCreate } from '@/api/news'
+import { newsControllerCreateNews } from '@/api/news'
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
 
 // Import BlogEditor
@@ -184,7 +184,7 @@ const AddNewsPage = () => {
     try {
       setLoading(true)
 
-      const newsData: API.CreateNewsDto = {
+      const newsData: API.CreateNewsBySessionDto = {
         title: formData.title,
         summary: formData.summary,
         content_html: content,
@@ -192,7 +192,7 @@ const AddNewsPage = () => {
         category: formData.category
       }
 
-      const response = await newsControllerCreate(newsData)
+      const response = await newsControllerCreateNews(newsData)
 
       if (response.data.statusCode === 201) {
         setSnackbar({
