@@ -21,7 +21,7 @@ import TagTableNew from '@/components/content/TagTableNew'
 import TagModalNew from '@/components/content/TagModalNew'
 
 // API Imports
-import { tagApi, type Tag, type CreateTagDto, type UpdateTagDto } from '@/libs/api/tag.api'
+import { tagApi, type Tag, type CreateTagDto, type UpdateTagDto } from '@/services'
 
 const TagsPage = () => {
   const [tags, setTags] = useState<Tag[]>([])

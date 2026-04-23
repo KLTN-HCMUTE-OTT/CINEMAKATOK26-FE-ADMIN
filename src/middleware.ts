@@ -44,10 +44,11 @@ export function middleware(request: NextRequest) {
 
   // Check if route is public
   const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
+  const isAuthApiRoute = pathname.startsWith('/api/auth/')
   const isStaticAsset = pathname.startsWith('/_next') || pathname.startsWith('/images') || pathname === '/favicon.ico'
 
   // Authentication check for protected routes
-  if (!isPublicRoute && !isStaticAsset) {
+  if (!isPublicRoute && !isStaticAsset && !isAuthApiRoute) {
     // In Next.js middleware, we can't access localStorage directly
     // We need to check for authentication token in cookies or headers
     const hasAuthCookie = request.cookies.has('accessToken')
@@ -63,7 +64,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Redirect logged-in users away from auth pages
-  if (isPublicRoute && !pathname.startsWith('/error')) {
+  if (isPublicRoute && !pathname.startsWith('/error') && !isAuthApiRoute) {
     const hasAuthCookie = request.cookies.has('accessToken')
 
     if (hasAuthCookie) {

@@ -103,10 +103,12 @@ const EditTVSeriesPage = () => {
           episodeTitle: episode.episodeTitle,
           episodeDuration: episode.episodeDuration,
           video: {
-            id: episode.video?.id,
-            videoUrl: episode.video?.videoUrl,
-            status: episode.video?.status,
-            thumbnailUrl: episode.video?.thumbnailUrl
+            id: episode.video.id,
+            videoUrl: episode.video.videoUrl,
+            status: episode.video.status,
+            thumbnailUrl: episode.video.thumbnailUrl,
+            sprites: episode.video.sprites,
+            vttFiles: episode.video.vttFiles
           }
         }))
       }))

@@ -8,7 +8,6 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
@@ -68,11 +67,10 @@ const ReportsPage = () => {
     status: statusFilter || undefined
   })
 
-  const [selectedReport, setSelectedReport] = useState<API.ReportDto | null>(null)
   const [actionDialog, setActionDialog] = useState<{
     open: boolean
     action: 'approve' | 'ban' | 'delete' | 'reject' | null
-    type?: string
+    type?: API.BanItemDto['type']
     id?: string
   }>({ open: false, action: null })
 
@@ -109,24 +107,29 @@ const ReportsPage = () => {
     setActionDialog({
       open: true,
       action,
-      type: viewModal.report?.type || '',
+      type: viewModal.report?.type,
       id: viewModal.report?.id || ''
     })
   }
 
   const handleActionConfirm = async () => {
-    if (!actionDialog.action || !actionDialog.type || !actionDialog.id) return
+    if (!actionDialog.action || !actionDialog.id) return
 
     try {
       switch (actionDialog.action) {
         case 'approve':
           await reportControllerApprove({ id: actionDialog.id })
           break
-        case 'ban':
-          await reportControllerBan({ type: actionDialog.type, id: viewModal.report?.targetId || actionDialog.id })
+        case 'ban': {
+          const targetId = viewModal.report?.targetId
+
+          if (!actionDialog.type || !targetId) return
+
+          await reportControllerBan({ type: actionDialog.type, id: targetId })
           break
+        }
         case 'reject':
-          await reportControllerReject({ type: actionDialog.type, id: actionDialog.id })
+          await reportControllerReject({ id: actionDialog.id })
           break
         case 'delete':
           await reportControllerDelete({ id: actionDialog.id })

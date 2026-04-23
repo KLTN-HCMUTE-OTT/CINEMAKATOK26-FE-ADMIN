@@ -18,7 +18,7 @@ import {
   TextField,
   InputAdornment
 } from '@mui/material'
-import type { Category } from '@/libs/api/category.api'
+import type { Category } from '@/services'
 
 interface CategoryTableNewProps {
   categories: Category[]

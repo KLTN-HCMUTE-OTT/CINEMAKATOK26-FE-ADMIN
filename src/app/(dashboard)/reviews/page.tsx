@@ -31,7 +31,6 @@ import { reviewControllerDeleteReview } from '@/api/reviews'
 import { episodeReviewControllerDeleteReview } from '@/api/episodeReviews'
 import { reportControllerBan, reportControllerUnban } from '@/api/reports'
 import { reviewReplyControllerDeleteReply } from '@/api/reviewReplies'
-import { title } from 'process'
 
 const reviewColumns = [
   { id: 'type', label: 'Type', minWidth: 120 },
@@ -85,7 +84,7 @@ const ReviewsPage = () => {
   const [actionDialog, setActionDialog] = useState<{
     open: boolean
     action: 'ban' | 'unban' | 'delete' | null
-    type?: string
+    type?: API.BanItemDto['type']
     id?: string
   }>({ open: false, action: null })
 

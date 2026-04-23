@@ -18,7 +18,7 @@ import {
   TextField,
   InputAdornment
 } from '@mui/material'
-import type { Tag } from '@/libs/api/tag.api'
+import type { Tag } from '@/services'
 
 interface TagTableNewProps {
   tags: Tag[]

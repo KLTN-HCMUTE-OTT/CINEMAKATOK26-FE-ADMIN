@@ -36,7 +36,7 @@ const TVseriesPage = () => {
   const router = useRouter()
 
   // State
-  const [tvSeries, setTvSeries] = useState<API.TVSeriesDto[]>([])
+  const [tvSeries, setTvSeries] = useState<API.TVSeriesSummaryDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(0)
@@ -235,186 +235,193 @@ const TVseriesPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                tvSeries.map(tvShow => (
-                  <>
-                    {/* TV Series Row */}
-                    <TableRow key={tvShow.id} hover>
-                      <TableCell>
-                        <IconButton size='small' onClick={() => handleToggleSeries(tvShow.id)}>
-                          <i
-                            className={expandedSeries === tvShow.id ? 'ri-arrow-down-s-line' : 'ri-arrow-right-s-line'}
+                tvSeries.map(tvShow => {
+                  const seasons = ((tvShow as unknown as API.TVSeriesDto).seasons || []) as API.SeasonDto[]
+
+                  return (
+                    <>
+                      {/* TV Series Row */}
+                      <TableRow key={tvShow.id} hover>
+                        <TableCell>
+                          <IconButton size='small' onClick={() => handleToggleSeries(tvShow.id)}>
+                            <i
+                              className={
+                                expandedSeries === tvShow.id ? 'ri-arrow-down-s-line' : 'ri-arrow-right-s-line'
+                              }
+                            />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Avatar
+                              src={tvShow.metaData?.thumbnail}
+                              alt={tvShow.metaData?.title}
+                              variant='rounded'
+                              sx={{ width: 60, height: 40 }}
+                            >
+                              <i className='ri-movie-line' />
+                            </Avatar>
+                            <Box>
+                              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                                {tvShow.metaData?.title || 'Untitled'}
+                              </Typography>
+                              <Typography variant='caption' color='text.secondary'>
+                                {tvShow.metaData?.description?.substring(0, 50)}
+                                {(tvShow.metaData?.description?.length || 0) > 50 ? '...' : ''}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={tvShow.metaData?.type || 'TV SHOW'}
+                            size='small'
+                            color='primary'
+                            variant='outlined'
                           />
-                        </IconButton>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Avatar
-                            src={tvShow.metaData?.thumbnail}
-                            alt={tvShow.metaData?.title}
-                            variant='rounded'
-                            sx={{ width: 60, height: 40 }}
-                          >
-                            <i className='ri-movie-line' />
-                          </Avatar>
-                          <Box>
-                            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                              {tvShow.metaData?.title || 'Untitled'}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              {tvShow.metaData?.description?.substring(0, 50)}
-                              {(tvShow.metaData?.description?.length || 0) > 50 ? '...' : ''}
-                            </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {tvShow.metaData?.releaseDate
+                            ? new Date(tvShow.metaData.releaseDate).toLocaleDateString()
+                            : '-'}
+                        </TableCell>
+                        <TableCell>{tvShow.totalSeasons || seasons.length || 0}</TableCell>
+                        <TableCell>
+                          <Chip label={tvShow.metaData?.maturityRating || 'N/A'} size='small' />
+                        </TableCell>
+                        <TableCell align='right'>
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                            <IconButton size='small' onClick={() => handleView(tvShow.id)}>
+                              <i className='ri-eye-line' />
+                            </IconButton>
+                            <IconButton size='small' onClick={() => handleEdit(tvShow.id)}>
+                              <i className='ri-edit-line' />
+                            </IconButton>
+                            <IconButton size='small' color='error' onClick={() => handleDelete(tvShow.id)}>
+                              <i className='ri-delete-bin-line' />
+                            </IconButton>
                           </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={tvShow.metaData?.type || 'TV SHOW'}
-                          size='small'
-                          color='primary'
-                          variant='outlined'
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {tvShow.metaData?.releaseDate
-                          ? new Date(tvShow.metaData.releaseDate).toLocaleDateString()
-                          : '-'}
-                      </TableCell>
-                      <TableCell>{tvShow.seasons?.length || 0}</TableCell>
-                      <TableCell>
-                        <Chip label={tvShow.metaData?.maturityRating || 'N/A'} size='small' />
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                          <IconButton size='small' onClick={() => handleView(tvShow.id)}>
-                            <i className='ri-eye-line' />
-                          </IconButton>
-                          <IconButton size='small' onClick={() => handleEdit(tvShow.id)}>
-                            <i className='ri-edit-line' />
-                          </IconButton>
-                          <IconButton size='small' color='error' onClick={() => handleDelete(tvShow.id)}>
-                            <i className='ri-delete-bin-line' />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                      </TableRow>
 
-                    {/* Seasons Collapse */}
-                    <TableRow>
-                      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                        <Collapse in={expandedSeries === tvShow.id} timeout='auto' unmountOnExit>
-                          <Box sx={{ margin: 2 }}>
-                            <Typography variant='h6' gutterBottom component='div' sx={{ fontWeight: 600 }}>
-                              Seasons
-                            </Typography>
-                            <Table size='small'>
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell width={50}></TableCell>
-                                  <TableCell>Season</TableCell>
-                                  <TableCell>Episodes</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {tvShow.seasons?.map(season => (
-                                  <>
-                                    {/* Season Row */}
-                                    <TableRow key={season.id}>
-                                      <TableCell>
-                                        <IconButton size='small' onClick={() => handleToggleSeason(season.id)}>
-                                          <i
-                                            className={
-                                              expandedSeason === season.id
-                                                ? 'ri-arrow-down-s-line'
-                                                : 'ri-arrow-right-s-line'
-                                            }
-                                          />
-                                        </IconButton>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                                          Season {season.seasonNumber}
-                                        </Typography>
-                                      </TableCell>
-                                      <TableCell>{season.episodes?.length || 0} episodes</TableCell>
-                                    </TableRow>
+                      {/* Seasons Collapse */}
+                      <TableRow>
+                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+                          <Collapse in={expandedSeries === tvShow.id} timeout='auto' unmountOnExit>
+                            <Box sx={{ margin: 2 }}>
+                              <Typography variant='h6' gutterBottom component='div' sx={{ fontWeight: 600 }}>
+                                Seasons
+                              </Typography>
+                              <Table size='small'>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell width={50}></TableCell>
+                                    <TableCell>Season</TableCell>
+                                    <TableCell>Episodes</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {seasons.map(season => (
+                                    <>
+                                      {/* Season Row */}
+                                      <TableRow key={season.id}>
+                                        <TableCell>
+                                          <IconButton size='small' onClick={() => handleToggleSeason(season.id)}>
+                                            <i
+                                              className={
+                                                expandedSeason === season.id
+                                                  ? 'ri-arrow-down-s-line'
+                                                  : 'ri-arrow-right-s-line'
+                                              }
+                                            />
+                                          </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                                            Season {season.seasonNumber}
+                                          </Typography>
+                                        </TableCell>
+                                        <TableCell>{season.episodes?.length || 0} episodes</TableCell>
+                                      </TableRow>
 
-                                    {/* Episodes Collapse */}
-                                    <TableRow>
-                                      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
-                                        <Collapse in={expandedSeason === season.id} timeout='auto' unmountOnExit>
-                                          <Box sx={{ margin: 2, ml: 4 }}>
-                                            <Typography
-                                              variant='subtitle2'
-                                              gutterBottom
-                                              component='div'
-                                              sx={{ fontWeight: 600 }}
-                                            >
-                                              Episodes
-                                            </Typography>
-                                            <Table size='small'>
-                                              <TableHead>
-                                                <TableRow>
-                                                  <TableCell>Episode</TableCell>
-                                                  <TableCell>Title</TableCell>
-                                                  <TableCell>Duration</TableCell>
-                                                  <TableCell>Status</TableCell>
-                                                </TableRow>
-                                              </TableHead>
-                                              <TableBody>
-                                                {season.episodes?.map(episode => {
-                                                  // Safe status check
-                                                  const videoStatus =
-                                                    episode.video?.status ?? episode.video?.status ?? 'No Video'
+                                      {/* Episodes Collapse */}
+                                      <TableRow>
+                                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+                                          <Collapse in={expandedSeason === season.id} timeout='auto' unmountOnExit>
+                                            <Box sx={{ margin: 2, ml: 4 }}>
+                                              <Typography
+                                                variant='subtitle2'
+                                                gutterBottom
+                                                component='div'
+                                                sx={{ fontWeight: 600 }}
+                                              >
+                                                Episodes
+                                              </Typography>
+                                              <Table size='small'>
+                                                <TableHead>
+                                                  <TableRow>
+                                                    <TableCell>Episode</TableCell>
+                                                    <TableCell>Title</TableCell>
+                                                    <TableCell>Duration</TableCell>
+                                                    <TableCell>Status</TableCell>
+                                                  </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                  {season.episodes?.map(episode => {
+                                                    // Safe status check
+                                                    const videoStatus =
+                                                      episode.video?.status ?? episode.video?.status ?? 'No Video'
 
-                                                  const statusColor =
-                                                    videoStatus === 'READY'
-                                                      ? 'success'
-                                                      : videoStatus === 'PROCESSING'
-                                                        ? 'warning'
-                                                        : videoStatus === 'FAILED'
-                                                          ? 'error'
-                                                          : 'default'
+                                                    const statusColor =
+                                                      videoStatus === 'READY'
+                                                        ? 'success'
+                                                        : videoStatus === 'PROCESSING'
+                                                          ? 'warning'
+                                                          : videoStatus === 'FAILED'
+                                                            ? 'error'
+                                                            : 'default'
 
-                                                  return (
-                                                    <TableRow key={episode.id}>
-                                                      <TableCell>
-                                                        <Chip label={`E${episode.episodeNumber}`} size='small' />
-                                                      </TableCell>
-                                                      <TableCell>
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                          <Typography variant='body2'>
-                                                            {episode.episodeTitle || `Episode ${episode.episodeNumber}`}
-                                                          </Typography>
-                                                        </Box>
-                                                      </TableCell>
-                                                      <TableCell>
-                                                        {episode.episodeDuration
-                                                          ? `${Math.floor(episode.episodeDuration / 60)} min`
-                                                          : '-'}
-                                                      </TableCell>
-                                                      <TableCell>
-                                                        <Chip label={videoStatus} size='small' color={statusColor} />
-                                                      </TableCell>
-                                                    </TableRow>
-                                                  )
-                                                })}
-                                              </TableBody>
-                                            </Table>
-                                          </Box>
-                                        </Collapse>
-                                      </TableCell>
-                                    </TableRow>
-                                  </>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </>
-                ))
+                                                    return (
+                                                      <TableRow key={episode.id}>
+                                                        <TableCell>
+                                                          <Chip label={`E${episode.episodeNumber}`} size='small' />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Typography variant='body2'>
+                                                              {episode.episodeTitle ||
+                                                                `Episode ${episode.episodeNumber}`}
+                                                            </Typography>
+                                                          </Box>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          {episode.episodeDuration
+                                                            ? `${Math.floor(episode.episodeDuration / 60)} min`
+                                                            : '-'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          <Chip label={videoStatus} size='small' color={statusColor} />
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    )
+                                                  })}
+                                                </TableBody>
+                                              </Table>
+                                            </Box>
+                                          </Collapse>
+                                        </TableCell>
+                                      </TableRow>
+                                    </>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  )
+                })
               )}
             </TableBody>
           </Table>

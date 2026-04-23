@@ -38,7 +38,9 @@ const EditNewsPage = () => {
     title: '',
     summary: '',
     cover_image: '',
-    category: [] as string[]
+    category: [] as string[],
+    author_name: '',
+    author_avatar: {} as Record<string, any>
   })
 
   const [content, setContent] = useState('')
@@ -70,7 +72,9 @@ const EditNewsPage = () => {
             title: newsData.title || '',
             summary: newsData.summary || '',
             cover_image: newsData.cover_image || '',
-            category: newsData.category || []
+            category: newsData.category || [],
+            author_name: newsData.author_name || '',
+            author_avatar: newsData.author_avatar || {}
           })
           setContent(newsData.content_html || '')
         }
@@ -228,7 +232,9 @@ const EditNewsPage = () => {
         summary: formData.summary,
         content_html: content,
         cover_image: formData.cover_image,
-        category: formData.category
+        category: formData.category,
+        author_name: formData.author_name,
+        author_avatar: formData.author_avatar
       }
 
       const response = await newsControllerUpdateNews({ id: newsId }, newsData)
