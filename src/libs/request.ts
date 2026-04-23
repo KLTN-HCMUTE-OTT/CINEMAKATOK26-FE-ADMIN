@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
 // Tạo axios instance với config
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL: '',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
@@ -11,14 +11,38 @@ const instance = axios.create({
   withCredentials: true // Cho phép gửi cookies
 })
 
+function getCookieValue(name: string): string | null {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  const cookies = document.cookie.split(';')
+
+  for (const cookie of cookies) {
+    const [key, ...valueParts] = cookie.trim().split('=')
+
+    if (key === name) {
+      return decodeURIComponent(valueParts.join('='))
+    }
+  }
+
+  return null
+}
+
 // Request interceptor
 instance.interceptors.request.use(
   config => {
-    // Lấy token từ localStorage (chỉ chạy ở client)
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken')
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+    // Note: Tokens are now managed as httpOnly cookies
+    // They are automatically sent with withCredentials: true
+
+    const method = config.method?.toUpperCase()
+    const isUnsafeMethod = method ? ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) : false
+
+    if (isUnsafeMethod) {
+      const csrfToken = getCookieValue('csrf-token')
+
+      if (csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken
       }
     }
 
@@ -40,7 +64,9 @@ instance.interceptors.request.use(
     return config
   },
   error => {
-    console.error('❌ Request Error:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Request Error:', error)
+    }
     return Promise.reject(error)
   }
 )
@@ -68,25 +94,23 @@ instance.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        // Gọi API refresh token
-        const refreshToken = localStorage.getItem('refreshToken')
-        if (refreshToken) {
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, { refreshToken })
-
-          const { accessToken } = response.data.data
-          localStorage.setItem('accessToken', accessToken)
-
-          // Retry request với token mới
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`
+        // Call BFF refresh endpoint (tokens are managed as httpOnly cookies)
+        const response = await axios.post(
+          '/api/auth/refresh',
+          {},
+          {
+            withCredentials: true
           }
+        )
+
+        if (response.status === 200) {
+          // Token refreshed - retry original request
+          // New token is in the httpOnly cookie, no need to set header
           return instance(originalRequest)
         }
       } catch (refreshError) {
         // Refresh token failed - redirect to login
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
           window.location.href = '/login'
         }
         return Promise.reject(refreshError)
@@ -144,24 +168,3 @@ export default function request<T = any>(
 
 // Export axios instance để dùng trực tiếp nếu cần
 export { instance as axiosInstance }
-
-// Export helper functions
-export const setAuthToken = (token: string) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('accessToken', token)
-  }
-}
-
-export const removeAuthToken = () => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-  }
-}
-
-export const getAuthToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('accessToken')
-  }
-  return null
-}

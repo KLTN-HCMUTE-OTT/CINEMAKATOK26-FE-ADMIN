@@ -11,7 +11,7 @@ import {
   Box,
   CircularProgress
 } from '@mui/material'
-import type { Tag, CreateTagDto, UpdateTagDto } from '@/libs/api/tag.api'
+import type { Tag, CreateTagDto, UpdateTagDto } from '@/services'
 
 interface TagModalNewProps {
   open: boolean

@@ -11,7 +11,7 @@ import {
   Box,
   CircularProgress
 } from '@mui/material'
-import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/libs/api/category.api'
+import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/services'
 
 interface CategoryModalNewProps {
   open: boolean

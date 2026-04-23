@@ -7,9 +7,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { authApi, type LoginResponse } from '@/libs/api/auth.api'
-import { syncAuthCookies, clearAuthCookies } from '@/utils/auth-cookies'
-import { startTokenRefreshMonitor, stopTokenRefreshMonitor, updateTokenTimestamp } from '@/libs/api/token-manager'
 
 interface User {
   id: string
@@ -29,11 +26,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Local storage keys
-const ACCESS_TOKEN_KEY = 'accessToken'
-const REFRESH_TOKEN_KEY = 'refreshToken'
-const USER_KEY = 'user'
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -41,46 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = !!user
 
-  // Start/stop token refresh monitor based on auth state
+  // Initialize auth state on mount
+  // Check if user is already logged in (tokens in httpOnly cookies)
   useEffect(() => {
-    if (isAuthenticated) {
-      startTokenRefreshMonitor()
-    } else {
-      stopTokenRefreshMonitor()
-    }
-
-    return () => {
-      stopTokenRefreshMonitor()
-    }
-  }, [isAuthenticated])
-
-  // Initialize auth state from localStorage
-  useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       try {
-        const storedUser = localStorage.getItem(USER_KEY)
-        const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY)
-
-        if (storedUser && accessToken) {
-          const parsedUser = JSON.parse(storedUser)
-
-          // Admin check - only allow admin users
-          if (parsedUser.isAdmin) {
-            setUser(parsedUser)
-          } else {
-            // Clear non-admin user data
-            localStorage.removeItem(USER_KEY)
-            localStorage.removeItem(ACCESS_TOKEN_KEY)
-            localStorage.removeItem(REFRESH_TOKEN_KEY)
-          }
-        }
+        // Try to verify auth by checking if we can access a protected endpoint
+        // For now, we'll initialize as not logged in - the middleware will handle redirects
+        setIsLoading(false)
       } catch (error) {
         console.error('Error initializing auth:', error)
-        // Clear invalid data
-        localStorage.removeItem(USER_KEY)
-        localStorage.removeItem(ACCESS_TOKEN_KEY)
-        localStorage.removeItem(REFRESH_TOKEN_KEY)
-      } finally {
         setIsLoading(false)
       }
     }
@@ -88,84 +50,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth()
   }, [])
 
-  // Login method
+  // Login method - now calls BFF instead of backend directly
   const login = async (email: string, password: string) => {
     try {
-      const response: LoginResponse = await authApi.login({ email, password })
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include' // Include cookies
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Login failed. Please try again.')
+      }
+
+      const data = await response.json()
+      const userData: User = data.user
 
       // Check if user is admin
-      if (!response.isAdmin) {
+      if (!userData.isAdmin) {
         throw new Error('You do not have admin privileges to access this area.')
       }
 
-      const userData: User = {
-        id: response.id,
-        name: response.name,
-        avatar: response.avatar,
-        isAdmin: response.isAdmin
-      }
-
-      // Store tokens and user data
-      localStorage.setItem(ACCESS_TOKEN_KEY, response.token.accessToken)
-      localStorage.setItem(REFRESH_TOKEN_KEY, response.token.refreshToken)
-      localStorage.setItem(USER_KEY, JSON.stringify(userData))
-
-      // Update token timestamp for refresh monitor
-      updateTokenTimestamp()
-
-      // Sync to cookies for middleware
-      syncAuthCookies()
-
+      // Set user state - tokens are now in httpOnly cookies managed by the server
       setUser(userData)
 
       // Redirect to admin dashboard
       router.push('/')
     } catch (error: any) {
       console.error('Login error:', error)
-      // Re-throw với message từ API hoặc generic message
       throw new Error(error.message || 'Login failed. Please try again.')
     }
   }
 
-  // Logout method
+  // Logout method - now calls BFF to clear cookies
   const logout = async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-      if (refreshToken) {
-        await authApi.logout(refreshToken)
-      }
+      // Call BFF logout endpoint to clear httpOnly cookies
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
-      // Clear local storage and cookies
-      localStorage.removeItem(ACCESS_TOKEN_KEY)
-      localStorage.removeItem(REFRESH_TOKEN_KEY)
-      localStorage.removeItem(USER_KEY)
-      clearAuthCookies()
-
+      // Clear local state
       setUser(null)
       router.push('/login')
     }
   }
 
-  // Refresh authentication
+  // Refresh authentication - tokens are refreshed via interceptor
   const refreshAuth = async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-      if (!refreshToken) {
-        throw new Error('No refresh token available')
+      // Call BFF refresh endpoint
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        throw new Error('Token refresh failed')
       }
-
-      const tokens = await authApi.refreshToken(refreshToken)
-
-      localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken)
-      localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken)
-
-      // Update token timestamp
-      updateTokenTimestamp()
-
-      // Sync to cookies
-      syncAuthCookies()
     } catch (error) {
       console.error('Token refresh error:', error)
       await logout()
@@ -195,13 +144,14 @@ export function useAuth() {
 }
 
 // Helper function to get access token
-export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(ACCESS_TOKEN_KEY)
-}
 
 // Helper function to get refresh token
+// Note: Token management is now handled via httpOnly cookies
+// These functions are kept for backward compatibility but return null
+export function getAccessToken(): string | null {
+  return null // httpOnly cookies are not accessible from JavaScript
+}
+
 export function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(REFRESH_TOKEN_KEY)
+  return null // httpOnly cookies are not accessible from JavaScript
 }

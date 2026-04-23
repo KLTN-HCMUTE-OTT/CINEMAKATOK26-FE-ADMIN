@@ -33,7 +33,7 @@ import Logo from '@components/layout/shared/Logo'
 
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
-import { authApi } from '@/libs/api/auth.api'
+import { authApi } from '@/services'
 
 const ForgotPassword = ({ mode }: { mode: Mode }) => {
   // States

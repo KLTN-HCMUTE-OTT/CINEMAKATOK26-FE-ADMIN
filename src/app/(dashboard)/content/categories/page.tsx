@@ -21,7 +21,7 @@ import CategoryTableNew from '@/components/content/CategoryTableNew'
 import CategoryModalNew from '@/components/content/CategoryModalNew'
 
 // API Imports
-import { categoryApi, type Category, type CreateCategoryDto, type UpdateCategoryDto } from '@/libs/api/category.api'
+import { categoryApi, type Category, type CreateCategoryDto, type UpdateCategoryDto } from '@/services'
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([])

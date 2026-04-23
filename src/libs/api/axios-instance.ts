@@ -4,12 +4,9 @@
  */
 
 import { axiosInstance } from '@/libs/request'
-import { getAuthToken } from '@/libs/request'
 
-// Helper function to maintain compatibility with existing code
 export function getAuthHeader(): { Authorization: string } | {} {
-  const token = getAuthToken()
-  return token ? { Authorization: `Bearer ${token}` } : {}
+  return {}
 }
 
 export default axiosInstance
