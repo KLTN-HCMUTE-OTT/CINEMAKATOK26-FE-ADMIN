@@ -23,10 +23,10 @@ import {
 } from '@mui/material'
 
 // API Imports
-import { categoryControllerFindAll } from '@/api/categories'
-import { tagControllerFindAll } from '@/api/tags'
-import { actorControllerFindAll } from '@/api/actors'
-import { directorControllerFindAll } from '@/api/directors'
+import { categoriesControllerGetCategories } from '@/api/categories'
+import { tagsControllerGetTags } from '@/api/tags'
+import { actorsControllerGetActors } from '@/api/actors'
+import { directorsControllerGetDirectors } from '@/api/directors'
 
 // Hooks
 import { useCloudinaryImageUpload } from '@/hooks/useCloudinaryImageUpload'
@@ -72,10 +72,10 @@ const TVSeriesMetadataForm = ({ initialData, onComplete }: TVSeriesMetadataFormP
 
       try {
         const [categoriesRes, tagsRes, actorsRes, directorsRes] = await Promise.all([
-          categoryControllerFindAll({ limit: 100 }),
-          tagControllerFindAll({ limit: 100 }),
-          actorControllerFindAll({ limit: 100 }),
-          directorControllerFindAll({ limit: 100 })
+          categoriesControllerGetCategories({ limit: 100 }),
+          tagsControllerGetTags({ limit: 100 }),
+          actorsControllerGetActors({ limit: 100 }),
+          directorsControllerGetDirectors({ limit: 100 })
         ])
 
         setCategories(categoriesRes.data.data || [])

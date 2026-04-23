@@ -23,9 +23,9 @@ import Alert from '@mui/material/Alert'
 // API Imports
 import {
   reportControllerFindOne,
-  reportControllerApproveItem,
-  reportControllerBanItem,
-  reportControllerDeleteReport
+  reportControllerApprove,
+  reportControllerBan,
+  reportControllerDelete
 } from '@/api/reports'
 
 const ReportDetailPage = () => {
@@ -77,14 +77,13 @@ const ReportDetailPage = () => {
     try {
       switch (actionDialog.action) {
         case 'approve':
-          await reportControllerApproveItem({ type: report.type, id: report.id })
+          await reportControllerApprove({ id: report.id })
           break
         case 'ban':
-          console.log('Report to ban:', report)
-          await reportControllerBanItem({ type: report.type, id: report.targetId })
+          await reportControllerBan({ type: report.type, id: report.targetId })
           break
         case 'delete':
-          await reportControllerDeleteReport({ id: report.id })
+          await reportControllerDelete({ id: report.id })
           break
       }
       // Refresh the report data

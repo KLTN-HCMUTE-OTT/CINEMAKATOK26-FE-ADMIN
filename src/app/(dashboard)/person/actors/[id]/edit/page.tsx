@@ -21,7 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Avatar from '@mui/material/Avatar'
 
 // API Imports
-import { actorControllerFindOne, actorControllerUpdate } from '@/api/actors'
+import { actorsControllerGetActorById, actorsControllerUpdateActor } from '@/api/actors'
 
 // Config Imports
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
@@ -57,7 +57,7 @@ const ActorEditPage = ({ params }: ActorEditPageProps) => {
         setLoading(true)
         setError(null)
 
-        const response = await actorControllerFindOne({ id: params.id })
+        const response = await actorsControllerGetActorById({ id: params.id })
         const actor = response.data.data
 
         setName(actor.name || '')
@@ -136,7 +136,7 @@ const ActorEditPage = ({ params }: ActorEditPageProps) => {
         nationality: nationality.trim()
       }
 
-      await actorControllerUpdate({ id: params.id }, actorData)
+      await actorsControllerUpdateActor({ id: params.id }, actorData)
 
       setSuccess(true)
       setTimeout(() => {

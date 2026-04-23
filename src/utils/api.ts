@@ -162,35 +162,14 @@ export function usePaginatedAPI<T = any>(
   })
 }
 
-// Simple infinite loading simulation (SWR infinite would require useSWRInfinite)
+// useInfiniteAPI is not implemented - use useSWRInfinite directly instead
 export function useInfiniteAPI<T = any>(
   getKey: (pageIndex: number, previousPageData: any) => string | null,
   options?: SWRConfiguration
 ) {
-  // For now, just use regular SWR with page 0
-  const key = getKey(0, null)
-
-  const { data, error, mutate, isValidating } = useSWR(key, key ? apiFetch : null, {
-    ...swrConfig,
-    ...options
-  })
-
-  const items: T[] = data ? (Array.isArray(data) ? data : [data]) : []
-  const isLoading = !error && !data
-  const isEmpty = Array.isArray(data) ? data.length === 0 : !data
-  const isReachingEnd = true // Simplified for now
-
-  return {
-    items,
-    error,
-    isLoading,
-    isValidating,
-    isEmpty,
-    isReachingEnd,
-    mutate,
-    size: 1,
-    setSize: () => {} // Placeholder
-  }
+  throw new Error(
+    'useInfiniteAPI is not implemented. Use useSWRInfinite directly. See: https://swr.vercel.app/docs/pagination'
+  )
 }
 
 /**
@@ -299,9 +278,9 @@ export const endpoints = {
 
   // Authentication
   auth: {
-    login: '/auth/login',
-    logout: '/auth/logout',
-    refresh: '/auth/refresh',
-    profile: '/auth/profile'
+    login: '/api/v1/auth/login',
+    logout: '/api/v1/auth/logout',
+    refresh: '/api/v1/auth/refresh',
+    profile: '/api/v1/auth/profile'
   }
 } as const

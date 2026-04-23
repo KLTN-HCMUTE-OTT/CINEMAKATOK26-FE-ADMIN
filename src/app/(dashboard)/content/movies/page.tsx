@@ -29,7 +29,7 @@ import {
 } from '@mui/material'
 
 // API Imports
-import { movieControllerFindAll, movieControllerDelete } from '@/api/movie'
+import { moviesControllerGetMovies, moviesControllerDeleteMovie } from '@/api/movies'
 
 const MoviesPage = () => {
   const router = useRouter()
@@ -49,7 +49,7 @@ const MoviesPage = () => {
     setError(null)
 
     try {
-      const response = await movieControllerFindAll({
+      const response = await moviesControllerGetMovies({
         page: page + 1, // API uses 1-based indexing
         limit: rowsPerPage,
         search: searchQuery ? JSON.stringify({ title: searchQuery }) : undefined
@@ -100,7 +100,7 @@ const MoviesPage = () => {
     if (!confirm('Are you sure you want to delete this movie?')) return
 
     try {
-      await movieControllerDelete({ id })
+      await moviesControllerDeleteMovie({ id })
       fetchMovies() // Refresh list
     } catch (err: any) {
       console.error('Error deleting movie:', err)

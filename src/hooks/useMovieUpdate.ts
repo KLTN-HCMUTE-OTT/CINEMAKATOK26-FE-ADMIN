@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
 // API Imports
-import { actorControllerFindOne } from '@/api/actors'
-import { directorControllerFindOne } from '@/api/directors'
-import { contentControllerUpdate } from '@/api/content'
-import { movieControllerUpdate } from '@/api/movie'
+import { actorsControllerGetActorById } from '@/api/actors'
+import { directorsControllerGetDirectorById } from '@/api/directors'
+import { contentsControllerUpdateContent } from '@/api/contents'
+import { moviesControllerUpdateMovie } from '@/api/movies'
 import { videoControllerUploadVideo } from '@/api/video'
 
 interface UseMovieUpdateProps {
@@ -21,7 +21,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
 
   const fetchFullActors = async (selectedActors: any[]) => {
     const actorPromises = selectedActors.map((a: any) =>
-      actorControllerFindOne({ id: a.id }).catch(err => {
+      actorsControllerGetActorById({ id: a.id }).catch(err => {
         console.error(`Failed to fetch actor ${a.id}:`, err)
         return null
       })
@@ -53,7 +53,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
 
   const fetchFullDirectors = async (selectedDirectors: any[]) => {
     const directorPromises = selectedDirectors.map((d: any) =>
-      directorControllerFindOne({ id: d.id }).catch(err => {
+      directorsControllerGetDirectorById({ id: d.id }).catch(err => {
         console.error(`Failed to fetch director ${d.id}:`, err)
         return null
       })
@@ -171,7 +171,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
         directors: fullDirectors
       }
 
-      const contentResponse = await contentControllerUpdate({ id: movie!.metaData!.id }, contentData)
+      const contentResponse = await contentsControllerUpdateContent({ id: movie!.metaData!.id }, contentData)
 
       const { deletedAt, rating, viewCount, ...cleanMetaData } = contentResponse.data.data as any
 
@@ -192,7 +192,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
         video: finalVideoDto || null
       }
 
-      await movieControllerUpdate({ id: movieId }, movieData)
+      await moviesControllerUpdateMovie({ id: movieId }, movieData)
       onSuccess()
     } catch (err: any) {
       console.error('Error updating movie:', err)

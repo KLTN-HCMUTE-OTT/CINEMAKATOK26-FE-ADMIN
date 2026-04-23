@@ -21,7 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Avatar from '@mui/material/Avatar'
 
 // API Imports
-import { directorControllerFindOne, directorControllerUpdate } from '@/api/directors'
+import { directorsControllerGetDirectorById, directorsControllerUpdateDirector } from '@/api/directors'
 
 // Config Imports
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
@@ -57,7 +57,7 @@ const DirectorEditPage = ({ params }: DirectorEditPageProps) => {
         setLoading(true)
         setError(null)
 
-        const response = await directorControllerFindOne({ id: params.id })
+        const response = await directorsControllerGetDirectorById({ id: params.id })
         const director = response.data.data
 
         setName(director.name || '')
@@ -136,7 +136,7 @@ const DirectorEditPage = ({ params }: DirectorEditPageProps) => {
         nationality: nationality.trim()
       }
 
-      await directorControllerUpdate({ id: params.id }, directorData)
+      await directorsControllerUpdateDirector({ id: params.id }, directorData)
 
       setSuccess(true)
       setTimeout(() => {

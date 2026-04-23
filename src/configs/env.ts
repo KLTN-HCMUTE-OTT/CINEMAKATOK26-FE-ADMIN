@@ -28,6 +28,23 @@ export const privateEnv = {
   ENABLE_PERFORMANCE_MONITORING: process.env.ENABLE_PERFORMANCE_MONITORING === 'true'
 } as const
 
+/**
+ * Validate that all required public environment variables are set
+ * Call this at app startup in src/app/layout.tsx
+ */
+export function validatePublicEnv(): void {
+  const requiredEnvVars = ['NEXT_PUBLIC_APP_URL', 'NEXT_PUBLIC_API_URL'] as const
+
+  const missingVars = requiredEnvVars.filter(key => !process.env[key])
+
+  if (missingVars.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missingVars.join(', ')}\n` +
+        `Make sure these are defined in your .env.local or environment configuration.`
+    )
+  }
+}
+
 // Environment validation
 const requiredEnvVars = {
   development: [],

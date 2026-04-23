@@ -25,7 +25,7 @@ import {
   DialogActions,
   Snackbar
 } from '@mui/material'
-import { newsControllerDelete, newsControllerFindOne } from '@/api/news'
+import { newsControllerDeleteNews, newsControllerGetNewsById } from '@/api/news'
 
 export default function NewsDetailPage() {
   const params = useParams()
@@ -50,7 +50,7 @@ export default function NewsDetailPage() {
       try {
         setLoading(true)
 
-        const response = await newsControllerFindOne({
+        const response = await newsControllerGetNewsById({
           id: params.id as string
         })
 
@@ -73,7 +73,7 @@ export default function NewsDetailPage() {
   const handleDelete = async () => {
     try {
       setDeleting(true)
-      await newsControllerDelete({ id: params.id as string })
+      await newsControllerDeleteNews({ id: params.id as string })
       router.push('/content/news')
     } catch (err: any) {
       console.error('Error deleting news:', err)
@@ -178,7 +178,7 @@ export default function NewsDetailPage() {
               <Stack direction='row' spacing={3} sx={{ mb: 2, color: 'text.secondary' }}>
                 <Stack direction='row' spacing={1} alignItems='center'>
                   <Typography variant='body2' className='text-base'>
-                    {news.name}
+                    {news.author_name}
                   </Typography>
                 </Stack>
                 <Stack direction='row' spacing={1} alignItems='center'>
@@ -291,10 +291,10 @@ export default function NewsDetailPage() {
           <Card elevation={2}>
             <CardContent>
               <Stack direction='row' spacing={2} alignItems='center'>
-                {news.avatar && (
+                {news.author_avatar && (
                   <Avatar
-                    src={typeof news.avatar === 'string' ? news.avatar : ''}
-                    alt={news.name}
+                    src={typeof news.author_avatar === 'string' ? news.author_avatar : ''}
+                    alt={news.author_name}
                     sx={{ width: 64, height: 64 }}
                   />
                 )}
@@ -303,7 +303,7 @@ export default function NewsDetailPage() {
                     Author
                   </Typography>
                   <Typography variant='body1' color='text.secondary'>
-                    {news.name}
+                    {news.author_name}
                   </Typography>
                 </Box>
               </Stack>

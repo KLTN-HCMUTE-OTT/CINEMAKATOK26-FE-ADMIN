@@ -22,7 +22,7 @@ import {
   Skeleton
 } from '@mui/material'
 
-import { newsControllerFindOne, newsControllerUpdate } from '@/api/news'
+import { newsControllerGetNewsById, newsControllerUpdateNews } from '@/api/news'
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
 
 // Import BlogEditor
@@ -61,7 +61,7 @@ const EditNewsPage = () => {
     const fetchNews = async () => {
       try {
         setFetchingNews(true)
-        const response = await newsControllerFindOne({ id: newsId })
+        const response = await newsControllerGetNewsById({ id: newsId })
 
         if (response.data.statusCode === 200 && response.data.data) {
           const newsData = response.data.data
@@ -231,7 +231,7 @@ const EditNewsPage = () => {
         category: formData.category
       }
 
-      const response = await newsControllerUpdate({ id: newsId }, newsData)
+      const response = await newsControllerUpdateNews({ id: newsId }, newsData)
 
       if (response.data.statusCode === 200) {
         setSnackbar({

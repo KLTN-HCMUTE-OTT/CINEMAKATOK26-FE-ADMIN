@@ -31,10 +31,10 @@ import { useReports } from '@/hooks/useReports'
 
 // API Imports
 import {
-  reportControllerApproveItem,
-  reportControllerBanItem,
-  reportControllerDeleteReport,
-  reportControllerRejectItem
+  reportControllerApprove,
+  reportControllerBan,
+  reportControllerDelete,
+  reportControllerReject
 } from '@/api/reports'
 
 const reportColumns = [
@@ -120,16 +120,16 @@ const ReportsPage = () => {
     try {
       switch (actionDialog.action) {
         case 'approve':
-          await reportControllerApproveItem({ type: actionDialog.type, id: actionDialog.id })
+          await reportControllerApprove({ id: actionDialog.id })
           break
         case 'ban':
-          await reportControllerBanItem({ type: actionDialog.type, id: viewModal.report?.targetId || actionDialog.id })
+          await reportControllerBan({ type: actionDialog.type, id: viewModal.report?.targetId || actionDialog.id })
           break
         case 'reject':
-          await reportControllerRejectItem({ type: actionDialog.type, id: actionDialog.id })
+          await reportControllerReject({ type: actionDialog.type, id: actionDialog.id })
           break
         case 'delete':
-          await reportControllerDeleteReport({ id: actionDialog.id })
+          await reportControllerDelete({ id: actionDialog.id })
           break
       }
       refetch() // Refresh the data

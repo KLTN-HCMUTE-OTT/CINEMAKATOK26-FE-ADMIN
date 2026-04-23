@@ -15,11 +15,11 @@ import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
 
 // API Imports
-import { movieControllerFindOne } from '@/api/movie'
-import { categoryControllerFindAll } from '@/api/categories'
-import { tagControllerFindAll } from '@/api/tags'
-import { actorControllerFindAll } from '@/api/actors'
-import { directorControllerFindAll } from '@/api/directors'
+import { moviesControllerGetMovieById } from '@/api/movies'
+import { categoriesControllerGetCategories } from '@/api/categories'
+import { tagsControllerGetTags } from '@/api/tags'
+import { actorsControllerGetActors } from '@/api/actors'
+import { directorsControllerGetDirectors } from '@/api/directors'
 
 // Component Imports
 import BasicInfoSection from '@/components/movies/BasicInfoSection'
@@ -103,7 +103,7 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
         setError(null)
 
         // Fetch movie
-        const movieResponse = await movieControllerFindOne({ id: params.id })
+        const movieResponse = await moviesControllerGetMovieById({ id: params.id })
         const movieData = movieResponse.data.data
 
         setMovie(movieData)
@@ -128,10 +128,10 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
 
         // Fetch options
         const [categoriesRes, tagsRes, actorsRes, directorsRes] = await Promise.all([
-          categoryControllerFindAll({ page: 1, limit: 100 }),
-          tagControllerFindAll({ page: 1, limit: 100 }),
-          actorControllerFindAll({ page: 1, limit: 100 }),
-          directorControllerFindAll({ page: 1, limit: 100 })
+          categoriesControllerGetCategories({ page: 1, limit: 100 }),
+          tagsControllerGetTags({ page: 1, limit: 100 }),
+          actorsControllerGetActors({ page: 1, limit: 100 }),
+          directorsControllerGetDirectors({ page: 1, limit: 100 })
         ])
 
         setCategories(categoriesRes.data.data || [])

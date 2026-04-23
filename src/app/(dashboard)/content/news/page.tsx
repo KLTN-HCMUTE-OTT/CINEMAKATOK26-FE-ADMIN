@@ -34,7 +34,7 @@ import {
   DialogTitle
 } from '@mui/material'
 
-import { newsControllerDelete, newsControllerFindAll } from '@/api/news'
+import { newsControllerDeleteNews, newsControllerGetNews } from '@/api/news'
 
 const NewsPage = () => {
   const router = useRouter()
@@ -67,7 +67,7 @@ const NewsPage = () => {
     setError(null)
 
     try {
-      const response = await newsControllerFindAll({
+      const response = await newsControllerGetNews({
         page: page + 1,
         limit: rowsPerPage,
         search: searchQuery
@@ -139,7 +139,7 @@ const NewsPage = () => {
 
     try {
       setDeleting(true)
-      const result = await newsControllerDelete({ id: selectedNewsId })
+      const result = await newsControllerDeleteNews({ id: selectedNewsId })
 
       if (result.data.statusCode === 200) {
         setSnackbar({
@@ -303,11 +303,11 @@ const NewsPage = () => {
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar
-                          src={typeof newsItem.avatar === 'string' ? newsItem.avatar : ''}
-                          alt={newsItem.name || 'Author'}
+                          src={typeof newsItem.author_avatar === 'string' ? newsItem.author_avatar : ''}
+                          alt={newsItem.author_name || 'Author'}
                           sx={{ width: 32, height: 32 }}
                         />
-                        <Typography variant='body2'>{newsItem.name || '-'}</Typography>
+                        <Typography variant='body2'>{newsItem.author_name || '-'}</Typography>
                       </Box>
                     </TableCell>
                     {/* Actions */}

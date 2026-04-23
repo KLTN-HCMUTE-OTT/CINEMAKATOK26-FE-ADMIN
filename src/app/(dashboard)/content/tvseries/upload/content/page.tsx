@@ -14,9 +14,9 @@ import SeasonManagement from '@/components/tvseries/SeasonManagement'
 import TVSeriesReview from '@/components/tvseries/TVSeriesReview'
 
 // API Imports
-import { tvSeriesControllerCreate } from '@/api/tvSeries'
-import { actorControllerFindOne } from '@/api/actors'
-import { directorControllerFindOne } from '@/api/directors'
+import { tvSeriesControllerCreateTvSeries } from '@/api/tvSeries'
+import { actorsControllerGetActorById } from '@/api/actors'
+import { directorsControllerGetDirectorById } from '@/api/directors'
 
 const steps = ['Series Metadata', 'Seasons & Episodes', 'Review & Publish']
 
@@ -59,7 +59,7 @@ const UploadTVSeriesPage = () => {
 
     try {
       // Fetch full actor data
-      const actorPromises = metadata.actors.map((a: any) => actorControllerFindOne({ id: a.id }))
+      const actorPromises = metadata.actors.map((a: any) => actorsControllerGetActorById(a.id))
       const actorResponses = await Promise.all(actorPromises)
 
       const fullActors = actorResponses.map((res: any) => {
@@ -77,7 +77,7 @@ const UploadTVSeriesPage = () => {
       })
 
       // Fetch full director data
-      const directorPromises = metadata.directors.map((d: any) => directorControllerFindOne({ id: d.id }))
+      const directorPromises = metadata.directors.map((d: any) => directorsControllerGetDirectorById(d.id))
       const directorResponses = await Promise.all(directorPromises)
 
       const fullDirectors = directorResponses.map((res: any) => {
@@ -121,7 +121,7 @@ const UploadTVSeriesPage = () => {
       }
 
       // Single API call to create TV series with all data
-      await tvSeriesControllerCreate(tvSeriesData)
+      await tvSeriesControllerCreateTvSeries(tvSeriesData)
 
       // Success - move to next step
       handleNext()
