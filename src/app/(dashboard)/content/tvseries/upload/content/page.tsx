@@ -17,40 +17,34 @@ import TVSeriesReview from '@/components/tvseries/TVSeriesReview'
 import { tvSeriesControllerCreateTvSeries } from '@/api/tvSeries'
 import { actorsControllerGetActorById } from '@/api/actors'
 import { directorsControllerGetDirectorById } from '@/api/directors'
+import { TVSeriesWorkflowProvider, useTVSeriesWorkflow } from '@/features/tvseries/contexts/TVSeriesWorkflowContext'
 
 const steps = ['Series Metadata', 'Seasons & Episodes', 'Review & Publish']
 
-const UploadTVSeriesPage = () => {
+const UploadTVSeriesPageContent = () => {
   const router = useRouter()
-  const [activeStep, setActiveStep] = useState(0)
-  const [metadata, setMetadata] = useState<any>(null)
-  const [seasons, setSeasons] = useState<API.CreateSeasonDto[]>([])
   const [isPublishing, setIsPublishing] = useState(false)
-  const [publishError, setPublishError] = useState<string | null>(null)
-
-  const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
-  }
-
-  const handleReset = () => {
-    setActiveStep(0)
-    setMetadata(null)
-    setSeasons([])
-    setPublishError(null)
-  }
+  const {
+    activeStep,
+    metadata,
+    seasons,
+    publishError,
+    setMetadata,
+    setSeasons,
+    setPublishError,
+    nextStep,
+    prevStep,
+    resetWorkflow
+  } = useTVSeriesWorkflow()
 
   const handleMetadataComplete = (metadataData: any) => {
     setMetadata(metadataData)
-    handleNext()
+    nextStep()
   }
 
   const handleSeasonsComplete = (seasonsData: API.CreateSeasonDto[]) => {
     setSeasons(seasonsData)
-    handleNext()
+    nextStep()
   }
 
   const handlePublish = async () => {
@@ -124,7 +118,7 @@ const UploadTVSeriesPage = () => {
       await tvSeriesControllerCreateTvSeries(tvSeriesData)
 
       // Success - move to next step
-      handleNext()
+      nextStep()
     } catch (error: any) {
       console.error('Error publishing TV series:', error)
       setPublishError(error.message || 'Failed to publish TV series. Please try again.')
@@ -143,7 +137,7 @@ const UploadTVSeriesPage = () => {
             seriesMetadata={metadata}
             initialSeasons={seasons}
             onComplete={handleSeasonsComplete}
-            onBack={handleBack}
+            onBack={prevStep}
           />
         )
       case 2:
@@ -194,7 +188,7 @@ const UploadTVSeriesPage = () => {
               now available on the platform.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-              <Button variant='outlined' onClick={handleReset}>
+              <Button variant='outlined' onClick={resetWorkflow}>
                 Upload Another Series
               </Button>
               <Button variant='contained' onClick={() => router.push('/content/tvseries')}>
@@ -212,7 +206,7 @@ const UploadTVSeriesPage = () => {
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Button disabled={isPublishing} onClick={handleBack} startIcon={<i className='ri-arrow-left-line' />}>
+                  <Button disabled={isPublishing} onClick={prevStep} startIcon={<i className='ri-arrow-left-line' />}>
                     Back to Edit
                   </Button>
                   <Button
@@ -237,6 +231,14 @@ const UploadTVSeriesPage = () => {
         </>
       )}
     </Box>
+  )
+}
+
+const UploadTVSeriesPage = () => {
+  return (
+    <TVSeriesWorkflowProvider>
+      <UploadTVSeriesPageContent />
+    </TVSeriesWorkflowProvider>
   )
 }
 

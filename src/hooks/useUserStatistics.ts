@@ -1,39 +1,26 @@
-// React Imports
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 
 // API Imports
 import { analyticsControllerGetUserStats } from '@/api/analytics'
 
 export const useUserStatistics = () => {
-  const [data, setData] = useState<API.UserStatsDto | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { data, error, isLoading, mutate } = useSWR(
+    ['user-statistics'],
+    async () => {
+      const response = await analyticsControllerGetUserStats()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        let response: any
-        response = await analyticsControllerGetUserStats()
-        // Extract data from response
-        const responseData = response.data?.data
-        setData(responseData)
-        console.log('User statistics fetched:', responseData)
-      } catch (err: any) {
-        setError(err?.response?.data?.data.message || 'Failed to fetch user statistics')
-        setData(null)
-      } finally {
-        setLoading(false)
-      }
+      return (response.data?.data || null) as API.UserStatsDto | null
+    },
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3
     }
-    fetchData()
-  }, [])
+  )
 
   return {
     data,
-    loading,
-    error
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    refetch: () => mutate()
   }
 }

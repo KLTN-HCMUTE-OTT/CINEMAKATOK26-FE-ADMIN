@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { auditLogControllerGetRecentActivity } from '@/api/auditLogs'
 
 interface UseRecentActivityProps {
@@ -9,45 +9,35 @@ interface UseRecentActivityProps {
 }
 
 export const useRecentActivity = ({ limit = 10, page = 1 }: UseRecentActivityProps = {}) => {
-  const [data, setData] = useState<API.RecentActivityDto[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [totalItems, setTotalItems] = useState(0)
+  const key = ['recent-activity', { limit, page }] as const
 
-  const fetchRecentActivity = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    async ([, params]) => {
       const response = await auditLogControllerGetRecentActivity({
-        limit,
-        page
+        limit: params.limit,
+        page: params.page
       })
 
-      if (response.data?.statusCode === 200) {
-        setData(response.data.data)
-        setTotalItems(response.data.meta?.totalItems || 0)
-      } else {
-        setError('Failed to fetch recent activity')
+      if (response.data?.statusCode !== 200) {
+        throw new Error('Failed to fetch recent activity')
       }
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 'Failed to fetch recent activity'
-      setError(errorMessage)
-      console.error('Error fetching recent activity:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  useEffect(() => {
-    fetchRecentActivity()
-  }, [limit, page])
+      return {
+        items: response.data.data || [],
+        totalItems: response.data.meta?.totalItems || 0
+      }
+    },
+    {
+      revalidateOnFocus: false
+    }
+  )
 
   return {
-    data,
-    loading,
-    error,
-    totalItems,
-    refetch: fetchRecentActivity
+    data: data?.items ?? [],
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    totalItems: data?.totalItems ?? 0,
+    refetch: () => mutate()
   }
 }
