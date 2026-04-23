@@ -10,17 +10,10 @@ import { Card, CardContent, Button } from '@mui/material'
 import DataTable, { type Column } from '@/components/shared/DataTable'
 import StatusBadge from '@/components/shared/StatusBadge'
 import { SeasonInfoCell, EpisodeCountCell, SeasonStatsCell, SeasonActionsCell } from '@/components/atoms/SeasonCells'
+import { useSeason } from '@/features/content/tvseries/contexts/SeasonContext'
 
-interface SeasonTableProps {
-  seasons: any[]
-  onEdit: (season: any) => void
-  onView: (season: any) => void
-  onDelete: (id: number) => void
-  onManageEpisodes: (season: any) => void
-  onAdd: () => void
-}
-
-const SeasonTable = ({ seasons, onEdit, onView, onDelete, onManageEpisodes, onAdd }: SeasonTableProps) => {
+const SeasonTable = () => {
+  const { seasons, openAddSeason, openEditSeason, viewSeason, deleteSeason, manageEpisodes } = useSeason()
   const [searchValue, setSearchValue] = useState('')
 
   const columns: Column[] = [
@@ -52,10 +45,10 @@ const SeasonTable = ({ seasons, onEdit, onView, onDelete, onManageEpisodes, onAd
             actions: (
               <SeasonActionsCell
                 season={season}
-                onEdit={onEdit}
-                onView={onView}
-                onDelete={onDelete}
-                onManageEpisodes={onManageEpisodes}
+                onEdit={openEditSeason}
+                onView={viewSeason}
+                onDelete={deleteSeason}
+                onManageEpisodes={manageEpisodes}
               />
             )
           }))}
@@ -63,7 +56,7 @@ const SeasonTable = ({ seasons, onEdit, onView, onDelete, onManageEpisodes, onAd
           onSearchChange={setSearchValue}
           searchPlaceholder='Search seasons...'
           actions={
-            <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
+            <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={openAddSeason}>
               Add Season
             </Button>
           }

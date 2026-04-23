@@ -23,28 +23,36 @@ import { actorsControllerGetActorById } from '@/api/actors'
 import { directorsControllerGetDirectorById } from '@/api/directors'
 import TVSeriesMetadataForm from '@/components/tvseries/TVSeriesMetadataForm'
 import TVSeriesReview from '@/components/tvseries/TVSeriesReview'
+import { TVSeriesWorkflowProvider, useTVSeriesWorkflow } from '@/features/tvseries/contexts/TVSeriesWorkflowContext'
 
 const steps = ['Series Metadata', 'Seasons & Episodes', 'Review & Update']
 
-const EditTVSeriesPage = () => {
+const EditTVSeriesPageContent = () => {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
+  const {
+    activeStep,
+    metadata,
+    seasons,
+    publishError,
+    setMetadata,
+    setSeasons,
+    setPublishError,
+    nextStep,
+    prevStep,
+    resetWorkflow
+  } = useTVSeriesWorkflow()
 
-  const [activeStep, setActiveStep] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const [originalTVSeries, setOriginalTVSeries] = useState<API.TVSeriesDto | null>(null)
 
-  const [metadata, setMetadata] = useState<any>(null)
-  const [seasons, setSeasons] = useState<API.CreateSeasonDto[]>([])
-
   const [seasonIdMap, setSeasonIdMap] = useState<Map<number, string>>(new Map())
   const [episodeIdMap, setEpisodeIdMap] = useState<Map<string, string>>(new Map())
 
   const [isUpdating, setIsUpdating] = useState(false)
-  const [updateError, setUpdateError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchTVSeriesData()
@@ -122,34 +130,27 @@ const EditTVSeriesPage = () => {
     }
   }
 
-  const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
-  }
-
   const handleReset = () => {
+    resetWorkflow()
     router.push(`/content/tvseries/${id}`)
   }
 
   const handleMetadataComplete = (metadataData: any) => {
     setMetadata(metadataData)
-    handleNext()
+    nextStep()
   }
 
   const handleSeasonsComplete = (seasonsData: API.CreateSeasonDto[]) => {
     setSeasons(seasonsData)
-    handleNext()
+    nextStep()
   }
 
   const handleUpdate = async () => {
     setIsUpdating(true)
-    setUpdateError(null)
+    setPublishError(null)
 
     if (!metadata) {
-      setUpdateError('Metadata is missing. Please complete the previous steps.')
+      setPublishError('Metadata is missing. Please complete the previous steps.')
       setIsUpdating(false)
 
       return
@@ -258,11 +259,11 @@ const EditTVSeriesPage = () => {
 
       await tvSeriesControllerUpdateTvSeries({ id }, updateData)
 
-      handleNext()
+      nextStep()
     } catch (error: any) {
       console.error('Error updating TV series:', error)
       console.error('Error details:', error.response?.data || error.message)
-      setUpdateError(
+      setPublishError(
         error?.response?.data?.message || error?.message || 'Failed to update TV series. Please try again.'
       )
     } finally {
@@ -283,16 +284,16 @@ const EditTVSeriesPage = () => {
             seriesMetadata={metadata}
             initialSeasons={seasons}
             onComplete={handleSeasonsComplete}
-            onBack={handleBack}
+            onBack={prevStep}
           />
         )
       case 2:
         return (
           <Box>
-            <TVSeriesReview metadata={metadata} seasons={seasons} publishError={updateError} />
+            <TVSeriesReview metadata={metadata} seasons={seasons} publishError={publishError} />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-              <Button onClick={handleBack} disabled={isUpdating}>
+              <Button onClick={prevStep} disabled={isUpdating}>
                 Back
               </Button>
               <Button variant='contained' onClick={handleUpdate} disabled={isUpdating}>
@@ -300,9 +301,9 @@ const EditTVSeriesPage = () => {
               </Button>
             </Box>
 
-            {updateError && (
+            {publishError && (
               <Alert severity='error' sx={{ mt: 2 }}>
-                {updateError}
+                {publishError}
               </Alert>
             )}
           </Box>
@@ -390,6 +391,14 @@ const EditTVSeriesPage = () => {
         </Card>
       )}
     </Box>
+  )
+}
+
+const EditTVSeriesPage = () => {
+  return (
+    <TVSeriesWorkflowProvider>
+      <EditTVSeriesPageContent />
+    </TVSeriesWorkflowProvider>
   )
 }
 

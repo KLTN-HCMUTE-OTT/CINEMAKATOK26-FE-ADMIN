@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { reportControllerFindAll } from '@/api/reports'
 
 interface UseReportsProps {
@@ -12,52 +12,41 @@ interface UseReportsProps {
 }
 
 export const useReports = ({ limit = 10, page = 1, search, sort, status }: UseReportsProps = {}) => {
-  const [data, setData] = useState<API.ReportDto[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [totalItems, setTotalItems] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
+  const key = ['reports', { limit, page, search, sort, status }] as const
 
-  const fetchReports = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    async ([, params]) => {
       const response = await reportControllerFindAll({
-        limit,
-        page,
-        search,
-        sort,
-        status
+        limit: params.limit,
+        page: params.page,
+        search: params.search,
+        sort: params.sort,
+        status: params.status
       })
 
-      if (response.data) {
-        console.log('Fetched reports:', response.data.data)
-        setData(response.data.data || [])
-        setTotalItems(response.data.meta?.totalItems || 0)
-        setTotalPages(response.data.meta?.totalPages || 0)
-      } else {
-        setError('Failed to fetch reports')
+      if (!response.data) {
+        throw new Error('Failed to fetch reports')
       }
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 'Failed to fetch reports'
-      setError(errorMessage)
-      console.error('Error fetching reports:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  useEffect(() => {
-    fetchReports()
-  }, [limit, page, search, sort, status])
+      return {
+        items: response.data.data || [],
+        totalItems: response.data.meta?.totalItems || 0,
+        totalPages: response.data.meta?.totalPages || 0
+      }
+    },
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3
+    }
+  )
 
   return {
-    data,
-    loading,
-    error,
-    totalItems,
-    totalPages,
-    refetch: fetchReports
+    data: data?.items ?? [],
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    totalItems: data?.totalItems ?? 0,
+    totalPages: data?.totalPages ?? 0,
+    refetch: () => mutate()
   }
 }

@@ -20,16 +20,10 @@ import {
   Box,
   Avatar
 } from '@mui/material'
+import { useSeason } from '@/features/content/tvseries/contexts/SeasonContext'
 
-interface SeasonModalProps {
-  open: boolean
-  onClose: () => void
-  onSave: (seasonData: any) => void
-  season?: any
-  title?: string
-}
-
-const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }: SeasonModalProps) => {
+const SeasonModal = () => {
+  const { modalOpen, selectedSeason, closeModal, saveSeason } = useSeason()
   const [seasonData, setSeasonData] = useState({
     title: '',
     description: '',
@@ -39,13 +33,13 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
   })
 
   useEffect(() => {
-    if (season) {
+    if (selectedSeason) {
       setSeasonData({
-        title: season.title || '',
-        description: season.description || '',
-        releaseDate: season.releaseDate || '',
-        status: season.status || 'draft',
-        poster: season.poster || ''
+        title: selectedSeason.title || '',
+        description: selectedSeason.description || '',
+        releaseDate: selectedSeason.releaseDate || '',
+        status: selectedSeason.status || 'draft',
+        poster: selectedSeason.poster || ''
       })
     } else {
       setSeasonData({
@@ -56,7 +50,7 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
         poster: ''
       })
     }
-  }, [season])
+  }, [selectedSeason])
 
   const handleSave = () => {
     if (!seasonData.title || !seasonData.description) {
@@ -65,7 +59,7 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
       return
     }
 
-    onSave(seasonData)
+    saveSeason(seasonData)
     handleClose()
   }
 
@@ -77,7 +71,7 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
       status: 'draft',
       poster: ''
     })
-    onClose()
+    closeModal()
   }
 
   const statusOptions = [
@@ -90,8 +84,8 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
   ]
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog open={modalOpen} onClose={handleClose} maxWidth='md' fullWidth>
+      <DialogTitle>{selectedSeason ? 'Edit Season' : 'Add New Season'}</DialogTitle>
       <DialogContent>
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Season Title */}
@@ -200,7 +194,7 @@ const SeasonModal = ({ open, onClose, onSave, season, title = 'Add New Season' }
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button variant='contained' onClick={handleSave} disabled={!seasonData.title || !seasonData.description}>
-          {title.includes('Add') ? 'Add Season' : 'Update Season'}
+          {selectedSeason ? 'Update Season' : 'Add Season'}
         </Button>
       </DialogActions>
     </Dialog>

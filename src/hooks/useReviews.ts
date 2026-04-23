@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { reviewControllerFindAll } from '@/api/reviews'
 import { episodeReviewControllerFindAll } from '@/api/episodeReviews'
 import { reviewReplyControllerFindAll } from '@/api/reviewReplies'
@@ -34,100 +34,82 @@ interface ReviewItem {
 }
 
 export const useReviews = ({ limit = 10, page = 1, search, sort, status, type = 'REVIEW' }: UseReviewsProps = {}) => {
-  const [data, setData] = useState<ReviewItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [totalItems, setTotalItems] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
+  const key = ['reviews', { limit, page, search, sort, status, type }] as const
 
-  const fetchReviews = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    async ([, params]) => {
       let allReviews: ReviewItem[] = []
       let totalItemsCount = 0
 
-      // Fetch regular reviews
-      if (type === 'REVIEW') {
+      if (params.type === 'REVIEW') {
         const reviewsResponse = await reviewControllerFindAll({
-          limit,
-          page,
-          search,
-          sort,
-          status
+          limit: params.limit,
+          page: params.page,
+          search: params.search,
+          sort: params.sort,
+          status: params.status
         })
 
         if (reviewsResponse.data?.data) {
-          const reviews = reviewsResponse.data.data.map(review => ({
+          allReviews = reviewsResponse.data.data.map(review => ({
             ...review,
             type: 'REVIEW' as const
           }))
-          allReviews = reviews
           totalItemsCount = reviewsResponse.data.meta?.totalItems || 0
         }
-      }
-      // Fetch episode reviews
-      else if (type === 'EPISODE_REVIEW') {
+      } else if (params.type === 'EPISODE_REVIEW') {
         const episodeReviewsResponse = await episodeReviewControllerFindAll({
-          limit,
-          page,
-          search,
-          sort,
-          status
+          limit: params.limit,
+          page: params.page,
+          search: params.search,
+          sort: params.sort,
+          status: params.status
         })
 
         if (episodeReviewsResponse.data?.data) {
-          const episodeReviews = episodeReviewsResponse.data.data.map(review => ({
+          allReviews = episodeReviewsResponse.data.data.map(review => ({
             ...review,
             type: 'EPISODE_REVIEW' as const
           }))
-          allReviews = episodeReviews
           totalItemsCount = episodeReviewsResponse.data.meta?.totalItems || 0
         }
-      }
-      // Fetch review replies
-      else if (type === 'REVIEW_REPLY') {
+      } else if (params.type === 'REVIEW_REPLY') {
         const reviewRepliesResponse = await reviewReplyControllerFindAll({
-          limit,
-          page,
-          search,
-          sort,
-          status
+          limit: params.limit,
+          page: params.page,
+          search: params.search,
+          sort: params.sort,
+          status: params.status
         })
 
         if (reviewRepliesResponse.data?.data) {
-          const reviewReplies = reviewRepliesResponse.data.data.map(reply => ({
+          allReviews = reviewRepliesResponse.data.data.map(reply => ({
             ...reply,
             type: 'REVIEW_REPLY' as const
           }))
-          allReviews = reviewReplies
           totalItemsCount = reviewRepliesResponse.data.meta?.totalItems || 0
         }
       }
 
-      setData(allReviews)
-      setTotalItems(totalItemsCount)
-      setTotalPages(Math.ceil(totalItemsCount / limit))
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 'Failed to fetch reviews'
-      setError(errorMessage)
-      console.error('Error fetching reviews:', err)
-    } finally {
-      setLoading(false)
+      return {
+        items: allReviews,
+        totalItems: totalItemsCount,
+        totalPages: Math.ceil(totalItemsCount / params.limit)
+      }
+    },
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3
     }
-  }
-
-  useEffect(() => {
-    fetchReviews()
-  }, [limit, page, search, sort, status, type])
+  )
 
   return {
-    data,
-    loading,
-    error,
-    totalItems,
-    totalPages,
-    refetch: fetchReviews
+    data: data?.items ?? [],
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    totalItems: data?.totalItems ?? 0,
+    totalPages: data?.totalPages ?? 0,
+    refetch: () => mutate()
   }
 }
