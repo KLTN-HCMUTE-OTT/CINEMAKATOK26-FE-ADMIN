@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, LinearProgress } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Utils Imports
@@ -30,9 +30,9 @@ const VoucherUsageCell = ({ usage, maxUsage }: { usage: number; maxUsage: number
     <Typography variant='body2'>
       {formatNumber(usage)} / {formatNumber(maxUsage)}
     </Typography>
-    <LinearProgress 
-      variant='determinate' 
-      value={(usage / maxUsage) * 100} 
+    <LinearProgress
+      variant='determinate'
+      value={(usage / maxUsage) * 100}
       sx={{ height: 4, borderRadius: 2, mt: 0.5 }}
       color={usage / maxUsage > 0.8 ? 'warning' : 'primary'}
     />
@@ -68,7 +68,7 @@ interface VouchersTableProps {
 const VouchersTable = ({ vouchers, onEdit, onDelete, onAdd }: VouchersTableProps) => {
   const [searchValue, setSearchValue] = useState('')
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'voucher', label: 'Voucher Code', minWidth: 180 },
     { id: 'usage', label: 'Usage', minWidth: 150 },
     { id: 'expiryDate', label: 'Expires', minWidth: 120 },
@@ -76,36 +76,33 @@ const VouchersTable = ({ vouchers, onEdit, onDelete, onAdd }: VouchersTableProps
     { id: 'actions', label: 'Actions', minWidth: 120 }
   ]
 
-  const filteredVouchers = vouchers.filter(voucher =>
-    voucher.code.toLowerCase().includes(searchValue.toLowerCase())
-  )
+  const filteredVouchers = vouchers.filter(voucher => voucher.code.toLowerCase().includes(searchValue.toLowerCase()))
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredVouchers.map(voucher => ({
         ...voucher,
         voucher: <VoucherCodeCell code={voucher.code} discount={voucher.discount} type={voucher.type} />,
         usage: <VoucherUsageCell usage={voucher.usage} maxUsage={voucher.maxUsage} />,
         status: <StatusBadge status={voucher.status as any} />,
-        actions: (
-          <VoucherActionsCell
-            voucher={voucher}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        )
+        actions: <VoucherActionsCell voucher={voucher} onEdit={onEdit} onDelete={onDelete} />
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search vouchers...'
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
-          Add Voucher
-        </Button>
-      }
       emptyMessage='No vouchers found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <DataTable.Search placeholder='Search vouchers...' />
+          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
+            Add Voucher
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

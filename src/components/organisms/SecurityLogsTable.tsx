@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 
 // Custom cell components
 const SecurityTypeCell = ({ type, severity }: { type: string; severity: string }) => {
@@ -81,7 +81,7 @@ const SecurityLogsTable = ({ logs, onBlock, onUnblock, onExport }: SecurityLogsT
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'securityType', label: 'Type & Severity', minWidth: 180 },
     { id: 'userInfo', label: 'User & Location', minWidth: 250 },
     { id: 'ipAddress', label: 'IP Address', minWidth: 130 },
@@ -139,7 +139,6 @@ const SecurityLogsTable = ({ logs, onBlock, onUnblock, onExport }: SecurityLogsT
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredLogs.map(log => ({
         ...log,
         securityType: <SecurityTypeCell type={log.type} severity={log.severity} />,
@@ -149,17 +148,26 @@ const SecurityLogsTable = ({ logs, onBlock, onUnblock, onExport }: SecurityLogsT
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search security logs...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      actions={
-        <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
-          Export Logs
-        </Button>
-      }
       emptyMessage='No security logs found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <DataTable.Search placeholder='Search security logs...' />
+            <DataTable.Filters />
+          </div>
+          <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
+            Export Logs
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

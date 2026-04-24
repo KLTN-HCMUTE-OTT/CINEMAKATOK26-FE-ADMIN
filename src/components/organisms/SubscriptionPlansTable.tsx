@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Box, Button, IconButton } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Utils Imports
@@ -53,7 +53,7 @@ interface SubscriptionPlansTableProps {
 const SubscriptionPlansTable = ({ plans, onEdit, onView, onDelete, onAdd }: SubscriptionPlansTableProps) => {
   const [searchValue, setSearchValue] = useState('')
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'name', label: 'Plan Name', minWidth: 150 },
     { id: 'price', label: 'Price', minWidth: 120 },
     { id: 'activeSubscribers', label: 'Active Subscribers', minWidth: 150 },
@@ -66,7 +66,6 @@ const SubscriptionPlansTable = ({ plans, onEdit, onView, onDelete, onAdd }: Subs
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredPlans.map(plan => ({
         ...plan,
         price: <PriceCell value={plan.price} interval={plan.interval} />,
@@ -76,14 +75,20 @@ const SubscriptionPlansTable = ({ plans, onEdit, onView, onDelete, onAdd }: Subs
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search plans...'
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
-          Add Plan
-        </Button>
-      }
       emptyMessage='No subscription plans found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <DataTable.Search placeholder='Search plans...' />
+          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
+            Add Plan
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

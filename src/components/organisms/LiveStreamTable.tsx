@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, Avatar, Chip } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Utils Imports
@@ -106,7 +106,7 @@ const LiveStreamTable = ({ streams, onStart, onStop, onEdit, onDelete, onAddStre
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'stream', label: 'Stream Info', minWidth: 300 },
     { id: 'status', label: 'Status', minWidth: 120 },
     { id: 'viewers', label: 'Viewers', minWidth: 100 },
@@ -143,17 +143,15 @@ const LiveStreamTable = ({ streams, onStart, onStop, onEdit, onDelete, onAddStre
 
     const matchesFilters = Object.entries(filterValues).every(([key, value]) => {
       if (!value) return true
-      
-return stream[key as keyof typeof stream] === value
+
+      return stream[key as keyof typeof stream] === value
     })
 
-    
-return matchesSearch && matchesFilters
+    return matchesSearch && matchesFilters
   })
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredStreams.map(stream => ({
         ...stream,
         stream: <StreamInfoCell stream={stream} />,
@@ -166,17 +164,26 @@ return matchesSearch && matchesFilters
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search streams...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAddStream}>
-          Add Stream
-        </Button>
-      }
       emptyMessage='No streams found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <DataTable.Search placeholder='Search streams...' />
+            <DataTable.Filters />
+          </div>
+          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAddStream}>
+            Add Stream
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

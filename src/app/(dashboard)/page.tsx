@@ -151,20 +151,24 @@ const OTTDashboard = () => {
             </Typography>
           </Box>
           <DataTable
-            columns={activityColumns}
             rows={formattedActivityData.map(row => ({
               ...row,
               details: <DetailsCell row={row} />
             }))}
-            totalCount={activityTotalItems}
-            page={activityPage}
-            rowsPerPage={activityRowsPerPage}
-            onPageChange={handleActivityPageChange}
-            onRowsPerPageChange={handleActivityRowsPerPageChange}
-            searchable={false}
             emptyMessage={activityError ? `Error: ${activityError}` : 'No recent activity'}
             loading={activityLoading}
-          />
+          >
+            {activityColumns.map(column => (
+              <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+            ))}
+            <DataTable.Pagination
+              totalCount={activityTotalItems}
+              page={activityPage}
+              rowsPerPage={activityRowsPerPage}
+              onPageChange={handleActivityPageChange}
+              onRowsPerPageChange={handleActivityRowsPerPageChange}
+            />
+          </DataTable>
         </Grid>
 
         {/* Detailed Statistics */}

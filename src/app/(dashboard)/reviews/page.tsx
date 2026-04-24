@@ -351,20 +351,26 @@ const ReviewsPage = () => {
         {/* Reviews Table */}
         <Grid item xs={12}>
           <DataTable
-            columns={reviewColumns}
             rows={formattedReviewsData}
-            totalCount={totalItems}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            searchable={true}
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
-            searchPlaceholder='Search reviews...'
             emptyMessage={reviewsError ? `Error: ${reviewsError}` : 'No reviews found'}
             loading={reviewsLoading}
-          />
+          >
+            <DataTable.Toolbar>
+              <DataTable.Search placeholder='Search reviews...' />
+            </DataTable.Toolbar>
+            {reviewColumns.map(column => (
+              <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+            ))}
+            <DataTable.Pagination
+              totalCount={totalItems}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </DataTable>
         </Grid>
       </Grid>
 

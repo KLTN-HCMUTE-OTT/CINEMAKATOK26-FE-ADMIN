@@ -23,7 +23,7 @@ import {
 } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Mock data for titles
@@ -147,7 +147,7 @@ const TitlesPage = () => {
     </Box>
   )
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'title', label: 'Title', minWidth: 200 },
     { id: 'type', label: 'Type', minWidth: 100 },
     { id: 'status', label: 'Status', minWidth: 120 },
@@ -241,7 +241,6 @@ const TitlesPage = () => {
 
       {/* Data Table */}
       <DataTable
-        columns={columns}
         rows={filteredTitles.map(title => ({
           ...title,
           type: <TypeCell value={title.type} />,
@@ -252,17 +251,26 @@ const TitlesPage = () => {
         }))}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        searchPlaceholder='Search titles...'
         filters={filters}
         filterValues={filterValues}
         onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-        actions={
-          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={() => setAddModalOpen(true)}>
-            Add Title
-          </Button>
-        }
         emptyMessage='No titles found'
-      />
+      >
+        <DataTable.Toolbar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <DataTable.Search placeholder='Search titles...' />
+              <DataTable.Filters />
+            </div>
+            <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={() => setAddModalOpen(true)}>
+              Add Title
+            </Button>
+          </div>
+        </DataTable.Toolbar>
+        {columns.map(column => (
+          <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+        ))}
+      </DataTable>
 
       {/* Add Title Modal */}
       <Dialog open={addModalOpen} onClose={() => setAddModalOpen(false)} maxWidth='md' fullWidth>

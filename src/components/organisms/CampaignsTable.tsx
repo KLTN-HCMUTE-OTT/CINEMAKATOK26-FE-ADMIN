@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, LinearProgress } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Utils Imports
@@ -30,9 +30,9 @@ const BudgetCell = ({ budget, spent }: { budget: number; spent: number }) => (
     <Typography variant='body2'>
       ${formatNumber(spent)} / ${formatNumber(budget)}
     </Typography>
-    <LinearProgress 
-      variant='determinate' 
-      value={(spent / budget) * 100} 
+    <LinearProgress
+      variant='determinate'
+      value={(spent / budget) * 100}
       sx={{ height: 4, borderRadius: 2, mt: 0.5 }}
       color={spent / budget > 0.9 ? 'error' : spent / budget > 0.7 ? 'warning' : 'primary'}
     />
@@ -41,9 +41,7 @@ const BudgetCell = ({ budget, spent }: { budget: number; spent: number }) => (
 
 const MetricsCell = ({ campaign }: { campaign: any }) => (
   <Box>
-    <Typography variant='body2'>
-      {formatNumber(campaign.impressions)} impressions
-    </Typography>
+    <Typography variant='body2'>{formatNumber(campaign.impressions)} impressions</Typography>
     <Typography variant='caption' color='text.secondary'>
       {formatNumber(campaign.clicks)} clicks • {formatNumber(campaign.conversions)} conversions
     </Typography>
@@ -79,7 +77,7 @@ interface CampaignsTableProps {
 const CampaignsTable = ({ campaigns, onEdit, onDelete, onAdd }: CampaignsTableProps) => {
   const [searchValue, setSearchValue] = useState('')
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'campaign', label: 'Campaign', minWidth: 200 },
     { id: 'budget', label: 'Budget', minWidth: 150 },
     { id: 'metrics', label: 'Performance', minWidth: 200 },
@@ -94,7 +92,6 @@ const CampaignsTable = ({ campaigns, onEdit, onDelete, onAdd }: CampaignsTablePr
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredCampaigns.map(campaign => ({
         ...campaign,
         campaign: <CampaignNameCell campaign={campaign} />,
@@ -102,24 +99,24 @@ const CampaignsTable = ({ campaigns, onEdit, onDelete, onAdd }: CampaignsTablePr
         metrics: <MetricsCell campaign={campaign} />,
         dateRange: `${campaign.startDate} - ${campaign.endDate}`,
         status: <StatusBadge status={campaign.status as any} />,
-        actions: (
-          <CampaignActionsCell
-            campaign={campaign}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        )
+        actions: <CampaignActionsCell campaign={campaign} onEdit={onEdit} onDelete={onDelete} />
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search campaigns...'
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
-          Add Campaign
-        </Button>
-      }
       emptyMessage='No campaigns found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <DataTable.Search placeholder='Search campaigns...' />
+          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
+            Add Campaign
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

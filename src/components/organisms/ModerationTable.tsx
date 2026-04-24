@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Chip, IconButton, Avatar } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Custom cell components
@@ -96,7 +96,7 @@ const ModerationTable = ({ reports, onViewReport, onResolveReport, onDismissRepo
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'content', label: 'Content', minWidth: 200 },
     { id: 'reportReason', label: 'Reason', minWidth: 150 },
     { id: 'reportedBy', label: 'Reported By', minWidth: 200 },
@@ -159,7 +159,6 @@ const ModerationTable = ({ reports, onViewReport, onResolveReport, onDismissRepo
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredReports.map(report => ({
         ...report,
         content: <ContentCell content={report.content} contentType={report.contentType} />,
@@ -174,12 +173,18 @@ const ModerationTable = ({ reports, onViewReport, onResolveReport, onDismissRepo
       searchValue={searchValue}
       searchable={false}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search reports...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
       emptyMessage='No reports found'
-    />
+    >
+      <DataTable.Toolbar>
+        <DataTable.Filters />
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

@@ -22,7 +22,6 @@ import {
 } from '@mui/material'
 
 // Components Imports
-import type { Column } from '@components/shared/DataTable'
 import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 import UserEditDialog from '@/components/dashboard/users/UserEditDialog'
@@ -156,11 +155,12 @@ const UsersPage = () => {
   const [userBanOpen, setUserBanOpen] = useState(false)
   const [tabValue, setTabValue] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
 
   // Initial load
   useEffect(() => {
-    fetchUsers(1, 10)
+    fetchUsers(1, rowsPerPage)
   }, [])
 
   // Handle search with debounce
@@ -171,7 +171,7 @@ const UsersPage = () => {
     if (searchTimeout) clearTimeout(searchTimeout)
 
     const timeout = setTimeout(() => {
-      fetchUsers(1, 10, value)
+      fetchUsers(1, rowsPerPage, value)
     }, 300)
 
     setSearchTimeout(timeout)
@@ -179,10 +179,16 @@ const UsersPage = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage)
-    fetchUsers(newPage, 10, searchValue)
+    fetchUsers(newPage, rowsPerPage, searchValue)
   }
 
-  const columns: Column[] = [
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage)
+    setCurrentPage(1)
+    fetchUsers(1, newRowsPerPage, searchValue)
+  }
+
+  const columns = [
     { id: 'user', label: 'User', minWidth: 250 },
     { id: 'status', label: 'Status', minWidth: 120 },
     { id: 'email', label: 'Email', minWidth: 150 },
@@ -254,7 +260,6 @@ const UsersPage = () => {
 
       {/* Data Table */}
       <DataTable
-        columns={columns}
         rows={users.map(user => ({
           ...user,
           user: <UserCell user={user} />,
@@ -264,16 +269,25 @@ const UsersPage = () => {
           actions: <UserActionsCell user={user} onView={handleViewUser} onEdit={handleEditUser} onBan={handleBanUser} />
         }))}
         totalCount={pagination.totalItems}
-        page={currentPage - 1}
-        rowsPerPage={10}
-        onPageChange={newPage => handlePageChange(newPage + 1)}
         searchValue={searchValue}
         onSearchChange={handleSearchChange}
-        searchPlaceholder='Search users by name or email...'
-        onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
         loading={loading}
         emptyMessage='No users found'
-      />
+      >
+        <DataTable.Toolbar>
+          <DataTable.Search placeholder='Search users by name or email...' />
+        </DataTable.Toolbar>
+        {columns.map(column => (
+          <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+        ))}
+        <DataTable.Pagination
+          totalCount={pagination.totalItems}
+          page={currentPage - 1}
+          rowsPerPage={rowsPerPage}
+          onPageChange={newPage => handlePageChange(newPage + 1)}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      </DataTable>
 
       {/* User Detail Modal */}
       <Dialog open={userDetailOpen} onClose={() => setUserDetailOpen(false)} maxWidth='md' fullWidth>

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 
 // Custom cell components
 const UserActionCell = ({ log }: { log: any }) => (
@@ -31,12 +31,7 @@ const ResourceCell = ({ resource, resourceId }: { resource: string; resourceId: 
 )
 
 const StatusCell = ({ status }: { status: string }) => (
-  <Chip 
-    label={status} 
-    size='small' 
-    color={status === 'success' ? 'success' : 'error'} 
-    variant='tonal' 
-  />
+  <Chip label={status} size='small' color={status === 'success' ? 'success' : 'error'} variant='tonal' />
 )
 
 interface AuditTrailTableProps {
@@ -48,7 +43,7 @@ const AuditTrailTable = ({ logs, onExport }: AuditTrailTableProps) => {
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'userAction', label: 'User & Action', minWidth: 200 },
     { id: 'resource', label: 'Resource', minWidth: 150 },
     { id: 'details', label: 'Details', minWidth: 300 },
@@ -79,7 +74,7 @@ const AuditTrailTable = ({ logs, onExport }: AuditTrailTableProps) => {
   ]
 
   const filteredLogs = logs.filter(log => {
-    const matchesSearch = 
+    const matchesSearch =
       log.userName.toLowerCase().includes(searchValue.toLowerCase()) ||
       log.action.toLowerCase().includes(searchValue.toLowerCase()) ||
       log.details.toLowerCase().includes(searchValue.toLowerCase())
@@ -88,8 +83,8 @@ const AuditTrailTable = ({ logs, onExport }: AuditTrailTableProps) => {
       if (!value) return true
       if (key === 'action') return log.action.includes(value)
       if (key === 'status') return log.status === value
-      
-return true
+
+      return true
     })
 
     return matchesSearch && matchesFilters
@@ -97,7 +92,6 @@ return true
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredLogs.map(log => ({
         ...log,
         userAction: <UserActionCell log={log} />,
@@ -107,17 +101,26 @@ return true
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search audit logs...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      actions={
-        <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
-          Export Logs
-        </Button>
-      }
       emptyMessage='No audit logs found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <DataTable.Search placeholder='Search audit logs...' />
+            <DataTable.Filters />
+          </div>
+          <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
+            Export Logs
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

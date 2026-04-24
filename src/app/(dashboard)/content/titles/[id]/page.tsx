@@ -8,7 +8,7 @@ import { Box, Typography, Tabs, Tab, Card, CardContent, Grid, Avatar, Chip, Butt
 
 // Components Imports
 import StatusBadge from '@components/shared/StatusBadge'
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import VideoUploader from '@components/shared/VideoUploader'
 import SeasonsManagement from '@components/organisms/SeasonsManagement'
 import EpisodesManagement from '@components/organisms/EpisodesManagement'
@@ -165,7 +165,7 @@ const TitleDetailPage = () => {
     setTabValue(newValue)
   }
 
-  const seasonColumns: Column[] = [
+  const seasonColumns = [
     { id: 'seasonNumber', label: 'Season', minWidth: 80 },
     { id: 'title', label: 'Title', minWidth: 150 },
     { id: 'episodes', label: 'Episodes', minWidth: 100 },
@@ -193,7 +193,7 @@ const TitleDetailPage = () => {
     }
   ]
 
-  const episodeColumns: Column[] = [
+  const episodeColumns = [
     { id: 'episodeNumber', label: 'Episode', minWidth: 80 },
     { id: 'title', label: 'Title', minWidth: 200 },
     { id: 'season', label: 'Season', minWidth: 80 },
@@ -225,7 +225,7 @@ const TitleDetailPage = () => {
     }
   ]
 
-  const assetColumns: Column[] = [
+  const assetColumns = [
     { id: 'fileName', label: 'File Name', minWidth: 250 },
     {
       id: 'type',
@@ -420,12 +420,20 @@ const TitleDetailPage = () => {
             <Typography variant='h6' sx={{ mb: 3 }}>
               Media Assets
             </Typography>
-            <DataTable
-              columns={assetColumns}
-              rows={mockAssets}
-              searchPlaceholder='Search assets...'
-              emptyMessage='No assets found'
-            />
+            <DataTable rows={mockAssets} emptyMessage='No assets found'>
+              <DataTable.Toolbar>
+                <DataTable.Search placeholder='Search assets...' />
+              </DataTable.Toolbar>
+              {assetColumns.map(column => (
+                <DataTable.Column
+                  key={column.id}
+                  id={column.id}
+                  label={column.label}
+                  minWidth={column.minWidth}
+                  format={column.format}
+                />
+              ))}
+            </DataTable>
           </CardContent>
         </TabPanel>
 
