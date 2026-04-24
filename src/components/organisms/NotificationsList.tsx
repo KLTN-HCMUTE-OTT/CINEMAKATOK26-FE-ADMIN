@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Utils Imports
@@ -87,7 +87,7 @@ const NotificationsList = ({ notifications, onEdit, onDelete, onSend }: Notifica
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'notification', label: 'Notification', minWidth: 300 },
     { id: 'type', label: 'Type', minWidth: 120 },
     { id: 'channels', label: 'Channels', minWidth: 150 },
@@ -130,8 +130,8 @@ const NotificationsList = ({ notifications, onEdit, onDelete, onSend }: Notifica
       if (!value) return true
       if (key === 'status') return notification.status === value
       if (key === 'type') return notification.type === value
-      
-return true
+
+      return true
     })
 
     return matchesSearch && matchesFilters
@@ -139,7 +139,6 @@ return true
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredNotifications.map(notification => ({
         ...notification,
         notification: <NotificationTitleCell notification={notification} />,
@@ -152,17 +151,26 @@ return true
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search notifications...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-send-plane-line' />} onClick={onSend}>
-          Send Notification
-        </Button>
-      }
       emptyMessage='No notifications found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <DataTable.Search placeholder='Search notifications...' />
+            <DataTable.Filters />
+          </div>
+          <Button variant='contained' startIcon={<i className='ri-send-plane-line' />} onClick={onSend}>
+            Send Notification
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 

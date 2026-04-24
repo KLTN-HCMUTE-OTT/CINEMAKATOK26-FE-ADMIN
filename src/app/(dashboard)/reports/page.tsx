@@ -231,20 +231,26 @@ const ReportsPage = () => {
         {/* Reports Table */}
         <Grid item xs={12}>
           <DataTable
-            columns={reportColumns}
             rows={formattedReportsData}
-            totalCount={totalItems}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            searchable={false}
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
-            searchPlaceholder='Search reports...'
             emptyMessage={reportsError ? `Error: ${reportsError}` : 'No reports found'}
             loading={reportsLoading}
-          />
+          >
+            <DataTable.Toolbar>
+              <DataTable.Search placeholder='Search reports...' />
+            </DataTable.Toolbar>
+            {reportColumns.map(column => (
+              <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+            ))}
+            <DataTable.Pagination
+              totalCount={totalItems}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </DataTable>
         </Grid>
       </Grid>
 

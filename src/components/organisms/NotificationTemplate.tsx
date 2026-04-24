@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
 
 // Components Imports
-import DataTable, { type Column } from '@components/shared/DataTable'
+import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
 
 // Custom cell components
@@ -74,7 +74,7 @@ const NotificationTemplate = ({ templates, onEdit, onDelete, onAdd }: Notificati
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns: Column[] = [
+  const columns = [
     { id: 'template', label: 'Template', minWidth: 200 },
     { id: 'preview', label: 'Preview', minWidth: 300 },
     { id: 'variables', label: 'Variables', minWidth: 200 },
@@ -122,7 +122,6 @@ const NotificationTemplate = ({ templates, onEdit, onDelete, onAdd }: Notificati
 
   return (
     <DataTable
-      columns={columns}
       rows={filteredTemplates.map(template => ({
         ...template,
         template: <TemplateNameCell template={template} />,
@@ -133,17 +132,26 @@ const NotificationTemplate = ({ templates, onEdit, onDelete, onAdd }: Notificati
       }))}
       searchValue={searchValue}
       onSearchChange={setSearchValue}
-      searchPlaceholder='Search templates...'
       filters={filters}
       filterValues={filterValues}
       onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      actions={
-        <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
-          Add Template
-        </Button>
-      }
       emptyMessage='No templates found'
-    />
+    >
+      <DataTable.Toolbar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <DataTable.Search placeholder='Search templates...' />
+            <DataTable.Filters />
+          </div>
+          <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={onAdd}>
+            Add Template
+          </Button>
+        </div>
+      </DataTable.Toolbar>
+      {columns.map(column => (
+        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
+      ))}
+    </DataTable>
   )
 }
 
