@@ -1,13 +1,24 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 // MUI Imports
-import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField
+} from '@mui/material'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 
-// Components Imports
-import DataTable from '@components/shared/DataTable'
+import { useDebounce } from '@/hooks/useDebounce'
 
 // Custom cell components
 const LogLevelCell = ({ level }: { level: string }) => {
@@ -67,81 +78,148 @@ const SystemLogsTable = ({ logs, onResolve, onExport }: SystemLogsTableProps) =>
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
 
-  const columns = [
-    { id: 'level', label: 'Level', minWidth: 100 },
-    { id: 'serviceMessage', label: 'Service & Message', minWidth: 300 },
-    { id: 'details', label: 'Details', minWidth: 250 },
-    { id: 'timestamp', label: 'Timestamp', minWidth: 180 },
-    { id: 'resolved', label: 'Status', minWidth: 150 }
-  ]
+  const debouncedSearch = useDebounce(searchValue, 400)
 
-  const filters = [
-    {
-      label: 'Level',
-      key: 'level',
-      options: [
-        { value: 'ERROR', label: 'Error' },
-        { value: 'WARNING', label: 'Warning' },
-        { value: 'INFO', label: 'Info' }
-      ]
-    },
-    {
-      label: 'Status',
-      key: 'resolved',
-      options: [
-        { value: 'false', label: 'Open' },
-        { value: 'true', label: 'Resolved' }
-      ]
-    }
-  ]
+  const handleFilterChange = useCallback((key: string, value: string) => {
+    setFilterValues(prev => ({ ...prev, [key]: value }))
+  }, [])
 
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch =
-      log.service.toLowerCase().includes(searchValue.toLowerCase()) ||
-      log.message.toLowerCase().includes(searchValue.toLowerCase())
+  const filteredLogs = useMemo(
+    () =>
+      logs.filter(log => {
+        const search = debouncedSearch.toLowerCase()
+        const matchesSearch = log.service.toLowerCase().includes(search) || log.message.toLowerCase().includes(search)
 
-    const matchesFilters = Object.entries(filterValues).every(([key, value]) => {
-      if (!value) return true
-      if (key === 'level') return log.level === value
-      if (key === 'resolved') return log.resolved.toString() === value
+        const matchesFilters = Object.entries(filterValues).every(([key, value]) => {
+          if (!value) return true
+          if (key === 'level') return log.level === value
+          if (key === 'resolved') return log.resolved.toString() === value
 
-      return true
-    })
+          return true
+        })
 
-    return matchesSearch && matchesFilters
-  })
+        return matchesSearch && matchesFilters
+      }),
+    [logs, debouncedSearch, filterValues]
+  )
+
+  const columns = useMemo<GridColDef[]>(
+    () => [
+      {
+        field: 'level',
+        headerName: 'Level',
+        minWidth: 120,
+        flex: 0.5,
+        sortable: false,
+        renderCell: params => <LogLevelCell level={params.row.level} />
+      },
+      {
+        field: 'serviceMessage',
+        headerName: 'Service & Message',
+        minWidth: 320,
+        flex: 1.5,
+        sortable: false,
+        renderCell: params => <ServiceMessageCell service={params.row.service} message={params.row.message} />
+      },
+      {
+        field: 'details',
+        headerName: 'Details',
+        minWidth: 260,
+        flex: 1,
+        sortable: false
+      },
+      {
+        field: 'timestamp',
+        headerName: 'Timestamp',
+        minWidth: 180,
+        flex: 0.8,
+        valueFormatter: params => new Date(params.value as string).toLocaleString()
+      },
+      {
+        field: 'resolved',
+        headerName: 'Status',
+        minWidth: 170,
+        flex: 0.8,
+        sortable: false,
+        renderCell: params => <ResolvedCell resolved={params.row.resolved} onResolve={onResolve} id={params.row.id} />
+      }
+    ],
+    [onResolve]
+  )
 
   return (
-    <DataTable
-      rows={filteredLogs.map(log => ({
-        ...log,
-        level: <LogLevelCell level={log.level} />,
-        serviceMessage: <ServiceMessageCell service={log.service} message={log.message} />,
-        timestamp: new Date(log.timestamp).toLocaleString(),
-        resolved: <ResolvedCell resolved={log.resolved} onResolve={onResolve} id={log.id} />
-      }))}
-      searchValue={searchValue}
-      onSearchChange={setSearchValue}
-      filters={filters}
-      filterValues={filterValues}
-      onFilterChange={(key, value) => setFilterValues(prev => ({ ...prev, [key]: value }))}
-      emptyMessage='No system logs found'
-    >
-      <DataTable.Toolbar>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <DataTable.Search placeholder='Search system logs...' />
-            <DataTable.Filters />
-          </div>
-          <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
-            Export Logs
-          </Button>
-        </div>
-      </DataTable.Toolbar>
-      {columns.map(column => (
-        <DataTable.Column key={column.id} id={column.id} label={column.label} minWidth={column.minWidth} />
-      ))}
-    </DataTable>
+    <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden' }}>
+      <Box
+        sx={{
+          p: 3,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 2,
+          flexWrap: 'wrap'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <TextField
+            size='small'
+            placeholder='Search system logs...'
+            value={searchValue}
+            onChange={event => setSearchValue(event.target.value)}
+            sx={{ minWidth: 240 }}
+          />
+
+          <FormControl size='small' sx={{ minWidth: 140 }}>
+            <InputLabel>Level</InputLabel>
+            <Select
+              value={filterValues.level || ''}
+              label='Level'
+              onChange={event => handleFilterChange('level', event.target.value)}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='ERROR'>Error</MenuItem>
+              <MenuItem value='WARNING'>Warning</MenuItem>
+              <MenuItem value='INFO'>Info</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size='small' sx={{ minWidth: 140 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={filterValues.resolved || ''}
+              label='Status'
+              onChange={event => handleFilterChange('resolved', event.target.value)}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='false'>Open</MenuItem>
+              <MenuItem value='true'>Resolved</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Button variant='outlined' startIcon={<i className='ri-download-line' />} onClick={onExport}>
+          Export Logs
+        </Button>
+      </Box>
+
+      <Box sx={{ height: 560 }}>
+        <DataGrid
+          rows={filteredLogs}
+          columns={columns}
+          disableRowSelectionOnClick
+          pageSizeOptions={[10, 25, 50, 100]}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 25
+              }
+            }
+          }}
+          sx={{ border: 0 }}
+        />
+      </Box>
+    </Box>
   )
 }
 

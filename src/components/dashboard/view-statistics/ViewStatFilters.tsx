@@ -2,7 +2,7 @@ import { Box, Tabs, Tab, TextField } from '@mui/material'
 
 interface ViewStatFiltersProps {
   searchQuery: string
-  onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onSearchChange: (value: string) => void
   tabValue: number
   onTabChange: (_event: React.SyntheticEvent, newValue: number) => void
 }
@@ -16,7 +16,7 @@ const ViewStatFilters = ({ searchQuery, onSearchChange, tabValue, onTabChange }:
           variant='outlined'
           placeholder='Search by title or category...'
           value={searchQuery}
-          onChange={onSearchChange}
+          onChange={event => onSearchChange(event.target.value)}
           InputProps={{
             startAdornment: <i className='ri-search-line' style={{ marginRight: 8, color: '#666' }} />
           }}

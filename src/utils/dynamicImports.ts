@@ -1,6 +1,7 @@
-import type { ComponentType } from 'react'
+import { createElement, type ComponentType } from 'react'
 
 import dynamic from 'next/dynamic'
+import { Skeleton } from '@mui/material'
 
 /**
  * Enhanced dynamic import wrapper with loading states and error handling
@@ -9,14 +10,15 @@ export function createDynamicComponent<P = {}>(
   importFunction: () => Promise<{ default: ComponentType<P> }>,
   options: {
     loadingMessage?: string
+    loadingHeight?: number
     ssr?: boolean
     retryable?: boolean
   } = {}
 ) {
-  const { ssr = false } = options
+  const { ssr = false, loadingHeight = 200 } = options
 
   return dynamic(importFunction, {
-    loading: () => null, // Simplified loading
+    loading: () => createElement(Skeleton, { variant: 'rectangular', height: loadingHeight, sx: { borderRadius: 1 } }),
     ssr
   })
 }
@@ -38,6 +40,25 @@ export const DynamicSeasonModal = createDynamicComponent(() => import('@/compone
 
 export const DynamicVideoUploader = createDynamicComponent(() => import('@/components/shared/VideoUploader'), {
   loadingMessage: 'Loading uploader...',
+  loadingHeight: 240,
+  ssr: false
+})
+
+export const DynamicHLSVideoPlayer = createDynamicComponent(() => import('@/components/shared/HLSVideoPlayer'), {
+  loadingMessage: 'Loading video player...',
+  loadingHeight: 220,
+  ssr: false
+})
+
+export const DynamicBlogEditor = createDynamicComponent(() => import('@/components/textEditor/TextEditor'), {
+  loadingMessage: 'Loading editor...',
+  loadingHeight: 360,
+  ssr: false
+})
+
+export const DynamicApexChart = createDynamicComponent(() => import('@/libs/ApexCharts'), {
+  loadingMessage: 'Loading chart...',
+  loadingHeight: 220,
   ssr: false
 })
 

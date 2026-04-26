@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { useViewStatistics } from '@/hooks/useViewStatistics'
+import { useDebounce } from '@/hooks/useDebounce'
 
 interface UseViewStatisticsControllerParams {
   exportToExcel?: (data: any[], headers: string[], fileName: string, sheetName: string) => void
@@ -12,6 +13,8 @@ export function useViewStatisticsController({ exportToExcel }: UseViewStatistics
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 400)
 
   const router = useRouter()
 
@@ -24,7 +27,7 @@ export function useViewStatisticsController({ exportToExcel }: UseViewStatistics
     tabValue,
     page,
     rowsPerPage,
-    searchQuery
+    searchQuery: debouncedSearchQuery
   })
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -32,8 +35,8 @@ export function useViewStatisticsController({ exportToExcel }: UseViewStatistics
     setPage(0)
   }
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
     setPage(0)
   }
 

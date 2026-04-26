@@ -7,7 +7,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
 // Component Imports
-import HLSVideoPlayer from '@/components/shared/HLSVideoPlayer'
+import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
 
 interface TrailerSectionProps {
   trailer: string
@@ -75,7 +75,7 @@ const TrailerSection = ({ trailer, onTrailerChange, onRemoveTrailer }: TrailerSe
                 />
               ) : isHLSUrl(trailer) ? (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                  <HLSVideoPlayer src={trailer} controls />
+                  <DynamicHLSVideoPlayer src={trailer} controls />
                 </div>
               ) : (
                 <video

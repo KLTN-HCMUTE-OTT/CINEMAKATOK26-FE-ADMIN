@@ -8,7 +8,7 @@ import Heading from '@tiptap/extension-heading'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 
-import TextEditor from './TextEditor'
+import { DynamicBlogEditor } from '@/utils/dynamicImports'
 
 interface QuestionEditorProps {
   content: JSONContent | string
@@ -61,7 +61,7 @@ const BlogEditor: React.FC<QuestionEditorProps> = ({ content, onChange, editorRe
     }
   }, [content, editor])
 
-  return <TextEditor editor={editor} error={error} />
+  return <DynamicBlogEditor editor={editor} error={error} />
 }
 
 export default BlogEditor
