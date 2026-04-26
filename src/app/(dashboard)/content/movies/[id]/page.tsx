@@ -25,7 +25,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import { movieControllerFindOne, movieControllerDelete } from '@/api/movie'
 
 // Component Imports
-import HLSVideoPlayer from '@/components/shared/HLSVideoPlayer'
+import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
 
 // Config Imports
 import { getS3Url } from '@/configs/aws'
@@ -208,7 +208,7 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
                   >
                     {isHLSUrl(movie.video.videoUrl) ? (
                       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                        <HLSVideoPlayer
+                        <DynamicHLSVideoPlayer
                           src={getS3Url(movie.video.videoUrl)}
                           poster={movie.metaData?.thumbnail}
                           controls

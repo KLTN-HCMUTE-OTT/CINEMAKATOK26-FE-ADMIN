@@ -9,7 +9,7 @@ import type { BoxProps } from '@mui/material/Box'
 import type { Props } from 'react-apexcharts'
 
 // Component Imports
-import ReactApexcharts from '@/libs/ApexCharts'
+import { DynamicApexChart } from '@/utils/dynamicImports'
 
 type ApexChartWrapperProps = Props & {
   boxProps?: BoxProps
@@ -100,7 +100,7 @@ const AppReactApexCharts = (props: ApexChartWrapperProps) => {
 
   return (
     <ApexChartWrapper {...boxProps}>
-      <ReactApexcharts {...rest} />
+      <DynamicApexChart {...rest} />
     </ApexChartWrapper>
   )
 }

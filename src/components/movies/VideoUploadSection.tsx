@@ -8,7 +8,7 @@ import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 
 // Component Imports
-import HLSVideoPlayer from '@/components/shared/HLSVideoPlayer'
+import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
 
 // Utils
 import { getS3Url } from '@/configs/aws'
@@ -70,7 +70,7 @@ const VideoUploadSection = ({
             >
               {isHLSUrl(currentVideoUrl) ? (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                  <HLSVideoPlayer src={getS3Url(currentVideoUrl)} controls />
+                  <DynamicHLSVideoPlayer src={getS3Url(currentVideoUrl)} controls />
                 </div>
               ) : (
                 <video

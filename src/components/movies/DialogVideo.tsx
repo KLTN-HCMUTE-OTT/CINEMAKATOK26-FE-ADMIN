@@ -3,8 +3,8 @@ import React from 'react'
 // MUI Imports
 import { Dialog, DialogTitle, DialogContent, Box, Typography, Button } from '@mui/material'
 
-import HLSVideoPlayer from '../shared/HLSVideoPlayer'
 import { getS3Url } from '@/configs/aws'
+import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
 
 // Video Player Imports
 
@@ -48,7 +48,7 @@ export const DialogVideo = ({ title, video, thumbnailUrl, videoDialogOpen, setVi
           >
             {isHLSUrl(video.videoUrl) ? (
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                <HLSVideoPlayer src={getS3Url(video.videoUrl)} poster={thumbnailUrl} controls autoPlay />
+                <DynamicHLSVideoPlayer src={getS3Url(video.videoUrl)} poster={thumbnailUrl} controls autoPlay />
               </div>
             ) : (
               <video
