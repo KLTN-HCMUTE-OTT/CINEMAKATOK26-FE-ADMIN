@@ -60,7 +60,21 @@ module.exports = plugin(function () {}, {
         facebook: '#497ce2',
         twitter: '#1da1f2',
         github: '#272727',
-        googlePlus: '#db4437'
+        googlePlus: '#db4437',
+        'brand-50': '#f0f4ff',
+        'brand-100': '#dbe4ff',
+        'brand-200': '#bac8ff',
+        'brand-300': '#91a7ff',
+        'brand-400': '#748ffc',
+        'brand-500': '#3b5bdb',
+        'brand-600': '#364fc7',
+        'brand-700': '#3046a5',
+        'brand-800': '#253784',
+        'brand-900': '#1a237e',
+        'status-success': '#2e7d32',
+        'status-warning': '#e65100',
+        'status-error': '#c62828',
+        'status-info': '#0277bd'
       },
       zIndex: {
         header: 'var(--header-z-index)',

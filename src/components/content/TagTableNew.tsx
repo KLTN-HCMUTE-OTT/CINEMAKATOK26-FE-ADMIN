@@ -19,6 +19,7 @@ import {
   InputAdornment
 } from '@mui/material'
 import type { Tag } from '@/services'
+import { TableSkeleton } from '@/components/ui/Skeleton'
 
 interface TagTableNewProps {
   tags: Tag[]
@@ -32,6 +33,7 @@ interface TagTableNewProps {
   onAdd: () => void
   searchTerm: string
   onSearchChange: (value: string) => void
+  loading?: boolean
 }
 
 const TagTableNew = ({
@@ -45,7 +47,8 @@ const TagTableNew = ({
   onDelete,
   onAdd,
   searchTerm,
-  onSearchChange
+  onSearchChange,
+  loading = false
 }: TagTableNewProps) => {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -105,7 +108,9 @@ const TagTableNew = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {tags.length === 0 ? (
+            {loading ? (
+              <TableSkeleton rows={rowsPerPage} columns={4} />
+            ) : tags.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
                   <Typography variant='body2' color='text.secondary'>
