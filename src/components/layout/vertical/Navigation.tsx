@@ -62,7 +62,7 @@ const Navigation = () => {
   return (
     // eslint-disable-next-line lines-around-comment
     // Sidebar Vertical Menu
-    <VerticalNav customStyles={navigationCustomStyles(theme)}>
+    <VerticalNav customStyles={navigationCustomStyles(theme)} breakpoint='md'>
       {/* Nav Header including Logo & nav toggle icons  */}
       <NavHeader>
         <Link href='/'>

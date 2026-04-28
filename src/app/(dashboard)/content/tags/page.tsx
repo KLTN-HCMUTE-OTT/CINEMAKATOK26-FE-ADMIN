@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react'
 import {
   Box,
   Alert,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,6 +14,8 @@ import {
   DialogActions,
   Button
 } from '@mui/material'
+
+import { TableSkeleton } from '@/components/ui/Skeleton'
 
 // Components Imports
 import TagTableNew from '@/components/content/TagTableNew'
@@ -187,13 +188,7 @@ const TagsPage = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='400px'>
-        <CircularProgress />
-      </Box>
-    )
-  }
+
 
   return (
     <Box>
@@ -242,6 +237,7 @@ const TagsPage = () => {
         onAdd={handleOpenAddModal}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
+        loading={loading}
       />
 
       {/* Add/Edit Tag Modal */}

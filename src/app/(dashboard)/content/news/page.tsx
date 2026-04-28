@@ -34,6 +34,8 @@ import {
   DialogTitle
 } from '@mui/material'
 
+import { TableSkeleton } from '@/components/ui/Skeleton'
+
 import { newsControllerDeleteNews, newsControllerGetNews } from '@/api/news'
 
 const NewsPage = () => {
@@ -47,6 +49,7 @@ const NewsPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -70,7 +73,7 @@ const NewsPage = () => {
       const response = await newsControllerGetNews({
         page: page + 1,
         limit: rowsPerPage,
-        search: searchQuery
+        search: debouncedSearchQuery
       })
 
       if (response.data) {
@@ -89,20 +92,16 @@ const NewsPage = () => {
   useEffect(() => {
     fetchNews()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, debouncedSearchQuery])
 
-  // Handle search with debounce
+  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page === 0) {
-        fetchNews()
-      } else {
-        setPage(0)
-      }
+      setDebouncedSearchQuery(searchQuery)
+      setPage(0)
     }, 500)
 
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery])
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -234,14 +233,7 @@ const NewsPage = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} align='center' sx={{ py: 10 }}>
-                    <CircularProgress />
-                    <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
-                      Loading news...
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                <TableSkeleton rows={rowsPerPage} columns={6} />
               ) : news.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align='center' sx={{ py: 10 }}>
@@ -336,17 +328,15 @@ const NewsPage = () => {
         </TableContainer>
 
         {/* Pagination */}
-        {!loading && news.length > 0 && (
-          <TablePagination
-            component='div'
-            count={totalCount}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          />
-        )}
+        <TablePagination
+          component='div'
+          count={totalCount}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
       </Card>
 
       {/* Delete Confirmation Dialog */}

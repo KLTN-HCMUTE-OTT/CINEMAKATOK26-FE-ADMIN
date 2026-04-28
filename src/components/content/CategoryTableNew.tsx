@@ -19,6 +19,7 @@ import {
   InputAdornment
 } from '@mui/material'
 import type { Category } from '@/services'
+import { TableSkeleton } from '@/components/ui/Skeleton'
 
 interface CategoryTableNewProps {
   categories: Category[]
@@ -32,6 +33,7 @@ interface CategoryTableNewProps {
   onAdd: () => void
   searchTerm: string
   onSearchChange: (value: string) => void
+  loading?: boolean
 }
 
 const CategoryTableNew = ({
@@ -45,7 +47,8 @@ const CategoryTableNew = ({
   onDelete,
   onAdd,
   searchTerm,
-  onSearchChange
+  onSearchChange,
+  loading = false
 }: CategoryTableNewProps) => {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -105,7 +108,9 @@ const CategoryTableNew = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {categories.length === 0 ? (
+            {loading ? (
+              <TableSkeleton rows={rowsPerPage} columns={4} />
+            ) : categories.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
                   <Typography variant='body2' color='text.secondary'>

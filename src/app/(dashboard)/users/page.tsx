@@ -21,6 +21,8 @@ import {
   CircularProgress
 } from '@mui/material'
 
+import { FormSkeleton } from '@/components/ui/Skeleton'
+
 // Components Imports
 import DataTable from '@components/shared/DataTable'
 import StatusBadge from '@components/shared/StatusBadge'
@@ -313,9 +315,7 @@ const UsersPage = () => {
 
           <TabPanel value={tabValue} index={0}>
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                <CircularProgress />
-              </Box>
+              <FormSkeleton fields={6} />
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -402,9 +402,7 @@ const UsersPage = () => {
 
           <TabPanel value={tabValue} index={1}>
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                <CircularProgress />
-              </Box>
+              <FormSkeleton fields={3} />
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
