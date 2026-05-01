@@ -23,6 +23,9 @@ export const privateEnv = {
   RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
 
+  // Monitoring
+  SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
+
   // Development
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
   ENABLE_PERFORMANCE_MONITORING: process.env.ENABLE_PERFORMANCE_MONITORING === 'true'

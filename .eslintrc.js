@@ -1,6 +1,30 @@
 module.exports = {
-  extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended', 'plugin:import/recommended', 'prettier'],
+  extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended', 'plugin:import/recommended', 'plugin:boundaries/recommended', 'prettier'],
+  plugins: ['boundaries'],
   rules: {
+    'boundaries/element-types': [
+      'warn',
+      {
+        default: 'allow',
+        rules: [
+          {
+            from: 'features',
+            disallow: ['features'],
+            message: 'Features must not import from other features directly. Use shared code instead.'
+          },
+          {
+            from: 'components',
+            disallow: ['features'],
+            message: 'Components must not import from features.'
+          },
+          {
+            from: 'lib',
+            disallow: ['features', 'components'],
+            message: 'Libs must not import from features or components.'
+          }
+        ]
+      }
+    ],
     'jsx-a11y/alt-text': 'off',
     'react/display-name': 'off',
     'react/no-children-prop': 'off',
@@ -114,7 +138,16 @@ module.exports = {
       typescript: {
         project: './tsconfig.json'
       }
-    }
+    },
+    'boundaries/elements': [
+      { type: 'features', pattern: 'src/features/*' },
+      { type: 'components', pattern: 'src/components/*' },
+      { type: 'lib', pattern: ['src/lib/*', 'src/libs/*', 'src/utils/*'] },
+      { type: 'hooks', pattern: 'src/hooks/*' },
+      { type: 'store', pattern: 'src/store/*' },
+      { type: 'api', pattern: 'src/api/*' },
+      { type: 'app', pattern: 'src/app/*' }
+    ]
   },
   overrides: [
     {

@@ -8,7 +8,7 @@ import { createContext, useMemo, useState } from 'react'
 import type { Mode } from '@core/types'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@/configs/themeConfig'
 
 // Hook Imports
 import { useObjectCookie } from '@core/hooks/useObjectCookie'

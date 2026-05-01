@@ -26,8 +26,8 @@ import type { ChildrenType, Direction } from '@core/types'
 import ModeChanger from './ModeChanger'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
-import primaryColorConfig from '@configs/primaryColorConfig'
+import themeConfig from '@/configs/themeConfig'
+import primaryColorConfig from '@/configs/primaryColorConfig'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'

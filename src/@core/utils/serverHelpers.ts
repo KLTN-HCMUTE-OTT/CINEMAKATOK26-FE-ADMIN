@@ -8,7 +8,7 @@ import type { Settings } from '@core/contexts/settingsContext'
 import type { SystemMode } from '@core/types'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@/configs/themeConfig'
 
 export const getSettingsFromCookie = (): Settings => {
   const cookieStore = cookies()
