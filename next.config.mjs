@@ -34,7 +34,7 @@ const nextConfig = {
     return config
   },
 
-  // Headers for security and performance
+  // Headers for caching — CSP is handled by middleware (nonce-based)
   async headers() {
     return [
       {
@@ -47,20 +47,6 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=3600, s-maxage=86400'
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.youtube-nocookie.com",
-              "style-src 'self' 'unsafe-inline'",
-              `img-src 'self' data: blob: https://res.cloudinary.com https:`,
-              "font-src 'self' data:",
-              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'https:'} wss:`,
-              "media-src 'self' https: blob: data:",
-              "frame-ancestors 'none'"
-            ].join('; ')
           }
         ]
       },
