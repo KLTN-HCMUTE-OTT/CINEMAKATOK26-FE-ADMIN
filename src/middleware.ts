@@ -8,35 +8,41 @@ const PUBLIC_ROUTES = ['/login', '/forgot-password', '/error', '/under-maintenan
 
 // Rate limiting configuration
 const RATE_LIMITS = {
-  '/api/': { maxRequests: 50, windowMs: 60000 }, // 50 requests per minute for API
-  '/api/auth/': { maxRequests: 5, windowMs: 60000 }, // 5 auth requests per minute
-  '/api/upload': { maxRequests: 10, windowMs: 300000 } // 10 uploads per 5 minutes
+  '/api/': { maxRequests: 50, windowMs: 60000 },
+  '/api/auth/': { maxRequests: 5, windowMs: 60000 },
+  '/api/upload': { maxRequests: 10, windowMs: 300000 }
 } as const
 
-// Security headers configuration
-const SECURITY_HEADERS = {
-  // CSRF Protection
+const STATIC_SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+}
 
-  // Content Security Policy
-  'Content-Security-Policy': [
+const IS_DEV = process.env.NODE_ENV === 'development'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+function buildCsp(nonce: string): string {
+  const scriptSrc = IS_DEV
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'`
+
+  return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+    scriptSrc,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob:",
+    `img-src 'self' data: blob: https://res.cloudinary.com https:`,
     "media-src 'self' blob:",
-    "connect-src 'self' https://cinematok2-bucket.s3.ap-southeast-1.amazonaws.com  https://www.youtube-nocookie.com http://localhost:3000 http://localhost:3001 https://veezy.shop http://127.0.0.1:3000 http://127.0.0.1:3001 https://api.github.com https://api.cloudinary.com wss:",
+    `connect-src 'self' ${API_URL} https://cinematok2-bucket.s3.ap-southeast-1.amazonaws.com https://www.youtube-nocookie.com https://veezy.shop https://api.cloudinary.com wss:`,
     "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'"
   ].join('; ')
-} as const
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -49,8 +55,6 @@ export function middleware(request: NextRequest) {
 
   // Authentication check for protected routes
   if (!isPublicRoute && !isStaticAsset && !isAuthApiRoute) {
-    // In Next.js middleware, we can't access localStorage directly
-    // We need to check for authentication token in cookies or headers
     const hasAuthCookie = request.cookies.has('accessToken')
 
     if (!hasAuthCookie) {
@@ -76,20 +80,29 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.next()
-  const clientIP2 = request.ip || request.headers.get('X-Forwarded-For') || 'unknown'
+  // Generate per-request nonce for CSP
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
 
-  // Apply security headers to all responses
-  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+  const requestHeaders = new Headers(request.headers)
+
+  requestHeaders.set('x-nonce', nonce)
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } })
+
+  // Apply static security headers
+  Object.entries(STATIC_SECURITY_HEADERS).forEach(([key, value]) => {
     response.headers.set(key, value)
   })
+
+  // Apply nonce-based CSP
+  response.headers.set('Content-Security-Policy', buildCsp(nonce))
 
   // Rate limiting for API routes
   if (pathname.startsWith('/api/')) {
     const rateLimitConfig =
       Object.entries(RATE_LIMITS).find(([path]) => pathname.startsWith(path))?.[1] || RATE_LIMITS['/api/']
 
-    const identifier = `${clientIP2}:${pathname}`
+    const identifier = `${clientIP}:${pathname}`
     const rateLimit = SecurityUtils.checkRateLimit(identifier, rateLimitConfig.maxRequests, rateLimitConfig.windowMs)
 
     // Add rate limit headers
@@ -109,7 +122,7 @@ export function middleware(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
             'Retry-After': Math.ceil((rateLimit.resetTime - Date.now()) / 1000).toString(),
-            ...Object.fromEntries(Object.entries(SECURITY_HEADERS))
+            ...STATIC_SECURITY_HEADERS
           }
         }
       )
@@ -121,7 +134,6 @@ export function middleware(request: NextRequest) {
     const origin = request.headers.get('origin')
     const host = request.headers.get('host')
 
-    // Check if origin matches host (basic CSRF protection)
     if (origin && host && !origin.endsWith(host)) {
       return new NextResponse(
         JSON.stringify({
@@ -132,13 +144,12 @@ export function middleware(request: NextRequest) {
           status: 403,
           headers: {
             'Content-Type': 'application/json',
-            ...Object.fromEntries(Object.entries(SECURITY_HEADERS))
+            ...STATIC_SECURITY_HEADERS
           }
         }
       )
     }
 
-    // For API routes, require CSRF token
     if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/')) {
       const csrfToken = request.headers.get('X-CSRF-Token')
       const sessionCsrf = request.cookies.get('csrf-token')?.value
@@ -153,7 +164,7 @@ export function middleware(request: NextRequest) {
             status: 403,
             headers: {
               'Content-Type': 'application/json',
-              ...Object.fromEntries(Object.entries(SECURITY_HEADERS))
+              ...STATIC_SECURITY_HEADERS
             }
           }
         )
@@ -161,9 +172,8 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Log security events (in production, send to monitoring service)
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Security] ${request.method} ${pathname} from ${clientIP2}`)
+  if (IS_DEV) {
+    console.log(`[Security] ${request.method} ${pathname} from ${clientIP}`)
   }
 
   return response

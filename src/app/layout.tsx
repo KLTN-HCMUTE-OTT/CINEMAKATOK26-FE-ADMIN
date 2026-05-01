@@ -1,6 +1,8 @@
 // Third-party Imports
 import 'react-perfect-scrollbar/dist/css/styles.css'
 
+import { headers } from 'next/headers'
+
 // Type Imports
 import type { ChildrenType } from '@core/types'
 
@@ -23,12 +25,14 @@ export const metadata = {
 }
 
 const RootLayout = ({ children }: ChildrenType) => {
-  // Vars
+  const nonce = headers().get('x-nonce') ?? undefined
   const direction = 'ltr'
 
   return (
     <html id='__next' dir={direction}>
-      <body className='flex is-full min-bs-full flex-auto flex-col'>{children}</body>
+      <body className='flex is-full min-bs-full flex-auto flex-col' nonce={nonce}>
+        {children}
+      </body>
     </html>
   )
 }
