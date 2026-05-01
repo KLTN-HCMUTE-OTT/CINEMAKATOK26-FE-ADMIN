@@ -11,7 +11,7 @@ import Button from '@mui/material/Button'
 import classnames from 'classnames'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@/configs/themeConfig'
 
 // Style Imports
 import styles from './styles.module.css'

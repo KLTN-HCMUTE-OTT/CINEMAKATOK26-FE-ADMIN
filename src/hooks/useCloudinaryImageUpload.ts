@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@configs/cloudinary'
+import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
 
 export const useCloudinaryImageUpload = () => {
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false)

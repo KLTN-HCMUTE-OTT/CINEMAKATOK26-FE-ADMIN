@@ -37,17 +37,11 @@
       "@menu/*": [
         "./src/@menu/*"
       ],
-      "@assets/*": [
-        "./src/assets/*"
-      ],
       "@components/*": [
         "./src/components/*"
       ],
-      "@configs/*": [
-        "./src/configs/*"
-      ],
-      "@views/*": [
-        "./src/views/*"
+      "@features/*": [
+        "./src/features/*"
       ]
     }
   },

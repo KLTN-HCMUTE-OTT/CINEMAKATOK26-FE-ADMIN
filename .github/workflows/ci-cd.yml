@@ -39,6 +39,9 @@ jobs:
 
       - name: Type check
         run: pnpm tsc --noEmit
+
+      - name: Bundle size check
+        run: pnpm check:bundle
         continue-on-error: true
 
       - name: Security audit

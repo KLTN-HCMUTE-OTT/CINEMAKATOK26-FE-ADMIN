@@ -2,7 +2,7 @@
 import type { Theme } from '@mui/material/styles'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@/configs/themeConfig'
 
 const iconStyles = (size?: string) => ({
   '& > *:nth-of-type(1)': {
