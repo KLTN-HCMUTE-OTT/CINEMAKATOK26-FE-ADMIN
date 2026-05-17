@@ -6,6 +6,7 @@ import type { ErrorInfo, ReactNode } from 'react'
 import { Box, Typography, Button, Card, CardContent, Alert, Collapse } from '@mui/material'
 
 import { config } from '@/configs/env'
+import { ErrorMonitoring } from '@/utils/monitoring'
 
 interface Props {
   children: ReactNode
@@ -44,43 +45,27 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to console in development
     if (config.isDevelopment) {
       console.error('ErrorBoundary caught an error:', error, errorInfo)
     }
 
-    // Update state with error details
-    this.setState({
-      error,
-      errorInfo
-    })
+    this.setState({ error, errorInfo })
 
-    // Call custom error handler if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo)
     }
 
-    // Report error to monitoring service in production
-    if (config.isProduction) {
-      this.reportError(error, errorInfo)
-    }
+    ErrorMonitoring.captureError(error, {
+      action: 'error-boundary',
+      route: typeof window !== 'undefined' ? window.location.pathname : undefined,
+      metadata: { componentStack: errorInfo.componentStack }
+    })
   }
 
-  private reportError = (error: Error, errorInfo: ErrorInfo) => {
-    // In a real app, you would send this to your error monitoring service
-    const errorReport = {
-      message: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Unknown',
-      url: typeof window !== 'undefined' ? window.location.href : 'Unknown'
+  private handleGoHome = () => {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'
     }
-
-    // Example: Send to monitoring service
-    // Sentry.captureException(error, { contexts: { react: errorInfo } })
-
-    console.error('Error report:', errorReport)
   }
 
   private handleReload = () => {
@@ -142,6 +127,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Button variant='contained' color='primary' onClick={this.handleReload}>
                   Reload Page
+                </Button>
+
+                <Button variant='outlined' onClick={this.handleGoHome}>
+                  Go Home
                 </Button>
 
                 <Button variant='outlined' onClick={this.handleReset}>

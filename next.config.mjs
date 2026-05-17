@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs'
 import bundleAnalyzer from '@next/bundle-analyzer'
 
 /** @type {import('next').NextConfig} */
@@ -33,7 +34,7 @@ const nextConfig = {
     return config
   },
 
-  // Headers for security and performance
+  // Headers for caching — CSP is handled by middleware (nonce-based)
   async headers() {
     return [
       {
@@ -46,11 +47,6 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=3600, s-maxage=86400'
-          },
-          {
-            key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https: wss:; media-src 'self' https: blob: data:;"
           }
         ]
       },
@@ -73,4 +69,15 @@ const withBundleAnalyzer = bundleAnalyzer({
   openAnalyzer: true
 })
 
-export default withBundleAnalyzer(nextConfig)
+const configWithPlugins = withBundleAnalyzer(nextConfig)
+
+export default withSentryConfig(configWithPlugins, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  disableServerWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
+  disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true
+})

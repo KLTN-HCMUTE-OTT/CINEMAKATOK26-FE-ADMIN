@@ -4,7 +4,8 @@ module.exports = {
       startServerCommand: 'pnpm start',
       startServerReadyPattern: /Ready in/i,
       startServerReadyTimeout: 30000,
-      url: ['http://localhost:3005', 'http://localhost:3005/users', 'http://localhost:3005/analytics'],
+      url: ['http://localhost:3011', 'http://localhost:3011/users', 'http://localhost:3011/analytics'],
+      budgetPath: './lighthouse-budget.json',
       numberOfRuns: 3,
       settings: {
         chromeFlags: '--no-sandbox --disable-setuid-sandbox --headless'

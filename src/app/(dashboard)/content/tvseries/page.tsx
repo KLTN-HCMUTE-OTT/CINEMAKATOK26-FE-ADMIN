@@ -23,11 +23,12 @@ import {
   Chip,
   TextField,
   InputAdornment,
-  CircularProgress,
   Alert,
   Avatar,
   Collapse
 } from '@mui/material'
+
+import { TableSkeleton } from '@/components/ui/Skeleton'
 
 // API Imports
 import { tvSeriesControllerGetTvSeries, tvSeriesControllerDeleteTvSeries } from '@/api/tvSeries'
@@ -43,6 +44,7 @@ const TVseriesPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
 
   // Expandable state
   const [expandedSeries, setExpandedSeries] = useState<string | null>(null)
@@ -57,7 +59,7 @@ const TVseriesPage = () => {
       const response = await tvSeriesControllerGetTvSeries({
         page: page + 1,
         limit: rowsPerPage,
-        search: searchQuery || undefined
+        search: debouncedSearchQuery || undefined
       })
 
       if (response.data) {
@@ -76,20 +78,16 @@ const TVseriesPage = () => {
   useEffect(() => {
     fetchTVseries()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, debouncedSearchQuery])
 
-  // Handle search with debounce
+  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page === 0) {
-        fetchTVseries()
-      } else {
-        setPage(0)
-      }
+      setDebouncedSearchQuery(searchQuery)
+      setPage(0)
     }, 500)
 
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery])
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -207,14 +205,7 @@ const TVseriesPage = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 10 }}>
-                    <CircularProgress />
-                    <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
-                      Loading TV series...
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                <TableSkeleton rows={rowsPerPage} columns={7} />
               ) : tvSeries.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align='center' sx={{ py: 10 }}>
@@ -428,17 +419,15 @@ const TVseriesPage = () => {
         </TableContainer>
 
         {/* Pagination */}
-        {!loading && tvSeries.length > 0 && (
-          <TablePagination
-            component='div'
-            count={totalCount}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          />
-        )}
+        <TablePagination
+          component='div'
+          count={totalCount}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
       </Card>
     </Box>
   )

@@ -1,10 +1,7 @@
-import { privateEnv, config } from '@/configs/env'
-import { logger } from './logger'
+import * as Sentry from '@sentry/nextjs'
 
-/**
- * Error monitoring and analytics integration
- * Supports Sentry, LogRocket, and custom monitoring services
- */
+import { config } from '@/configs/env'
+import { logger } from './logger'
 
 interface ErrorContext {
   userId?: string
@@ -21,31 +18,15 @@ interface PerformanceMetric {
   tags?: Record<string, string>
 }
 
-/**
- * Error monitoring service
- */
 export class ErrorMonitoring {
   private static isInitialized = false
 
-  /**
-   * Initialize error monitoring service
-   */
   static async initialize(): Promise<void> {
     if (this.isInitialized || !config.isProduction) {
       return
     }
 
     try {
-      // Initialize Sentry if DSN is provided
-      if (privateEnv.SENTRY_DSN) {
-        await this.initializeSentry()
-      }
-
-      // Initialize other monitoring services here
-      // if (privateEnv.LOGROCKET_APP_ID) {
-      //   await this.initializeLogRocket()
-      // }
-
       this.isInitialized = true
       logger.info('Error monitoring initialized successfully')
     } catch (error) {
@@ -53,84 +34,51 @@ export class ErrorMonitoring {
     }
   }
 
-  /**
-   * Initialize Sentry error monitoring
-   */
-  private static async initializeSentry(): Promise<void> {
-    try {
-      // In a real implementation, you would import and configure Sentry here
-      // const Sentry = await import('@sentry/nextjs')
-      //
-      // Sentry.init({
-      //   dsn: privateEnv.SENTRY_DSN,
-      //   environment: process.env.NODE_ENV,
-      //   tracesSampleRate: config.isDevelopment ? 1.0 : 0.1,
-      //   beforeSend(event) {
-      //     // Filter out sensitive information
-      //     return this.sanitizeErrorEvent(event)
-      //   }
-      // })
-
-      logger.info('Sentry monitoring configured')
-    } catch (error) {
-      logger.error('Failed to initialize Sentry', error as Error)
-    }
-  }
-
-  /**
-   * Capture and report an error
-   */
   static captureError(error: Error, context?: ErrorContext): void {
     if (!config.isProduction) {
       logger.error('Error captured', error, context)
-      
-return
+
+      return
     }
 
     try {
-      // Send to Sentry
-      // Sentry.captureException(error, {
-      //   user: context?.userId ? { id: context.userId } : undefined,
-      //   tags: {
-      //     route: context?.route,
-      //     action: context?.action
-      //   },
-      //   extra: context?.metadata
-      // })
+      Sentry.captureException(error, {
+        user: context?.userId ? { id: context.userId } : undefined,
+        tags: {
+          route: context?.route,
+          action: context?.action
+        },
+        extra: context?.metadata
+      })
 
-      // Log to our structured logger
       logger.error('Application error', error, {
         ...context,
         errorType: 'application',
         captured: true
       })
     } catch (monitoringError) {
-      // Fallback logging if monitoring fails
       console.error('Failed to capture error in monitoring service:', monitoringError)
       console.error('Original error:', error)
     }
   }
 
-  /**
-   * Capture a message (non-error)
-   */
   static captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: ErrorContext): void {
     if (!config.isProduction) {
       logger.info(`Message captured: ${message}`, context)
-      
-return
+
+      return
     }
 
     try {
-      // Send to Sentry
-      // Sentry.captureMessage(message, level, {
-      //   user: context?.userId ? { id: context.userId } : undefined,
-      //   tags: {
-      //     route: context?.route,
-      //     action: context?.action
-      //   },
-      //   extra: context?.metadata
-      // })
+      Sentry.captureMessage(message, {
+        level: level === 'warning' ? 'warning' : level,
+        user: context?.userId ? { id: context.userId } : undefined,
+        tags: {
+          route: context?.route,
+          action: context?.action
+        },
+        extra: context?.metadata
+      })
 
       logger.info(message, {
         ...context,
@@ -142,34 +90,22 @@ return
     }
   }
 
-  /**
-   * Set user context for error tracking
-   */
   static setUserContext(userId: string, email?: string, username?: string): void {
     try {
-      // Sentry.setUser({
-      //   id: userId,
-      //   email,
-      //   username
-      // })
-
-      logger.info('User context set for monitoring', { userId, email, username })
+      Sentry.setUser({ id: userId, email, username })
     } catch (error) {
       logger.error('Failed to set user context', error as Error)
     }
   }
 
-  /**
-   * Add breadcrumb for debugging
-   */
   static addBreadcrumb(message: string, category: string = 'user', data?: Record<string, any>): void {
     try {
-      // Sentry.addBreadcrumb({
-      //   message,
-      //   category,
-      //   data,
-      //   timestamp: Date.now() / 1000
-      // })
+      Sentry.addBreadcrumb({
+        message,
+        category,
+        data,
+        timestamp: Date.now() / 1000
+      })
 
       logger.debug(`Breadcrumb: ${message}`, { category, data })
     } catch (error) {
@@ -177,21 +113,17 @@ return
     }
   }
 
-  /**
-   * Track performance metric
-   */
   static trackPerformance(metric: PerformanceMetric): void {
     try {
-      // Send to monitoring service
-      // Sentry.addBreadcrumb({
-      //   message: `Performance: ${metric.name}`,
-      //   category: 'performance',
-      //   data: {
-      //     value: metric.value,
-      //     unit: metric.unit,
-      //     ...metric.tags
-      //   }
-      // })
+      Sentry.addBreadcrumb({
+        message: `Performance: ${metric.name}`,
+        category: 'performance',
+        data: {
+          value: metric.value,
+          unit: metric.unit,
+          ...metric.tags
+        }
+      })
 
       logger.performance(metric.name, metric.value, metric.unit, metric.tags)
     } catch (error) {
@@ -199,11 +131,7 @@ return
     }
   }
 
-  /**
-   * Sanitize error event before sending (remove sensitive data)
-   */
   private static sanitizeErrorEvent(event: any): any {
-    // Remove sensitive information from error events
     const sensitiveKeys = ['password', 'token', 'secret', 'key', 'authorization']
 
     const sanitize = (obj: any): any => {

@@ -10,7 +10,7 @@ import styled from '@emotion/styled'
 import MaterioLogo from '@core/svg/Logo'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@/configs/themeConfig'
 
 type LogoTextProps = {
   color?: CSSProperties['color']

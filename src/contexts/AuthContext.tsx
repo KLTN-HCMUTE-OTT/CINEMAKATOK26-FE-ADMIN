@@ -13,6 +13,7 @@ interface User {
   name: string
   avatar: string | null
   isAdmin: boolean
+  roles?: string[]
 }
 
 interface AuthContextType {

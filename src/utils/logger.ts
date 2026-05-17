@@ -136,14 +136,16 @@ export class Logger {
     if (!this.config.enableRemote) return
 
     try {
-      // In a real implementation, send to monitoring service like Sentry, LogRocket, etc.
-      // Example: await fetch('/api/logs', { method: 'POST', body: JSON.stringify(entry) })
+      const Sentry = await import('@sentry/nextjs')
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Would send to remote logging service:', entry)
+      if (entry.level === LogLevel.ERROR) {
+        Sentry.captureException(entry.metadata?.stack ? new Error(entry.message) : entry.message, {
+          extra: entry.metadata
+        })
+      } else if (entry.level === LogLevel.WARN) {
+        Sentry.captureMessage(entry.message, { level: 'warning', extra: entry.metadata })
       }
     } catch (error) {
-      // Avoid infinite loops - don't log errors from the logger itself
       console.error('Failed to send log to remote service:', error)
     }
   }

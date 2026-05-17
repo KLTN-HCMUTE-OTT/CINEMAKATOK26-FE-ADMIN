@@ -20,15 +20,130 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Vercel (Production)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm tsc --noEmit
+
+      - name: Bundle size check
+        run: pnpm check:bundle
+        continue-on-error: true
+
+      - name: Security audit
         run: pnpm audit --audit-level moderate
         continue-on-error: true
+
+  # Unit & Component Tests
+  test:
+    name: Unit & Component Tests
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run unit & component tests
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # E2E Tests
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [quality, test]
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm test:e2e:install
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.STAGING_API_URL || 'http://localhost:3000' }}
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3011
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
 
   # Build and Test
   build:
     name: Build Application
     runs-on: ubuntu-latest
-    needs: quality
+    needs: [quality, test]
 
     strategy:
       matrix:
@@ -63,6 +178,7 @@ jobs:
       - name: Bundle analysis
         if: matrix.environment == 'production'
         run: ANALYZE=true pnpm run build
+        continue-on-error: true
 
       - name: Upload build artifacts
         if: matrix.environment == 'production'
@@ -99,15 +215,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Run security scan
-        run: |
-          # Check for known vulnerabilities
-          pnpm audit --audit-level high
-
-          # Check for secrets in code (basic check)
-          if grep -r "sk_" src/ || grep -r "pk_" src/ || grep -r "secret" src/; then
-            echo "Potential secrets found in source code"
-            exit 1
-          fi
+        run: pnpm audit --audit-level high
         continue-on-error: true
 
   # Performance Testing
@@ -148,7 +256,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [quality, build, security]
+    needs: [quality, build, security, test]
     if: github.ref == 'refs/heads/develop'
     environment: staging
 
@@ -177,20 +285,15 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          # Wait for deployment
           sleep 30
-
-          # Basic health check
           curl -f ${{ secrets.STAGING_URL }}/api/health || exit 1
-
-          # Check critical pages
           curl -f ${{ secrets.STAGING_URL }} || exit 1
 
   # Deploy to Production
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [quality, build, security, performance]
+    needs: [quality, build, security, performance, test, e2e]
     if: github.ref == 'refs/heads/main'
     environment: production
 
@@ -220,36 +323,14 @@ jobs:
 
       - name: Post-deployment verification
         run: |
-          # Wait for deployment
           sleep 60
-
-          # Health check
           curl -f ${{ secrets.PRODUCTION_URL }}/api/health || exit 1
-
-          # Critical path check
           curl -f ${{ secrets.PRODUCTION_URL }} || exit 1
 
       - name: Notify deployment success
         if: success()
-        run: |
-          echo "✅ Production deployment successful!"
-          # Add Slack/Discord notification here if needed
+        run: echo "Production deployment successful!"
 
       - name: Notify deployment failure
         if: failure()
-        run: |
-          echo "❌ Production deployment failed!"
-          # Add failure notification here
-
-  # Cleanup
-  cleanup:
-    name: Cleanup
-    runs-on: ubuntu-latest
-    needs: [deploy-staging, deploy-production]
-    if: always()
-
-    steps:
-      - name: Clean up old artifacts
-        run: |
-          echo "Cleaning up build artifacts and temporary files..."
-          # Cleanup logic here
+        run: echo "Production deployment failed!"

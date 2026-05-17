@@ -23,10 +23,11 @@ import {
   Chip,
   TextField,
   InputAdornment,
-  CircularProgress,
   Alert,
   Avatar
 } from '@mui/material'
+
+import { TableSkeleton } from '@/components/ui/Skeleton'
 
 // API Imports
 import { moviesControllerGetMovies, moviesControllerDeleteMovie } from '@/api/movies'
@@ -42,6 +43,7 @@ const MoviesPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
 
   // Fetch movies
   const fetchMovies = async () => {
@@ -52,7 +54,7 @@ const MoviesPage = () => {
       const response = await moviesControllerGetMovies({
         page: page + 1, // API uses 1-based indexing
         limit: rowsPerPage,
-        search: searchQuery ? JSON.stringify({ title: searchQuery }) : undefined
+        search: debouncedSearchQuery ? JSON.stringify({ title: debouncedSearchQuery }) : undefined
       })
 
       if (response.data) {
@@ -71,20 +73,16 @@ const MoviesPage = () => {
   useEffect(() => {
     fetchMovies()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, debouncedSearchQuery])
 
-  // Handle search with debounce
+  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page === 0) {
-        fetchMovies()
-      } else {
-        setPage(0) // Reset to first page, which will trigger fetchMovies
-      }
+      setDebouncedSearchQuery(searchQuery)
+      setPage(0) // Reset to first page when search changes
     }, 500)
 
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery])
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -187,14 +185,7 @@ const MoviesPage = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 10 }}>
-                    <CircularProgress />
-                    <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
-                      Loading movies...
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                <TableSkeleton rows={rowsPerPage} columns={7} />
               ) : movies.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align='center' sx={{ py: 10 }}>
@@ -282,17 +273,15 @@ const MoviesPage = () => {
         </TableContainer>
 
         {/* Pagination */}
-        {!loading && movies.length > 0 && (
-          <TablePagination
-            component='div'
-            count={totalCount}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          />
-        )}
+        <TablePagination
+          component='div'
+          count={totalCount}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
       </Card>
     </Box>
   )
