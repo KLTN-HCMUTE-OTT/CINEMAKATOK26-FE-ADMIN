@@ -95,6 +95,9 @@ const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectSc
           <MenuItem href='/reports' icon={<i className='ri-flag-line' />}>
             Reports
           </MenuItem>
+          <MenuItem href='/watch-party' icon={<i className='ri-tv-2-line' />}>
+            Watch Party
+          </MenuItem>
         </MenuSection>
 
         <MenuSection label='Marketing & Engagement'>

@@ -10,7 +10,7 @@ import type { ChildrenType } from '@core/types'
 import '@/app/globals.css'
 
 // Generated Icon CSS Imports
-import '@assets/iconify-icons/generated-icons.css'
+import '@/assets/iconify-icons/generated-icons.css'
 
 // Env validation
 import { validatePublicEnv } from '@/configs/env'
