@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Alert, Box, Button, Typography } from '@mui/material'
 
 import { useWatchPartyManagement } from '@/hooks/useWatchPartyManagement'
@@ -12,6 +13,7 @@ import KickMemberDialog from '@/components/dashboard/watch-party/KickMemberDialo
 import BanUserDialog from '@/components/dashboard/watch-party/BanUserDialog'
 
 const WatchPartyPage = () => {
+  const router = useRouter()
   const {
     roomsWithHost,
     roomDetail,
@@ -77,6 +79,10 @@ const WatchPartyPage = () => {
   const handleForceClose = (room: API.RoomListItemDto) => {
     setSelectedRoom(room)
     setCloseDialogOpen(true)
+  }
+
+  const handleWatchLive = (room: API.RoomListItemDto) => {
+    router.push(`/watch-party/${room.roomId}`)
   }
 
   const handleKickMember = (member: API.WatchPartyMember) => {
@@ -147,6 +153,7 @@ const WatchPartyPage = () => {
         onRowsPerPageChange={handleRowsPerPageChange}
         onViewDetails={handleViewDetails}
         onForceClose={handleForceClose}
+        onWatchLive={handleWatchLive}
       />
 
       {/* Room Detail Dialog */}

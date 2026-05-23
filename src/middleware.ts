@@ -36,7 +36,7 @@ function buildCsp(nonce: string): string {
     "font-src 'self' https://fonts.gstatic.com",
     `img-src 'self' data: blob: https://res.cloudinary.com https:`,
     "media-src 'self' blob:",
-    `connect-src 'self' ${API_URL} https://cinematok2-bucket.s3.ap-southeast-1.amazonaws.com https://www.youtube-nocookie.com https://veezy.shop https://api.cloudinary.com wss:`,
+    `connect-src 'self' ${API_URL} https://cinematok2-bucket.s3.ap-southeast-1.amazonaws.com https://www.youtube-nocookie.com https://veezy.shop https://api.cloudinary.com wss: ws:`,
     "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",

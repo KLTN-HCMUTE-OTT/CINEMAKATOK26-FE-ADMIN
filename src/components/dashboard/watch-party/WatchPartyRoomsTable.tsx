@@ -21,6 +21,7 @@ interface WatchPartyRoomsTableProps {
   onRowsPerPageChange: (rowsPerPage: number) => void
   onViewDetails: (room: RoomWithHost) => void
   onForceClose: (room: RoomWithHost) => void
+  onWatchLive?: (room: RoomWithHost) => void
 }
 
 const formatRelativeTime = (epochMs: number) => {
@@ -36,11 +37,13 @@ const formatRelativeTime = (epochMs: number) => {
 const RoomActionsCell = ({
   room,
   onViewDetails,
-  onForceClose
+  onForceClose,
+  onWatchLive
 }: {
   room: RoomWithHost
   onViewDetails: (room: RoomWithHost) => void
   onForceClose: (room: RoomWithHost) => void
+  onWatchLive?: (room: RoomWithHost) => void
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -50,15 +53,17 @@ const RoomActionsCell = ({
         <i className='ri-more-2-line' />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-        <MenuItem
-          onClick={() => {
-            setAnchorEl(null)
-            onViewDetails(room)
-          }}
-        >
-          <i className='ri-eye-line' style={{ marginRight: 8 }} />
-          View Details
-        </MenuItem>
+        {onWatchLive && (
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null)
+              onWatchLive(room)
+            }}
+          >
+            <i className='ri-live-line' style={{ marginRight: 8 }} />
+            Watch Live
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             setAnchorEl(null)
@@ -85,7 +90,8 @@ const WatchPartyRoomsTable = ({
   onPageChange,
   onRowsPerPageChange,
   onViewDetails,
-  onForceClose
+  onForceClose,
+  onWatchLive
 }: WatchPartyRoomsTableProps) => {
   const columns = [
     { id: 'title', label: 'Title', minWidth: 220 },
@@ -137,7 +143,14 @@ const WatchPartyRoomsTable = ({
         {formatRelativeTime(room.createdAt)}
       </Typography>
     ),
-    actions: <RoomActionsCell room={room} onViewDetails={onViewDetails} onForceClose={onForceClose} />
+    actions: (
+      <RoomActionsCell
+        room={room}
+        onViewDetails={onViewDetails}
+        onForceClose={onForceClose}
+        onWatchLive={onWatchLive}
+      />
+    )
   }))
 
   return (

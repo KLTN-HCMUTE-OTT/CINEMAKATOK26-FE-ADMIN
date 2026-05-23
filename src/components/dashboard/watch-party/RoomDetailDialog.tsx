@@ -83,7 +83,7 @@ const RoomDetailDialog = ({
   const getUserDisplay = (userId: string, fallbackDisplayName?: string) => {
     const user = userMap.get(userId)
     return {
-      name: user?.name ?? fallbackDisplayName ?? `user-${userId.slice(0, 6)}`,
+      name: user?.name ?? fallbackDisplayName ?? (userId ? `user-${userId.slice(0, 6)}` : 'Unknown'),
       avatar: user?.avatar
     }
   }
