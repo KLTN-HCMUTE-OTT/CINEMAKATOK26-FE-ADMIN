@@ -55,6 +55,18 @@ declare namespace API {
     id: string
   }
 
+  type AdminBanUserDto = {
+    /** Duration in seconds (omit for permanent ban) */
+    durationSec?: number
+    /** Reason for the ban */
+    reason?: string
+  }
+
+  type AdminCloseRoomDto = {
+    /** Reason for closing the room */
+    reason?: string
+  }
+
   type AnalyticsControllerGetCategoriesStatsParams = {
     search?: string
     sort?: string
@@ -530,6 +542,28 @@ declare namespace API {
     parentReplyId?: string
   }
 
+  type CreateRoomRequest = {
+    /** Video ID for the watch party */
+    videoId: string
+    /** Display title for the room */
+    title: string
+    /** Optional password to restrict joins */
+    password?: string
+    /** Whether the room is discoverable in the public rooms list (default true) */
+    isPublic?: boolean
+  }
+
+  type CreateRoomResponse = {
+    roomId: string
+    inviteCode: string
+  }
+
+  type CreateRoomResponseResponseDto = {
+    statusCode: number
+    message: string
+    data: CreateRoomResponse
+  }
+
   type CreateSeasonDto = {
     /** Season number */
     seasonNumber: number
@@ -775,6 +809,21 @@ declare namespace API {
   type ForgotPasswordRequest = {
     /** User email to send OTP */
     email: string
+  }
+
+  type InviteLookupResponse = {
+    roomId: string
+    title: string
+    videoId: string
+    requirePassword: boolean
+    memberCount: number
+    maxMembers: number
+  }
+
+  type InviteLookupResponseResponseDto = {
+    statusCode: number
+    message: string
+    data: InviteLookupResponse
   }
 
   type LoginResponse = {
@@ -1329,6 +1378,29 @@ declare namespace API {
     statusCode: number
     message: string
     data: ReviewReplyDto
+  }
+
+  type RoomListItemDto = {
+    roomId: string
+    title: string
+    videoId: string
+    hostId: string
+    requirePassword: boolean
+    isPublic: boolean
+    memberCount: number
+    maxMembers: number
+    createdAt: number
+  }
+
+  type RoomListResponse = {
+    items: RoomListItemDto[]
+    total: number
+  }
+
+  type RoomListResponseResponseDto = {
+    statusCode: number
+    message: string
+    data: RoomListResponse
   }
 
   type SeasonDto = {
@@ -2054,6 +2126,127 @@ declare namespace API {
   type WatchListControllerRemoveFromWatchListParams = {
     /** Content ID to remove */
     contentId: string
+  }
+
+  type WatchPartyControllerAdminBanUserParams = {
+    userId: string
+  }
+
+  type WatchPartyControllerAdminCloseRoomParams = {
+    id: string
+  }
+
+  type WatchPartyControllerAdminGetRoomDetailsParams = {
+    id: string
+  }
+
+  type WatchPartyControllerAdminKickMemberParams = {
+    id: string
+    userId: string
+  }
+
+  type WatchPartyControllerAdminListRoomsParams = {
+    limit?: number
+    offset?: number
+    /** Search by title or hostId */
+    search?: string
+    /** Filter by videoId */
+    videoId?: string
+  }
+
+  type WatchPartyControllerAdminUnbanUserParams = {
+    userId: string
+  }
+
+  type WatchPartyControllerCloseRoomParams = {
+    id: string
+  }
+
+  type WatchPartyControllerListRoomsParams = {
+    scope?: 'public' | 'all'
+    limit?: number
+    offset?: number
+    /** Filter by videoId */
+    videoId?: string
+  }
+
+  type WatchPartyControllerLookupInviteParams = {
+    code: string
+  }
+
+  type WatchPartyStatsResponse = {
+    totalActiveRooms: number
+    totalPublicRooms: number
+    totalMembers: number
+  }
+
+  type WatchPartyStatsResponseResponseDto = {
+    statusCode: number
+    message: string
+    data: WatchPartyStatsResponse
+  }
+
+  type WatchPartyMember = {
+    userId: string
+    displayName: string
+    joinedAt: number
+  }
+
+  type WatchPartyChatMessage = {
+    userId: string
+    content: string
+    timestamp: number
+  }
+
+  type WatchPartyVideoState = {
+    isPlaying: boolean
+    currentTime: number
+    updatedAt: number
+  }
+
+  type WatchPartyModerationEntry = {
+    userId: string
+    reason?: string
+    bannedAt?: number
+    bannedUntil?: number | null
+    mutedAt?: number
+    mutedUntil?: number | null
+  }
+
+  type WatchPartyRoomDetail = {
+    roomId: string
+    title: string
+    videoId: string
+    hostId: string
+    requirePassword: boolean
+    isPublic: boolean
+    memberCount: number
+    maxMembers: number
+    createdAt: number
+    inviteCode?: string
+    members: WatchPartyMember[]
+    chatMessages: WatchPartyChatMessage[]
+    videoState?: WatchPartyVideoState
+    moderation: {
+      banList: WatchPartyModerationEntry[]
+      muteList: WatchPartyModerationEntry[]
+    }
+  }
+
+  type WatchPartyRoomDetailResponseDto = {
+    statusCode: number
+    message: string
+    data: WatchPartyRoomDetail
+  }
+
+  type GetUsersByIdsDto = {
+    ids: string[]
+  }
+
+  type UserBatchResponseDto = {
+    statusCode: number
+    message: string
+    data: UserDto[]
   }
 
   type WatchProgressControllerDeleteWatchProgressParams = {

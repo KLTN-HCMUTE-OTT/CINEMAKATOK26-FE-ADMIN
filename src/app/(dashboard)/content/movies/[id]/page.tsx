@@ -22,7 +22,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
 
 // API Imports
-import { movieControllerFindOne, movieControllerDelete } from '@/api/movie'
+import { moviesControllerGetMovieById, moviesControllerDeleteMovie } from '@/api/movies'
 
 // Component Imports
 import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
@@ -62,7 +62,7 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
       try {
         setLoading(true)
         setError(null)
-        const response = await movieControllerFindOne({ id: params.id })
+        const response = await moviesControllerGetMovieById({ id: params.id })
 
         setMovie(response.data.data)
       } catch (err: any) {
@@ -80,7 +80,7 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
   const handleDelete = async () => {
     try {
       setDeleting(true)
-      await movieControllerDelete({ id: params.id })
+      await moviesControllerDeleteMovie({ id: params.id })
       router.push('/content/movies')
     } catch (err: any) {
       console.error('Error deleting movie:', err)
