@@ -57,7 +57,7 @@ async function proxyRequest(request: NextRequest) {
   }
 
   if (!['GET', 'HEAD'].includes(request.method)) {
-    init.body = await request.text()
+    init.body = await request.arrayBuffer()
   }
 
   const response = await fetch(upstreamUrl, init)

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { videoControllerUploadVideo } from '@/api/video'
+import { streamingControllerUploadVideo } from '@/api/streaming'
 
 interface VideoFile {
   id: string
@@ -69,7 +69,7 @@ export const useVideoUpload = () => {
       onProgressUpdate(videoFile.id, 0, 'uploading')
 
       // Upload video
-      const response = await videoControllerUploadVideo({}, videoFile.file, {
+      const response = await streamingControllerUploadVideo({}, videoFile.file, {
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -79,7 +79,7 @@ export const useVideoUpload = () => {
       })
 
       const result = response.data
-      const videoData: API.VideoDto | undefined = result.data?.videos
+      const videoData: API.VideoDto | undefined = result.data?.video
 
       console.log(`Video uploaded successfully - ID: ${videoData?.id}, Status: ${videoData?.status}`)
 
