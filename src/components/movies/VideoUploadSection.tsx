@@ -8,7 +8,7 @@ import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 
 // Component Imports
-import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
+import { DynamicHLSVideoPlayer, DynamicShakaVideoPlayer } from '@/utils/dynamicImports'
 
 // Utils
 import { getS3Url } from '@/configs/aws'
@@ -16,6 +16,7 @@ import { getS3Url } from '@/configs/aws'
 interface VideoUploadSectionProps {
   videoFile: File | null
   currentVideoUrl?: string
+  currentVideoId?: string
   uploadingVideo: boolean
   videoUploadProgress: number
   onVideoUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -25,6 +26,7 @@ interface VideoUploadSectionProps {
 const VideoUploadSection = ({
   videoFile,
   currentVideoUrl,
+  currentVideoId,
   uploadingVideo,
   videoUploadProgress,
   onVideoUpload,
@@ -68,9 +70,9 @@ const VideoUploadSection = ({
                 mb: 2
               }}
             >
-              {isHLSUrl(currentVideoUrl) ? (
+              {currentVideoId ? (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                  <DynamicHLSVideoPlayer src={getS3Url(currentVideoUrl)} controls />
+                  <DynamicShakaVideoPlayer videoId={currentVideoId} />
                 </div>
               ) : (
                 <video

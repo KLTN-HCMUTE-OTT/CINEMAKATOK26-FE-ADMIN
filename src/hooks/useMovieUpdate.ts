@@ -5,7 +5,7 @@ import { actorsControllerGetActorById } from '@/api/actors'
 import { directorsControllerGetDirectorById } from '@/api/directors'
 import { contentsControllerUpdateContent } from '@/api/contents'
 import { moviesControllerUpdateMovie } from '@/api/movies'
-import { videoControllerUploadVideo } from '@/api/video'
+import { streamingControllerUploadVideo } from '@/api/streaming'
 
 interface UseMovieUpdateProps {
   movieId: string
@@ -83,40 +83,27 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
       })
   }
 
-  const uploadVideo = async (videoFile: File) => {
+  const uploadVideo = async (videoFile: File): Promise<API.VideoDto> => {
     setUploadingVideo(true)
     try {
-      console.log('Uploading new video file:', videoFile.name)
-
-      const uploadResponse = await videoControllerUploadVideo({}, videoFile, {
-        onUploadProgress: (progressEvent: any) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          setVideoUploadProgress(percentCompleted)
-          console.log(`Upload progress: ${percentCompleted}%`)
+      const uploadResponse = await streamingControllerUploadVideo({}, videoFile, {
+        onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            setVideoUploadProgress(percentCompleted)
+          }
         }
       })
 
-      console.log('Video upload response:', uploadResponse)
+      console.log('[uploadVideo] full response:', JSON.stringify(uploadResponse.data, null, 2))
 
-      // Extract video DTO from response
-      const uploadedData = uploadResponse?.data?.data
-      let videoDto = null
+      const videoDto: API.VideoDto | undefined = uploadResponse.data?.data?.video
 
-      if (uploadedData && Array.isArray(uploadedData) && uploadedData.length > 0) {
-        videoDto = uploadedData[0].videoData
-      } else if (uploadedData?.videoData) {
-        videoDto = uploadedData.videoData
-      } else {
-        videoDto = uploadedData
-      }
-
-      console.log('Extracted video DTO:', videoDto)
-
-      if (!videoDto || !videoDto.videos?.id) {
+      if (!videoDto?.id) {
         throw new Error('Invalid video upload response')
       }
 
-      return videoDto.videos
+      return videoDto
     } finally {
       setUploadingVideo(false)
     }

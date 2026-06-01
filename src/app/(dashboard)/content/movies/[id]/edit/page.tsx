@@ -345,6 +345,7 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
               <VideoUploadSection
                 videoFile={videoFile}
                 currentVideoUrl={movie?.video?.videoUrl}
+                currentVideoId={movie?.video?.id}
                 uploadingVideo={uploadingVideo}
                 videoUploadProgress={videoUploadProgress}
                 onVideoUpload={handleVideoUpload}
