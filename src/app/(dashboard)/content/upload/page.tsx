@@ -35,6 +35,7 @@ const UploadPage = () => {
   const [metadata, setMetadata] = useState<any>(null)
   const [isPublishing, setIsPublishing] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
+  const [uploaderKey, setUploaderKey] = useState(0)
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1)
@@ -49,6 +50,7 @@ const UploadPage = () => {
     setUploadedFiles([])
     setMetadata(null)
     setPublishError(null)
+    setUploaderKey(k => k + 1)
   }
 
   // Only advance to the next step when coming from step 0 (prevent double-advance on back-navigation)
