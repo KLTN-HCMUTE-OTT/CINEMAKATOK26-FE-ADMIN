@@ -1,9 +1,9 @@
 // MUI Imports
-import { Card, CardContent, Typography, Grid, Box, Button, LinearProgress } from '@mui/material'
+import { Card, CardContent, Typography, Grid, Box, Button, LinearProgress, FormHelperText } from '@mui/material'
 
 import MetadataBasicFields from './MetadataBasicFields'
 import MetadataPeopleAndTaxonomy from './MetadataPeopleAndTaxonomy'
-import type { VideoMetadata } from './types'
+import type { VideoMetadata, MetadataErrors } from './types'
 
 interface MetadataFormProps {
   metadata: VideoMetadata
@@ -14,6 +14,7 @@ interface MetadataFormProps {
   loading: boolean
   uploadingThumbnail: boolean
   uploadingBanner: boolean
+  errors?: MetadataErrors
   onMetadataChange: (metadata: VideoMetadata) => void
   onThumbnailUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
   onBannerUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -28,6 +29,7 @@ const MetadataForm = ({
   loading,
   uploadingThumbnail,
   uploadingBanner,
+  errors = {},
   onMetadataChange,
   onThumbnailUpload,
   onBannerUpload
@@ -41,7 +43,7 @@ const MetadataForm = ({
           Content Metadata
         </Typography>
         <Grid container spacing={2}>
-          <MetadataBasicFields metadata={metadata} onMetadataChange={setMetadata} />
+          <MetadataBasicFields metadata={metadata} errors={errors} onMetadataChange={setMetadata} />
 
           {/* Thumbnail Upload */}
           <Grid item xs={12}>
@@ -113,9 +115,13 @@ const MetadataForm = ({
                   </Typography>
                 </Box>
               )}
-              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
-                Upload thumbnail image for the content
-              </Typography>
+              {errors.thumbnail ? (
+                <FormHelperText error sx={{ mt: 0.5 }}>{errors.thumbnail}</FormHelperText>
+              ) : (
+                <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
+                  Upload thumbnail image for the content
+                </Typography>
+              )}
             </Box>
           </Grid>
 
@@ -189,9 +195,13 @@ const MetadataForm = ({
                   </Typography>
                 </Box>
               )}
-              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
-                Upload banner image for the content
-              </Typography>
+              {errors.banner ? (
+                <FormHelperText error sx={{ mt: 0.5 }}>{errors.banner}</FormHelperText>
+              ) : (
+                <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
+                  Upload banner image for the content
+                </Typography>
+              )}
             </Box>
           </Grid>
 
@@ -202,6 +212,7 @@ const MetadataForm = ({
             actors={actors}
             directors={directors}
             loading={loading}
+            errors={errors}
             onMetadataChange={setMetadata}
           />
         </Grid>

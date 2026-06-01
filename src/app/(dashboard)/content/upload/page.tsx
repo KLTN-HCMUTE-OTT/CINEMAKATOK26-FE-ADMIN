@@ -449,9 +449,20 @@ const UploadPage = () => {
                   variant='contained'
                   onClick={activeStep === steps.length - 1 ? handlePublish : handleNext}
                   disabled={
-                    (activeStep === 0 && uploadedFiles.length === 0) ||
-                    (activeStep === 1 && !metadata?.title) ||
-                    isPublishing
+                    isPublishing ||
+                    ((activeStep === 0 || activeStep === 1) && (
+                      uploadedFiles.length === 0 ||
+                      !metadata?.title?.trim() ||
+                      !metadata?.description?.trim() ||
+                      !metadata?.releaseDate ||
+                      !metadata?.thumbnail ||
+                      !metadata?.banner ||
+                      !metadata?.trailer?.trim() ||
+                      !metadata?.categories?.length ||
+                      !metadata?.tags?.length ||
+                      !metadata?.actors?.length ||
+                      !metadata?.directors?.length
+                    ))
                   }
                   startIcon={isPublishing ? <CircularProgress size={20} color='inherit' /> : undefined}
                 >
