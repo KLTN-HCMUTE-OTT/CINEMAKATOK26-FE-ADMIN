@@ -1,6 +1,6 @@
-import { Grid, TextField, Chip, Autocomplete } from '@mui/material'
+import { Grid, TextField, Chip, Autocomplete, FormHelperText } from '@mui/material'
 
-import type { VideoMetadata } from './types'
+import type { VideoMetadata, MetadataErrors } from './types'
 
 interface MetadataPeopleAndTaxonomyProps {
   metadata: VideoMetadata
@@ -9,6 +9,7 @@ interface MetadataPeopleAndTaxonomyProps {
   actors: any[]
   directors: any[]
   loading: boolean
+  errors?: MetadataErrors
   onMetadataChange: (metadata: VideoMetadata) => void
 }
 
@@ -19,6 +20,7 @@ const MetadataPeopleAndTaxonomy = ({
   actors,
   directors,
   loading,
+  errors = {},
   onMetadataChange
 }: MetadataPeopleAndTaxonomyProps) => {
   const setMetadata = onMetadataChange
@@ -34,7 +36,15 @@ const MetadataPeopleAndTaxonomy = ({
           onChange={(_event, newValue) => {
             setMetadata({ ...metadata, categories: newValue.map(v => ({ id: v.id, categoryName: v.categoryName })) })
           }}
-          renderInput={params => <TextField {...params} label='Categories' placeholder='Search categories...' />}
+          renderInput={params => (
+            <TextField
+              {...params}
+              label='Categories'
+              placeholder='Search categories...'
+              required
+              error={!!errors.categories}
+            />
+          )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip {...getTagProps({ index })} key={option.id} label={option.categoryName} size='small' />
@@ -45,6 +55,7 @@ const MetadataPeopleAndTaxonomy = ({
           loadingText='Loading categories...'
           noOptionsText='No categories found'
         />
+        {errors.categories && <FormHelperText error sx={{ mx: '14px' }}>{errors.categories}</FormHelperText>}
       </Grid>
 
       <Grid item xs={12}>
@@ -56,7 +67,9 @@ const MetadataPeopleAndTaxonomy = ({
           onChange={(_event, newValue) => {
             setMetadata({ ...metadata, tags: newValue.map(v => ({ id: v.id, tagName: v.tagName })) })
           }}
-          renderInput={params => <TextField {...params} label='Tags' placeholder='Search tags...' />}
+          renderInput={params => (
+            <TextField {...params} label='Tags' placeholder='Search tags...' required error={!!errors.tags} />
+          )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip {...getTagProps({ index })} key={option.id} label={option.tagName} size='small' />
@@ -67,6 +80,7 @@ const MetadataPeopleAndTaxonomy = ({
           loadingText='Loading tags...'
           noOptionsText='No tags found'
         />
+        {errors.tags && <FormHelperText error sx={{ mx: '14px' }}>{errors.tags}</FormHelperText>}
       </Grid>
 
       <Grid item xs={12}>
@@ -78,7 +92,9 @@ const MetadataPeopleAndTaxonomy = ({
           onChange={(_event, newValue) => {
             setMetadata({ ...metadata, actors: newValue.map(v => ({ id: v.id, name: v.name })) })
           }}
-          renderInput={params => <TextField {...params} label='Actors' placeholder='Search actors...' />}
+          renderInput={params => (
+            <TextField {...params} label='Actors' placeholder='Search actors...' required error={!!errors.actors} />
+          )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip {...getTagProps({ index })} key={option.id} label={option.name} size='small' />
@@ -89,6 +105,7 @@ const MetadataPeopleAndTaxonomy = ({
           loadingText='Loading actors...'
           noOptionsText='No actors found'
         />
+        {errors.actors && <FormHelperText error sx={{ mx: '14px' }}>{errors.actors}</FormHelperText>}
       </Grid>
 
       <Grid item xs={12}>
@@ -100,7 +117,9 @@ const MetadataPeopleAndTaxonomy = ({
           onChange={(_event, newValue) => {
             setMetadata({ ...metadata, directors: newValue.map(v => ({ id: v.id, name: v.name })) })
           }}
-          renderInput={params => <TextField {...params} label='Directors' placeholder='Search directors...' />}
+          renderInput={params => (
+            <TextField {...params} label='Directors' placeholder='Search directors...' required error={!!errors.directors} />
+          )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip {...getTagProps({ index })} key={option.id} label={option.name} size='small' />
@@ -111,6 +130,7 @@ const MetadataPeopleAndTaxonomy = ({
           loadingText='Loading directors...'
           noOptionsText='No directors found'
         />
+        {errors.directors && <FormHelperText error sx={{ mx: '14px' }}>{errors.directors}</FormHelperText>}
       </Grid>
     </>
   )

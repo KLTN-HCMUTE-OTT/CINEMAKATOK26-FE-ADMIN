@@ -53,7 +53,7 @@ const UploadTVSeriesPageContent = () => {
 
     try {
       // Fetch full actor data
-      const actorPromises = metadata.actors.map((a: any) => actorsControllerGetActorById(a.id))
+      const actorPromises = metadata.actors.map((a: any) => actorsControllerGetActorById({ id: a.id }))
       const actorResponses = await Promise.all(actorPromises)
 
       const fullActors = actorResponses.map((res: any) => {
@@ -71,7 +71,7 @@ const UploadTVSeriesPageContent = () => {
       })
 
       // Fetch full director data
-      const directorPromises = metadata.directors.map((d: any) => directorsControllerGetDirectorById(d.id))
+      const directorPromises = metadata.directors.map((d: any) => directorsControllerGetDirectorById({ id: d.id }))
       const directorResponses = await Promise.all(directorPromises)
 
       const fullDirectors = directorResponses.map((res: any) => {

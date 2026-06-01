@@ -22,6 +22,8 @@ import { useVideoUpload } from '@/hooks/useVideoUpload'
 import { useCloudinaryImageUpload } from '@/hooks/useCloudinaryImageUpload'
 
 // Types
+import type { MetadataErrors } from './video-uploader/types'
+
 interface VideoFile {
   id: string
   name: string
@@ -82,6 +84,7 @@ const VideoUploader = ({
   const [actors, setActors] = useState<API.ActorDto[]>([])
   const [directors, setDirectors] = useState<API.DirectorDto[]>([])
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<MetadataErrors>({})
 
   const [metadata, setMetadata] = useState<VideoMetadata>(() => {
     // Restore form values from parent state when navigating back
@@ -113,6 +116,41 @@ const VideoUploader = ({
   useEffect(() => {
     metadataRef.current = metadata
   })
+
+  const validateMetadata = (m: VideoMetadata): MetadataErrors => {
+    const e: MetadataErrors = {}
+    if (!m.title.trim()) e.title = 'Title is required'
+    if (!m.description.trim()) e.description = 'Description is required'
+    if (!m.releaseDate) e.releaseDate = 'Release date is required'
+    if (!m.thumbnail) e.thumbnail = 'Thumbnail is required'
+    if (!m.banner) e.banner = 'Banner is required'
+    if (!m.trailer.trim()) e.trailer = 'Trailer URL is required'
+    if (m.categories.length === 0) e.categories = 'At least one category is required'
+    if (m.tags.length === 0) e.tags = 'At least one tag is required'
+    if (m.actors.length === 0) e.actors = 'At least one actor is required'
+    if (m.directors.length === 0) e.directors = 'At least one director is required'
+    return e
+  }
+
+  const handleMetadataChange = (newMetadata: VideoMetadata) => {
+    setMetadata(newMetadata)
+    if (Object.keys(errors).length > 0) {
+      setErrors(prev => {
+        const next = { ...prev }
+        if (newMetadata.title.trim()) delete next.title
+        if (newMetadata.description.trim()) delete next.description
+        if (newMetadata.releaseDate) delete next.releaseDate
+        if (newMetadata.thumbnail) delete next.thumbnail
+        if (newMetadata.banner) delete next.banner
+        if (newMetadata.trailer.trim()) delete next.trailer
+        if (newMetadata.categories.length > 0) delete next.categories
+        if (newMetadata.tags.length > 0) delete next.tags
+        if (newMetadata.actors.length > 0) delete next.actors
+        if (newMetadata.directors.length > 0) delete next.directors
+        return next
+      })
+    }
+  }
 
   // Call onChange whenever existingFiles or metadata changes to sync with parent state
   useEffect(() => {
@@ -270,6 +308,7 @@ const VideoUploader = ({
     try {
       const url = await uploadThumbnailImage(file)
       setMetadata(prev => ({ ...prev, thumbnail: url }))
+      setErrors(prev => { const next = { ...prev }; delete next.thumbnail; return next })
     } catch (error) {
       alert('Failed to upload thumbnail. Please try again.')
     }
@@ -282,6 +321,7 @@ const VideoUploader = ({
     try {
       const url = await uploadBannerImage(file)
       setMetadata(prev => ({ ...prev, banner: url }))
+      setErrors(prev => { const next = { ...prev }; delete next.banner; return next })
     } catch (error) {
       alert('Failed to upload banner. Please try again.')
     }
@@ -292,9 +332,14 @@ const VideoUploader = ({
   }
 
   const handleProcessVideos = () => {
+    const validationErrors = validateMetadata(metadataRef.current)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+    setErrors({})
     if (onUpload) {
       const readyFiles = existingFiles.filter(f => f.videoData)
-      // Use ref to guarantee we always read the latest metadata, not a stale closure
       onUpload(readyFiles, metadataRef.current)
     }
   }
@@ -326,7 +371,8 @@ const VideoUploader = ({
           loading={loading}
           uploadingThumbnail={uploadingThumbnail}
           uploadingBanner={uploadingBanner}
-          onMetadataChange={setMetadata}
+          errors={errors}
+          onMetadataChange={handleMetadataChange}
           onThumbnailUpload={handleThumbnailUpload}
           onBannerUpload={handleBannerUpload}
         />

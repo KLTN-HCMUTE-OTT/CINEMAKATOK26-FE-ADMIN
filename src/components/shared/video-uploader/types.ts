@@ -15,3 +15,16 @@ export interface VideoMetadata {
   actors: Array<{ id: string; name: string }>
   directors: Array<{ id: string; name: string }>
 }
+
+export interface MetadataErrors {
+  title?: string
+  description?: string
+  releaseDate?: string
+  thumbnail?: string
+  banner?: string
+  trailer?: string
+  categories?: string
+  tags?: string
+  actors?: string
+  directors?: string
+}

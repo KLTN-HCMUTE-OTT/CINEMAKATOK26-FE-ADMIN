@@ -1,9 +1,10 @@
 import { Grid, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material'
 
-import type { VideoMetadata } from './types'
+import type { VideoMetadata, MetadataErrors } from './types'
 
 interface MetadataBasicFieldsProps {
   metadata: VideoMetadata
+  errors?: MetadataErrors
   onMetadataChange: (metadata: VideoMetadata) => void
 }
 
@@ -29,7 +30,7 @@ const accessTierOptions = [
   { value: 'PREMIUM', label: 'Premium - Subscribers only' }
 ] as const
 
-const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFieldsProps) => {
+const MetadataBasicFields = ({ metadata, errors = {}, onMetadataChange }: MetadataBasicFieldsProps) => {
   const setMetadata = onMetadataChange
 
   return (
@@ -101,6 +102,8 @@ const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFields
           value={metadata.title}
           onChange={e => setMetadata({ ...metadata, title: e.target.value })}
           required
+          error={!!errors.title}
+          helperText={errors.title}
         />
       </Grid>
       <Grid item xs={12}>
@@ -112,6 +115,8 @@ const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFields
           value={metadata.description}
           onChange={e => setMetadata({ ...metadata, description: e.target.value })}
           required
+          error={!!errors.description}
+          helperText={errors.description}
         />
       </Grid>
 
@@ -124,6 +129,8 @@ const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFields
           onChange={e => setMetadata({ ...metadata, releaseDate: e.target.value })}
           InputLabelProps={{ shrink: true }}
           required
+          error={!!errors.releaseDate}
+          helperText={errors.releaseDate}
         />
       </Grid>
 
@@ -157,7 +164,9 @@ const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFields
           value={metadata.trailer}
           onChange={e => setMetadata({ ...metadata, trailer: e.target.value })}
           placeholder='https://example.com/trailer.mp4'
-          helperText='URL to the content trailer video'
+          required
+          error={!!errors.trailer}
+          helperText={errors.trailer ?? 'URL to the content trailer video'}
         />
       </Grid>
     </>
