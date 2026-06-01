@@ -34,6 +34,7 @@ const UploadPage = () => {
   const [metadata, setMetadata] = useState<any>(null)
   const [isPublishing, setIsPublishing] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
+  const [uploaderKey, setUploaderKey] = useState(0)
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1)
@@ -48,6 +49,7 @@ const UploadPage = () => {
     setUploadedFiles([])
     setMetadata(null)
     setPublishError(null)
+    setUploaderKey(k => k + 1)
   }
 
   const handleUpload = (files: any[], fileMetadata: any) => {
@@ -62,7 +64,7 @@ const UploadPage = () => {
 
     try {
       // Fetch full actor data
-      const actorPromises = metadata.actors.map((a: any) => actorsControllerGetActorById(a.id))
+      const actorPromises = metadata.actors.map((a: any) => actorsControllerGetActorById({ id: a.id }))
       const actorResponses = await Promise.all(actorPromises)
 
       const fullActors = actorResponses.map(res => {
@@ -84,7 +86,7 @@ const UploadPage = () => {
       })
 
       // Fetch full director data
-      const directorPromises = metadata.directors.map((d: any) => directorsControllerGetDirectorById(d.id))
+      const directorPromises = metadata.directors.map((d: any) => directorsControllerGetDirectorById({ id: d.id }))
       const directorResponses = await Promise.all(directorPromises)
 
       const fullDirectors = directorResponses.map(res => {
@@ -150,14 +152,6 @@ const UploadPage = () => {
 
   const getStepContent = (step: number) => {
     switch (step) {
-      case 0:
-        return (
-          <VideoUploader
-            onUpload={handleUpload}
-            maxFileSize={5000} // 5GB
-            acceptedFormats={['.mp4', '.mov', '.avi', '.mkv', '.webm']}
-          />
-        )
       case 1:
         return (
           <Card>
@@ -366,8 +360,17 @@ const UploadPage = () => {
         </Card>
       ) : (
         <>
-          {/* Step Content */}
-          <Box sx={{ mb: 4 }}>{getStepContent(activeStep)}</Box>
+          {/* VideoUploader — always mounted to preserve file/metadata state across steps */}
+          <Box sx={{ mb: 4, display: activeStep === 0 ? 'block' : 'none' }}>
+            <VideoUploader
+              key={uploaderKey}
+              onUpload={handleUpload}
+              maxFileSize={5000}
+              acceptedFormats={['.mp4', '.mov', '.avi', '.mkv', '.webm']}
+            />
+          </Box>
+          {/* Step content for steps 1+ */}
+          {activeStep > 0 && <Box sx={{ mb: 4 }}>{getStepContent(activeStep)}</Box>}
 
           {/* Navigation Buttons */}
           <Card>
