@@ -71,6 +71,9 @@ instance.interceptors.request.use(
   }
 )
 
+// Singleton refresh promise to prevent race conditions on concurrent 401s
+let refreshPromise: Promise<boolean> | null = null
+
 // Response interceptor
 instance.interceptors.response.use(
   response => {
@@ -93,28 +96,28 @@ instance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      try {
-        // Call BFF refresh endpoint (tokens are managed as httpOnly cookies)
-        const response = await axios.post(
-          '/api/auth/refresh',
-          {},
-          {
-            withCredentials: true
-          }
-        )
-
-        if (response.status === 200) {
-          // Token refreshed - retry original request
-          // New token is in the httpOnly cookie, no need to set header
-          return instance(originalRequest)
-        }
-      } catch (refreshError) {
-        // Refresh token failed - redirect to login
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
-        }
-        return Promise.reject(refreshError)
+      // Dùng singleton promise để tránh gọi refresh nhiều lần song song
+      if (!refreshPromise) {
+        refreshPromise = axios
+          .post('/api/auth/refresh', {}, { withCredentials: true })
+          .then(res => res.status === 200)
+          .catch(() => false)
+          .finally(() => {
+            refreshPromise = null
+          })
       }
+
+      const refreshed = await refreshPromise
+
+      if (refreshed) {
+        return instance(originalRequest)
+      }
+
+      // Refresh thất bại - redirect về login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+      return Promise.reject(error)
     }
 
     // Xử lý 403 - Forbidden

@@ -31,9 +31,10 @@ export async function POST(request: NextRequest) {
     // Create response
     const res = NextResponse.json({ message: 'Logged out successfully' })
 
-    // Clear httpOnly cookies
+    // Clear httpOnly cookies (delete at all possible paths for safety)
     res.cookies.delete('accessToken')
     res.cookies.delete('refreshToken')
+    res.cookies.delete({ name: 'refreshToken', path: '/api/auth/refresh' })
     res.cookies.delete('csrf-token')
 
     return res
