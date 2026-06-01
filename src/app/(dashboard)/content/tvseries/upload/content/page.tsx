@@ -101,6 +101,7 @@ const UploadTVSeriesPageContent = () => {
           description: metadata.description,
           releaseDate: metadata.releaseDate,
           maturityRating: metadata.maturityRating,
+          accessTier: metadata.accessTier || 'BASIC',
           thumbnail: metadata.thumbnail,
           banner: metadata.banner,
           trailer: metadata.trailer,

@@ -209,6 +209,17 @@ const TVSeriesReview = ({ metadata, seasons, publishError }: TVSeriesReviewProps
               </Box>
             </Grid>
 
+            {/* Access Tier */}
+            <Grid item xs={12} md={6}>
+              <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                Access Tier
+              </Typography>
+              <Chip
+                label={metadata.accessTier || 'BASIC'}
+                color={metadata.accessTier === 'PREMIUM' ? 'secondary' : 'default'}
+              />
+            </Grid>
+
             {/* Categories */}
             {metadata.categories.length > 0 && (
               <Grid item xs={12}>

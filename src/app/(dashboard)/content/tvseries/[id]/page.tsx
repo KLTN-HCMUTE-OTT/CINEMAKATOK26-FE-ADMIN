@@ -245,6 +245,17 @@ const TVSeriesDetailPage = () => {
 
                 <Box>
                   <Typography variant='caption' color='text.secondary'>
+                    Access Tier
+                  </Typography>
+                  <Chip
+                    label={metadata.accessTier || 'BASIC'}
+                    size='small'
+                    color={metadata.accessTier === 'PREMIUM' ? 'secondary' : 'default'}
+                  />
+                </Box>
+
+                <Box>
+                  <Typography variant='caption' color='text.secondary'>
                     IMDB Rating
                   </Typography>
                   <Typography variant='body1'>⭐ {metadata.imdbRating}/10</Typography>

@@ -88,6 +88,20 @@ const BasicMetadataSection = ({
       </Grid>
 
       <Grid item xs={12} md={6}>
+        <FormControl fullWidth required>
+          <InputLabel>Access Tier</InputLabel>
+          <Select
+            value={metadata.accessTier || 'BASIC'}
+            label='Access Tier'
+            onChange={e => onChange('accessTier', e.target.value)}
+          >
+            <MenuItem value='BASIC'>Basic - Free users can watch</MenuItem>
+            <MenuItem value='PREMIUM'>Premium - Subscribers only</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
         <Box>
           <Typography variant='body2' sx={{ mb: 1, fontWeight: 500 }}>
             Thumbnail Image *

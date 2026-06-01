@@ -17,6 +17,7 @@ export function useTVSeriesMetadataForm({ initialData }: UseTVSeriesMetadataForm
     description: initialData?.description || '',
     releaseDate: initialData?.releaseDate || '',
     maturityRating: initialData?.maturityRating || 'PG-13',
+    accessTier: initialData?.accessTier || 'BASIC',
     thumbnail: initialData?.thumbnail || '',
     banner: initialData?.banner || '',
     trailer: initialData?.trailer || '',
