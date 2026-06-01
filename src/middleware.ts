@@ -44,7 +44,7 @@ function buildCsp(nonce: string): string {
   ].join('; ')
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const clientIP = request.ip || request.headers.get('X-Forwarded-For') || 'unknown'
 
@@ -53,16 +53,67 @@ export function middleware(request: NextRequest) {
   const isAuthApiRoute = pathname.startsWith('/api/auth/')
   const isStaticAsset = pathname.startsWith('/_next') || pathname.startsWith('/images') || pathname === '/favicon.ico'
 
+  // Generate per-request nonce for CSP (moved up so all response paths can use it)
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-nonce', nonce)
+
+  const applySecurityHeaders = (res: NextResponse) => {
+    Object.entries(STATIC_SECURITY_HEADERS).forEach(([key, value]) => res.headers.set(key, value))
+    res.headers.set('Content-Security-Policy', buildCsp(nonce))
+    return res
+  }
+
   // Authentication check for protected routes
   if (!isPublicRoute && !isStaticAsset && !isAuthApiRoute) {
-    const hasAuthCookie = request.cookies.has('accessToken')
+    const hasAccessToken = request.cookies.has('accessToken')
 
-    if (!hasAuthCookie) {
+    if (!hasAccessToken) {
+      // Try silent refresh before redirecting to login
+      const refreshToken = request.cookies.get('refreshToken')?.value
+
+      if (refreshToken) {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+          const refreshRes = await fetch(`${apiUrl}/api/v1/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken })
+          })
+
+          if (refreshRes.ok) {
+            const data = await refreshRes.json()
+            const response = applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
+
+            response.cookies.set('accessToken', data.data.accessToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'strict',
+              path: '/',
+              maxAge: 60 * 15
+            })
+
+            if (data.data.refreshToken) {
+              response.cookies.set('refreshToken', data.data.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 60 * 60 * 24 * 7
+              })
+            }
+
+            if (IS_DEV) console.log(`[Security] Silent token refresh for ${pathname}`)
+            return response
+          }
+        } catch {
+          // Refresh failed, fall through to redirect
+        }
+      }
+
       const url = request.nextUrl.clone()
-
       url.pathname = '/login'
       url.searchParams.set('redirect', pathname)
-
       return NextResponse.redirect(url)
     }
   }
@@ -80,22 +131,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Generate per-request nonce for CSP
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
-
-  const requestHeaders = new Headers(request.headers)
-
-  requestHeaders.set('x-nonce', nonce)
-
-  const response = NextResponse.next({ request: { headers: requestHeaders } })
-
-  // Apply static security headers
-  Object.entries(STATIC_SECURITY_HEADERS).forEach(([key, value]) => {
-    response.headers.set(key, value)
-  })
-
-  // Apply nonce-based CSP
-  response.headers.set('Content-Security-Policy', buildCsp(nonce))
+  const response = applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
 
   // Rate limiting for API routes
   if (pathname.startsWith('/api/')) {

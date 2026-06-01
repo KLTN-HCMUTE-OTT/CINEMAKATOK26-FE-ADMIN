@@ -95,8 +95,6 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
         }
       })
 
-      console.log('[uploadVideo] full response:', JSON.stringify(uploadResponse.data, null, 2))
-
       const videoDto: API.VideoDto | undefined = uploadResponse.data?.data?.video
 
       if (!videoDto?.id) {

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/auth/refresh', // Restrict to refresh endpoint
+      path: '/',
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
 

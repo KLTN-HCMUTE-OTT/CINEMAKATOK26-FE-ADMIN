@@ -53,7 +53,8 @@ async function proxyRequest(request: NextRequest) {
   const init: RequestInit = {
     method: request.method,
     headers,
-    cache: 'no-store'
+    cache: 'no-store',
+    redirect: 'manual' // Never follow backend redirects — they cause HTML to be proxied as 200
   }
 
   if (!['GET', 'HEAD'].includes(request.method)) {
@@ -61,6 +62,13 @@ async function proxyRequest(request: NextRequest) {
   }
 
   const response = await fetch(upstreamUrl, init)
+
+  // Backend returned a redirect (3xx) — treat as authentication failure so the
+  // client's axios interceptor can trigger token refresh and retry.
+  if (response.status >= 300 && response.status < 400) {
+    return NextResponse.json({ error: 'Unauthorized', message: 'Session expired' }, { status: 401 })
+  }
+
   const responseBody = await response.arrayBuffer()
   const responseHeaders = new Headers(response.headers)
   responseHeaders.set('cache-control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
