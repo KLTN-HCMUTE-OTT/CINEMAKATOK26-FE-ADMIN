@@ -274,6 +274,21 @@ declare namespace API {
     confirmPassword: string
   }
 
+  type CheckSubscribeDto = {
+    /** isActive */
+    isActive: boolean
+    /** plan */
+    plan: string
+    /** expiresAt */
+    expiresAt: string
+  }
+
+  type CheckSubscribeDtoResponseDto = {
+    statusCode: number
+    message: string
+    data: CheckSubscribeDto
+  }
+
   type ChurnFeatureDto = {
     userId: string
     accountAgeDays: number
@@ -310,6 +325,27 @@ declare namespace API {
     trend: 'up' | 'down'
   }
 
+  type ClearKeyKeyDto = {
+    /** JSON Web Key type */
+    kty: string
+    /** Base64url encoded Key ID */
+    kid: string
+    /** Base64url encoded content decryption key */
+    k: string
+  }
+
+  type ClearKeyLicenseRequestDto = {
+    /** Array of Key IDs (base64url or hex) from DASH manifest */
+    kids: string[]
+    /** Video ID */
+    videoId: string
+  }
+
+  type ClearKeyLicenseResponseDto = {
+    keys: ClearKeyKeyDto[]
+    type: string
+  }
+
   type ContentDto = {
     /** Unique identifier of the entity */
     id: string
@@ -339,6 +375,8 @@ declare namespace API {
     viewCount?: number
     /** IMDB rating of the content */
     imdbRating?: number
+    /** Access tier of the content */
+    accessTier?: 'BASIC' | 'PREMIUM'
     /** Categories of the content */
     categories: CategoryDto[]
     /** Tags of the content */
@@ -437,6 +475,8 @@ declare namespace API {
     avgRating?: number
     /** IMDB rating of the content */
     imdbRating?: number
+    /** Access tier of the content */
+    accessTier?: 'BASIC' | 'PREMIUM'
     /** Categories of the content */
     categories: UpdateCategoryDto[]
     /** Tags of the content */
@@ -605,6 +645,18 @@ declare namespace API {
     sprites: string[]
     /** VTT file URLs */
     vttFiles: string[]
+    /** Whether the video contains violent scenes */
+    isViolent: Record<string, any>
+    /** Overall violence score (0.0 to 1.0) */
+    violenceScore: Record<string, any>
+    /** Detected violence coordinates by frame */
+    violentSegments: Record<string, any>
+    /** Whether the video contains nude/sexy scenes */
+    isNude: Record<string, any>
+    /** Overall nudity score (0.0 to 1.0) */
+    nudityScore: Record<string, any>
+    /** Detected nudity coordinates by frame */
+    nuditySegments: Record<string, any>
   }
 
   type CreateWatchListDto = {
@@ -809,6 +861,60 @@ declare namespace API {
   type ForgotPasswordRequest = {
     /** User email to send OTP */
     email: string
+  }
+
+  type InformationSubscribeDto = {
+    /** Unique identifier of the entity */
+    id: string
+    /** Creation date of the entity */
+    createdAt: string
+    /** Last update date of the entity */
+    updatedAt: string
+    /** userId */
+    userId: string
+    /** planId */
+    planId: string
+    status: 'active' | 'expired' | 'cancelled'
+    /** plan name */
+    planName: string
+    /** startsAt */
+    startsAt: string
+    /** expiresAt */
+    expiresAt: string
+    /** autoRenew */
+    autoRenew: boolean
+    /** paymentId */
+    paymentId: Record<string, any>
+  }
+
+  type InformationSubscribeDtoResponseDto = {
+    statusCode: number
+    message: string
+    data: InformationSubscribeDto
+  }
+
+  type InitiatePaymentDto = {
+    /** Subscription plan to purchase */
+    plan: 'basic' | 'premium'
+  }
+
+  type InitiatePaymentResponseDto = {
+    /** VNPAY checkout URL — redirect the user to this URL to complete payment */
+    paymentUrl: string
+    /** Internal order code for tracking this payment */
+    orderCode: string
+    /** Amount to be charged in VND (smallest unit) */
+    amount: number
+    /** Subscription plan being purchased */
+    plan: 'basic' | 'premium'
+    /** Idempotency key used to deduplicate this request */
+    idempotencyKey: string
+  }
+
+  type InitiatePaymentResponseDtoResponseDto = {
+    statusCode: number
+    message: string
+    data: InitiatePaymentResponseDto
   }
 
   type InviteLookupResponse = {
@@ -1025,6 +1131,69 @@ declare namespace API {
     itemsPerPage: number
     totalPages: number
     currentPage: number
+  }
+
+  type PaymentControllerGetByIdParams = {
+    id: string
+  }
+
+  type PaymentControllerGetHistoryParams = {
+    /** Items per page (max 100) */
+    limit?: number
+    /** Page number (1-indexed) */
+    page?: number
+  }
+
+  type PaymentDetailDto = {
+    /** Payment UUID */
+    id: string
+    /** Owner user UUID */
+    userId: string
+    /** Linked subscription UUID (populated after saga completes) */
+    subscriptionId?: string
+    /** Internal order code sent to VNPAY */
+    orderCode: string
+    /** VNPAY transaction number (set after payment is confirmed) */
+    vnpayTxnNo?: string
+    /** Charge amount in VND */
+    amount: number
+    /** Currency code */
+    currency: string
+    /** Subscription plan */
+    plan: 'basic' | 'premium'
+    /** Whether this is a new purchase, upgrade, or renewal */
+    paymentType: 'new' | 'upgrade' | 'renewal'
+    /** Subscription duration purchased (days) */
+    durationDays: number
+    /** Current payment lifecycle status */
+    status: 'pending' | 'processing' | 'completed' | 'failed' | 'expired' | 'refunded'
+    /** VNPAY response code (e.g. "00" = success) */
+    vnpayResponseCode?: string
+    /** VNPAY response message */
+    vnpayMessage?: string
+    /** Bank code used for payment */
+    bankCode?: string
+    /** Card type used (ATM or VISA) */
+    cardType?: string
+    /** Timestamp when VNPAY confirmed the payment */
+    payDate?: string
+    /** Record creation timestamp */
+    createdAt: string
+    /** Record last-update timestamp */
+    updatedAt: string
+  }
+
+  type PaymentDetailDtoPaginatedResponseDto = {
+    statusCode: number
+    message: string
+    data: PaymentDetailDto[]
+    meta: PaginationMeta
+  }
+
+  type PaymentDetailDtoResponseDto = {
+    statusCode: number
+    message: string
+    data: PaymentDetailDto
   }
 
   type ProfileResponse = {
@@ -1423,8 +1592,16 @@ declare namespace API {
     accessToken: string
   }
 
+  type StreamingControllerGetDrmKeyInfoParams = {
+    videoId: string
+  }
+
   type StreamingControllerGetFileAccessParams = {
     s3Key: string
+  }
+
+  type StreamingControllerGetManifestUrlParams = {
+    videoId: string
   }
 
   type TagDto = {
@@ -1678,6 +1855,8 @@ declare namespace API {
     viewCount?: number
     /** IMDB rating of the content */
     imdbRating?: number
+    /** Access tier of the content */
+    accessTier?: 'BASIC' | 'PREMIUM'
     /** Categories of the content */
     categories: UpdateCategoryDto[]
     /** Tags of the content */
@@ -1686,6 +1865,13 @@ declare namespace API {
     actors: UpdateActorDto[]
     /** Directors of the content */
     directors: UpdateDirectorDto[]
+  }
+
+  type UpdateContentPreferencesDto = {
+    /** Violence sensitivity level */
+    violence: 'off' | 'moderate' | 'strict'
+    /** Nudity sensitivity level */
+    nudity: 'off' | 'moderate' | 'strict'
   }
 
   type UpdateDirectorDto = {
@@ -1852,6 +2038,18 @@ declare namespace API {
     sprites: string[]
     /** VTT file URLs */
     vttFiles: string[]
+    /** Whether the video contains violent scenes */
+    isViolent: Record<string, any>
+    /** Overall violence score (0.0 to 1.0) */
+    violenceScore: Record<string, any>
+    /** Detected violence coordinates by frame */
+    violentSegments: Record<string, any>
+    /** Whether the video contains nude/sexy scenes */
+    isNude: Record<string, any>
+    /** Overall nudity score (0.0 to 1.0) */
+    nudityScore: Record<string, any>
+    /** Detected nudity coordinates by frame */
+    nuditySegments: Record<string, any>
   }
 
   type UpdateWatchProgressDto = {
@@ -2021,6 +2219,18 @@ declare namespace API {
     sprites: string[]
     /** VTT file URLs */
     vttFiles: string[]
+    /** Whether the video contains violent scenes */
+    isViolent: Record<string, any>
+    /** Overall violence score (0.0 to 1.0) */
+    violenceScore: Record<string, any>
+    /** Detected violence coordinates by frame */
+    violentSegments: Record<string, any>
+    /** Whether the video contains nude/sexy scenes */
+    isNude: Record<string, any>
+    /** Overall nudity score (0.0 to 1.0) */
+    nudityScore: Record<string, any>
+    /** Detected nudity coordinates by frame */
+    nuditySegments: Record<string, any>
   }
 
   type VideoDtoPaginatedResponseDto = {
@@ -2041,6 +2251,10 @@ declare namespace API {
   }
 
   type VideosControllerGetVideoByIdParams = {
+    id: string
+  }
+
+  type VideosControllerGetVideoParentContentParams = {
     id: string
   }
 
@@ -2097,6 +2311,13 @@ declare namespace API {
     message: string
     data: ViewStatsItemDto[]
     meta: PaginationMeta
+  }
+
+  type VnpayIpnResponseDto = {
+    /** VNPAY result code — "00" means success, everything else is an error */
+    RspCode: string
+    /** Human-readable result message */
+    Message: string
   }
 
   type WatchListControllerCheckInWatchListByMovieIdParams = {
@@ -2184,69 +2405,6 @@ declare namespace API {
     statusCode: number
     message: string
     data: WatchPartyStatsResponse
-  }
-
-  type WatchPartyMember = {
-    userId: string
-    displayName: string
-    joinedAt: number
-  }
-
-  type WatchPartyChatMessage = {
-    userId: string
-    content: string
-    timestamp: number
-  }
-
-  type WatchPartyVideoState = {
-    isPlaying: boolean
-    currentTime: number
-    updatedAt: number
-  }
-
-  type WatchPartyModerationEntry = {
-    userId: string
-    reason?: string
-    bannedAt?: number
-    bannedUntil?: number | null
-    mutedAt?: number
-    mutedUntil?: number | null
-  }
-
-  type WatchPartyRoomDetail = {
-    roomId: string
-    title: string
-    videoId: string
-    hostId: string
-    requirePassword: boolean
-    isPublic: boolean
-    memberCount: number
-    maxMembers: number
-    createdAt: number
-    inviteCode?: string
-    members: WatchPartyMember[]
-    chatMessages: WatchPartyChatMessage[]
-    videoState?: WatchPartyVideoState
-    moderation: {
-      banList: WatchPartyModerationEntry[]
-      muteList: WatchPartyModerationEntry[]
-    }
-  }
-
-  type WatchPartyRoomDetailResponseDto = {
-    statusCode: number
-    message: string
-    data: WatchPartyRoomDetail
-  }
-
-  type GetUsersByIdsDto = {
-    ids: string[]
-  }
-
-  type UserBatchResponseDto = {
-    statusCode: number
-    message: string
-    data: UserDto[]
   }
 
   type WatchProgressControllerDeleteWatchProgressParams = {

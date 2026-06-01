@@ -32,10 +32,7 @@ const MetadataPeopleAndTaxonomy = ({
           getOptionLabel={option => option.categoryName}
           value={metadata.categories}
           onChange={(_event, newValue) => {
-            setMetadata({
-              ...metadata,
-              categories: newValue.map(v => ({ id: v.id, categoryName: v.categoryName }))
-            })
+            setMetadata({ ...metadata, categories: newValue.map(v => ({ id: v.id, categoryName: v.categoryName })) })
           }}
           renderInput={params => <TextField {...params} label='Categories' placeholder='Search categories...' />}
           renderTags={(value, getTagProps) =>
@@ -57,10 +54,7 @@ const MetadataPeopleAndTaxonomy = ({
           getOptionLabel={option => option.tagName}
           value={metadata.tags}
           onChange={(_event, newValue) => {
-            setMetadata({
-              ...metadata,
-              tags: newValue.map(v => ({ id: v.id, tagName: v.tagName }))
-            })
+            setMetadata({ ...metadata, tags: newValue.map(v => ({ id: v.id, tagName: v.tagName })) })
           }}
           renderInput={params => <TextField {...params} label='Tags' placeholder='Search tags...' />}
           renderTags={(value, getTagProps) =>
@@ -82,10 +76,7 @@ const MetadataPeopleAndTaxonomy = ({
           getOptionLabel={option => option.name}
           value={metadata.actors}
           onChange={(_event, newValue) => {
-            setMetadata({
-              ...metadata,
-              actors: newValue.map(v => ({ id: v.id, name: v.name }))
-            })
+            setMetadata({ ...metadata, actors: newValue.map(v => ({ id: v.id, name: v.name })) })
           }}
           renderInput={params => <TextField {...params} label='Actors' placeholder='Search actors...' />}
           renderTags={(value, getTagProps) =>
@@ -107,10 +98,7 @@ const MetadataPeopleAndTaxonomy = ({
           getOptionLabel={option => option.name}
           value={metadata.directors}
           onChange={(_event, newValue) => {
-            setMetadata({
-              ...metadata,
-              directors: newValue.map(v => ({ id: v.id, name: v.name }))
-            })
+            setMetadata({ ...metadata, directors: newValue.map(v => ({ id: v.id, name: v.name })) })
           }}
           renderInput={params => <TextField {...params} label='Directors' placeholder='Search directors...' />}
           renderTags={(value, getTagProps) =>

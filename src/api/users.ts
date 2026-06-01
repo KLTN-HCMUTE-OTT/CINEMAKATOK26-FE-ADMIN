@@ -136,9 +136,28 @@ export async function userControllerUnbanUser(
 }
 
 /** Batch fetch users by IDs (admin) POST /api/v1/users/batch */
-export async function userControllerGetUsersByIds(body: API.GetUsersByIdsDto, options?: { [key: string]: any }) {
-  return request<API.UserBatchResponseDto>('/api/v1/users/batch', {
+export async function userControllerGetUsersByIds(options?: { [key: string]: any }) {
+  return request<any>('/api/v1/users/batch', {
     method: 'POST',
+    ...(options || {})
+  })
+}
+
+/** Get content preferences Get user content sensitivity preferences GET /api/v1/users/me/content-preferences */
+export async function userControllerGetContentPreferences(options?: { [key: string]: any }) {
+  return request<any>('/api/v1/users/me/content-preferences', {
+    method: 'GET',
+    ...(options || {})
+  })
+}
+
+/** Update content preferences Update user content sensitivity preferences (e.g. violence) PATCH /api/v1/users/me/content-preferences */
+export async function userControllerUpdateContentPreferences(
+  body: API.UpdateContentPreferencesDto,
+  options?: { [key: string]: any }
+) {
+  return request<any>('/api/v1/users/me/content-preferences', {
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
     },

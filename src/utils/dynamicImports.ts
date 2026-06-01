@@ -50,6 +50,12 @@ export const DynamicHLSVideoPlayer = createDynamicComponent(() => import('@/comp
   ssr: false
 })
 
+export const DynamicShakaVideoPlayer = createDynamicComponent(() => import('@/components/shared/ShakaVideoPlayer'), {
+  loadingMessage: 'Loading secure video player...',
+  loadingHeight: 220,
+  ssr: false
+})
+
 export const DynamicBlogEditor = createDynamicComponent(() => import('@/components/textEditor/TextEditor'), {
   loadingMessage: 'Loading editor...',
   loadingHeight: 360,

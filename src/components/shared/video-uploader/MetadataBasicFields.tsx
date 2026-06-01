@@ -24,6 +24,11 @@ const contentTypeOptions = [
   { value: 'TVSERIES', label: 'TV Series' }
 ] as const
 
+const accessTierOptions = [
+  { value: 'BASIC', label: 'Basic - Free users can watch' },
+  { value: 'PREMIUM', label: 'Premium - Subscribers only' }
+] as const
+
 const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFieldsProps) => {
   const setMetadata = onMetadataChange
 
@@ -59,6 +64,28 @@ const MetadataBasicFields = ({ metadata, onMetadataChange }: MetadataBasicFields
             }
           >
             {maturityRatingOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <FormControl fullWidth>
+          <InputLabel>Access Tier</InputLabel>
+          <Select
+            value={metadata.accessTier}
+            label='Access Tier'
+            onChange={e =>
+              setMetadata({
+                ...metadata,
+                accessTier: e.target.value as 'BASIC' | 'PREMIUM'
+              })
+            }
+          >
+            {accessTierOptions.map(option => (
               <MenuItem key={option.value} value={option.value}>
                 {option.label}
               </MenuItem>

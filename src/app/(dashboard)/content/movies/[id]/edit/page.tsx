@@ -61,6 +61,7 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
   const [avgRating, setAvgRating] = useState(0)
   const [type, setType] = useState<'MOVIE' | 'TV_SERIES'>('MOVIE')
   const [maturityRating, setMaturityRating] = useState<string>('PG-13')
+  const [accessTier, setAccessTier] = useState<'BASIC' | 'PREMIUM'>('BASIC')
 
   // Upload states
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
@@ -120,6 +121,7 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
         setAvgRating(movieData.metaData?.avgRating || 0)
         setType((movieData.metaData?.type === 'TVSERIES' ? 'TV_SERIES' : 'MOVIE') as any)
         setMaturityRating(movieData.metaData?.maturityRating || 'PG-13')
+        setAccessTier((movieData.metaData?.accessTier as 'BASIC' | 'PREMIUM') || 'BASIC')
 
         setSelectedCategories(movieData.metaData?.categories || [])
         setSelectedTags(movieData.metaData?.tags || [])
@@ -227,6 +229,7 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
       avgRating,
       type,
       maturityRating,
+      accessTier,
       selectedCategories,
       selectedTags,
       selectedActors,
@@ -312,10 +315,12 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
                 description={description}
                 type={type}
                 maturityRating={maturityRating}
+                accessTier={accessTier}
                 onTitleChange={setTitle}
                 onDescriptionChange={setDescription}
                 onTypeChange={setType}
                 onMaturityRatingChange={setMaturityRating}
+                onAccessTierChange={setAccessTier}
               />
 
               <MediaUploadSection

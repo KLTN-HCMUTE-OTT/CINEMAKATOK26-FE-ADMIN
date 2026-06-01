@@ -134,6 +134,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
     avgRating?: number
     type: 'MOVIE' | 'TV_SERIES'
     maturityRating: string
+    accessTier?: 'BASIC' | 'PREMIUM'
     selectedCategories: any[]
     selectedTags: any[]
     selectedActors: any[]
@@ -156,6 +157,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
         releaseDate: formData.releaseDate,
         type: formData.type === 'TV_SERIES' ? 'TVSERIES' : 'MOVIE',
         maturityRating: formData.maturityRating,
+        accessTier: formData.accessTier || 'BASIC',
         trailer: formData.trailer,
         imdbRating: formData.imdbRating ?? 0,
         avgRating: formData.avgRating ?? 0,
@@ -174,6 +176,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
       const contentResponse = await contentsControllerUpdateContent({ id: movie!.metaData!.id }, contentData)
 
       const { deletedAt, rating, viewCount, ...cleanMetaData } = contentResponse.data.data as any
+      cleanMetaData.accessTier = formData.accessTier || 'BASIC'
 
       // Upload video if provided
       let finalVideoDto = movie?.video

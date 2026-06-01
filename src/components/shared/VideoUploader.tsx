@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 // MUI Imports
 import { Grid } from '@mui/material'
@@ -42,6 +42,7 @@ interface VideoMetadata {
   description: string
   releaseDate: string
   maturityRating: 'G' | 'PG' | 'PG-13' | 'R' | 'NC-17' | 'TV-Y' | 'TV-PG' | 'TV-14' | 'TV-MA'
+  accessTier: 'BASIC' | 'PREMIUM'
   thumbnail: string
   banner: string
   trailer: string
@@ -58,13 +59,17 @@ interface VideoUploaderProps {
   maxFileSize?: number
   acceptedFormats?: string[]
   uploadedFiles?: VideoFile[]
+  initialMetadata?: VideoMetadata | null
+  onChange?: (files: VideoFile[], metadata: VideoMetadata) => void
 }
 
 const VideoUploader = ({
   onUpload,
   maxFileSize = 5000,
   acceptedFormats = ['.mp4', '.mov', '.avi', '.mkv'],
-  uploadedFiles = []
+  uploadedFiles = [],
+  initialMetadata = null,
+  onChange
 }: VideoUploaderProps) => {
   // States
   const [isDragActive, setIsDragActive] = useState(false)
@@ -78,22 +83,43 @@ const VideoUploader = ({
   const [directors, setDirectors] = useState<API.DirectorDto[]>([])
   const [loading, setLoading] = useState(false)
 
-  const [metadata, setMetadata] = useState<VideoMetadata>({
-    type: 'MOVIE',
-    title: '',
-    description: '',
-    releaseDate: '',
-    maturityRating: 'PG-13',
-    thumbnail: '',
-    banner: '',
-    trailer: '',
-    imdbRating: 0,
-    avgRating: 0,
-    categories: [],
-    tags: [],
-    actors: [],
-    directors: []
+  const [metadata, setMetadata] = useState<VideoMetadata>(() => {
+    // Restore form values from parent state when navigating back
+    if (initialMetadata) {
+      return initialMetadata
+    }
+
+    return {
+      type: 'MOVIE',
+      title: '',
+      description: '',
+      releaseDate: '',
+      maturityRating: 'PG-13',
+      accessTier: 'BASIC',
+      thumbnail: '',
+      banner: '',
+      trailer: '',
+      imdbRating: 0,
+      avgRating: 0,
+      categories: [],
+      tags: [],
+      actors: [],
+      directors: []
+    }
   })
+
+  // Always keep a ref to the latest metadata so handleProcessVideos never reads a stale closure
+  const metadataRef = useRef(metadata)
+  useEffect(() => {
+    metadataRef.current = metadata
+  })
+
+  // Call onChange whenever existingFiles or metadata changes to sync with parent state
+  useEffect(() => {
+    if (onChange) {
+      onChange(existingFiles, metadata)
+    }
+  }, [existingFiles, metadata, onChange])
 
   // Custom hooks
   const { extractVideoDuration, uploadVideoToAPI } = useVideoUpload()
@@ -267,8 +293,9 @@ const VideoUploader = ({
 
   const handleProcessVideos = () => {
     if (onUpload) {
-      const uploadedFiles = existingFiles.filter(f => f.videoData)
-      onUpload(uploadedFiles, metadata)
+      const readyFiles = existingFiles.filter(f => f.videoData)
+      // Use ref to guarantee we always read the latest metadata, not a stale closure
+      onUpload(readyFiles, metadataRef.current)
     }
   }
 
