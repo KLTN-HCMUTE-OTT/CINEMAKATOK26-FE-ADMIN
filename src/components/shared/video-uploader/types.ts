@@ -4,6 +4,7 @@ export interface VideoMetadata {
   description: string
   releaseDate: string
   maturityRating: 'G' | 'PG' | 'PG-13' | 'R' | 'NC-17' | 'TV-Y' | 'TV-PG' | 'TV-14' | 'TV-MA'
+  accessTier: 'BASIC' | 'PREMIUM'
   thumbnail: string
   banner: string
   trailer: string

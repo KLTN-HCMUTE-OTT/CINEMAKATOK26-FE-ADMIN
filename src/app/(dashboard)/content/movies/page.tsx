@@ -179,16 +179,17 @@ const MoviesPage = () => {
                 <TableCell>Release Date</TableCell>
                 <TableCell>Duration</TableCell>
                 <TableCell>Rating</TableCell>
+                <TableCell>Access Tier</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align='right'>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {loading ? (
-                <TableSkeleton rows={rowsPerPage} columns={7} />
+                <TableSkeleton rows={rowsPerPage} columns={8} />
               ) : movies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 10 }}>
+                  <TableCell colSpan={8} align='center' sx={{ py: 10 }}>
                     <i className='ri-film-line' style={{ fontSize: '48px', color: '#999' }} />
                     <Typography variant='body1' color='text.secondary' sx={{ mt: 2 }}>
                       {searchQuery ? 'No movies found matching your search' : 'No movies yet'}
@@ -238,6 +239,14 @@ const MoviesPage = () => {
                     <TableCell>{formatDuration(movie.duration)}</TableCell>
                     <TableCell>
                       <Chip label={movie.metaData?.maturityRating || 'N/A'} size='small' />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={movie.metaData?.accessTier || 'BASIC'}
+                        size='small'
+                        color={movie.metaData?.accessTier === 'PREMIUM' ? 'secondary' : 'default'}
+                        variant='outlined'
+                      />
                     </TableCell>
                     <TableCell>
                       <Chip

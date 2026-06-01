@@ -4,7 +4,7 @@ import React from 'react'
 import { Dialog, DialogTitle, DialogContent, Box, Typography, Button } from '@mui/material'
 
 import { getS3Url } from '@/configs/aws'
-import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
+import { DynamicHLSVideoPlayer, DynamicShakaVideoPlayer } from '@/utils/dynamicImports'
 
 // Video Player Imports
 
@@ -46,7 +46,11 @@ export const DialogVideo = ({ title, video, thumbnailUrl, videoDialogOpen, setVi
               overflow: 'hidden'
             }}
           >
-            {isHLSUrl(video.videoUrl) ? (
+            {video.id ? (
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                <DynamicShakaVideoPlayer videoId={video.id} poster={thumbnailUrl} />
+              </div>
+            ) : isHLSUrl(video.videoUrl) ? (
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                 <DynamicHLSVideoPlayer src={getS3Url(video.videoUrl)} poster={thumbnailUrl} controls autoPlay />
               </div>

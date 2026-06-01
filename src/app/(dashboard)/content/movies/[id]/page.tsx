@@ -25,7 +25,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import { moviesControllerGetMovieById, moviesControllerDeleteMovie } from '@/api/movies'
 
 // Component Imports
-import { DynamicHLSVideoPlayer } from '@/utils/dynamicImports'
+import { DynamicHLSVideoPlayer, DynamicShakaVideoPlayer } from '@/utils/dynamicImports'
 
 // Config Imports
 import { getS3Url } from '@/configs/aws'
@@ -206,7 +206,14 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
                       overflow: 'hidden'
                     }}
                   >
-                    {isHLSUrl(movie.video.videoUrl) ? (
+                    {movie.video?.id ? (
+                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                        <DynamicShakaVideoPlayer
+                          videoId={movie.video.id}
+                          poster={movie.metaData?.thumbnail}
+                        />
+                      </div>
+                    ) : isHLSUrl(movie.video?.videoUrl) ? (
                       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                         <DynamicHLSVideoPlayer
                           src={getS3Url(movie.video.videoUrl)}
@@ -226,7 +233,7 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
                         controls
                         poster={movie.metaData?.thumbnail}
                       >
-                        <source src={getS3Url(movie.video.videoUrl)} type='video/mp4' />
+                        {movie.video?.videoUrl && <source src={getS3Url(movie.video.videoUrl)} type='video/mp4' />}
                         Your browser does not support the video tag.
                       </video>
                     )}
@@ -330,6 +337,20 @@ const MovieDetailPage = ({ params }: MovieDetailPageProps) => {
                     <Chip
                       label={movie.video?.status || 'N/A'}
                       color={movie.video?.status === 'READY' ? 'success' : 'warning'}
+                      size='small'
+                    />
+                  </Box>
+                </Box>
+
+                <Box>
+                  <Typography variant='caption' color='text.secondary'>
+                    Access Tier
+                  </Typography>
+                  <Box>
+                    <Chip
+                      label={movie.metaData?.accessTier || 'BASIC'}
+                      color={movie.metaData?.accessTier === 'PREMIUM' ? 'secondary' : 'default'}
+                      variant='outlined'
                       size='small'
                     />
                   </Box>

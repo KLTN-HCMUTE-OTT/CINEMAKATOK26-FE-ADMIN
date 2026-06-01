@@ -14,10 +14,12 @@ interface BasicInfoSectionProps {
   description: string
   type: 'MOVIE' | 'TV_SERIES'
   maturityRating: string
+  accessTier: 'BASIC' | 'PREMIUM'
   onTitleChange: (value: string) => void
   onDescriptionChange: (value: string) => void
   onTypeChange: (value: 'MOVIE' | 'TV_SERIES') => void
   onMaturityRatingChange: (value: string) => void
+  onAccessTierChange: (value: 'BASIC' | 'PREMIUM') => void
 }
 
 const BasicInfoSection = ({
@@ -25,10 +27,12 @@ const BasicInfoSection = ({
   description,
   type,
   maturityRating,
+  accessTier,
   onTitleChange,
   onDescriptionChange,
   onTypeChange,
-  onMaturityRatingChange
+  onMaturityRatingChange,
+  onAccessTierChange
 }: BasicInfoSectionProps) => {
   return (
     <>
@@ -77,6 +81,20 @@ const BasicInfoSection = ({
             <MenuItem value='TV-PG'>TV-PG</MenuItem>
             <MenuItem value='TV-14'>TV-14</MenuItem>
             <MenuItem value='TV-MA'>TV-MA</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <FormControl fullWidth>
+          <InputLabel>Access Tier</InputLabel>
+          <Select
+            value={accessTier}
+            onChange={e => onAccessTierChange(e.target.value as 'BASIC' | 'PREMIUM')}
+            label='Access Tier'
+          >
+            <MenuItem value='BASIC'>Basic – Free users can watch</MenuItem>
+            <MenuItem value='PREMIUM'>Premium – Subscribers only</MenuItem>
           </Select>
         </FormControl>
       </Grid>
