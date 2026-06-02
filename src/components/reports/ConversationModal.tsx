@@ -13,7 +13,7 @@ import {
   reviewReplyControllerGetRepliesForEpisodeReview,
   reviewReplyControllerFindOne
 } from '@/api/reviewReplies'
-import { reviewControllerFindOne } from '@/api/reviews'
+import { reviewControllerFindOne } from '@/api/review'
 import { episodeReviewControllerFindOne } from '@/api/episodeReviews'
 
 interface ConversationModalProps {
@@ -113,32 +113,29 @@ const ConversationModal = ({
 
         setOriginalReview(fetchedReview)
 
-        // Fetch conversation dựa trên review type
+        // Fetch conversation dựa trên review type (cả ACTIVE và BANNED)
+        let allReplies: any[] = []
         if (reviewId) {
-          console.log('Fetching replies for reviewId:', reviewId)
-          response = await reviewReplyControllerGetRepliesForReview({
-            reviewId: reviewId,
-            limit: 1000,
-            page: 1
-          })
+          const [activeRes, bannedRes] = await Promise.all([
+            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'ACTIVE' as any }),
+            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'BANNED' as any })
+          ])
+          allReplies = [
+            ...(activeRes?.data?.data || []),
+            ...(bannedRes?.data?.data || [])
+          ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         } else if (episodeReviewId) {
-          console.log('Fetching replies for episodeReviewId:', episodeReviewId)
-          response = await reviewReplyControllerGetRepliesForEpisodeReview({
-            episodeReviewId: episodeReviewId,
-            limit: 1000,
-            page: 1
-          })
+          const [activeRes, bannedRes] = await Promise.all([
+            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'ACTIVE' as any }),
+            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'BANNED' as any })
+          ])
+          allReplies = [
+            ...(activeRes?.data?.data || []),
+            ...(bannedRes?.data?.data || [])
+          ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         }
 
-        console.log('Conversation response:', response)
-        console.log('Report targetId for highlighting:', report.targetId)
-
-        if (response?.data?.data) {
-          setReplies(response.data.data)
-          console.log('Loaded replies:', response.data.data.length, 'replies')
-        } else {
-          console.log('No replies data in response')
-        }
+        setReplies(allReplies)
       } catch (err) {
         console.error('Failed to fetch conversation:', err)
         setError('Failed to load conversation thread')
@@ -246,6 +243,7 @@ const ConversationModal = ({
                           color='error'
                           onClick={async () => {
                             await onReplyAction('ban', reply.id)
+                            setReplies(prev => prev.map(r => r.id === reply.id ? { ...r, status: 'BANNED' } : r))
                           }}
                         >
                           Ban
@@ -257,6 +255,7 @@ const ConversationModal = ({
                           color='success'
                           onClick={async () => {
                             await onReplyAction('unban', reply.id)
+                            setReplies(prev => prev.map(r => r.id === reply.id ? { ...r, status: 'ACTIVE' } : r))
                           }}
                         >
                           Unban

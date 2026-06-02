@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { reviewControllerFindAll } from '@/api/reviews'
+import { reviewControllerFindAll } from '@/api/review'
 import { episodeReviewControllerFindAll } from '@/api/episodeReviews'
 import { reviewReplyControllerFindAll } from '@/api/reviewReplies'
 
