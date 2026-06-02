@@ -12,6 +12,8 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
 
 // Components Imports
 import DataTable from '@components/shared/DataTable'
@@ -84,6 +86,12 @@ const ReportsPage = () => {
     report: API.ReportDto | null
   }>({ open: false, report: null })
 
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'error'
+  }>({ open: false, message: '', severity: 'success' })
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
   }
@@ -137,8 +145,11 @@ const ReportsPage = () => {
       }
       refetch() // Refresh the data
       handleViewModalClose()
-    } catch (error) {
+      setSnackbar({ open: true, message: 'Action completed successfully', severity: 'success' })
+    } catch (error: any) {
       console.error('Error performing action:', error)
+      const message = error?.response?.data?.message || error?.message || 'Action failed'
+      setSnackbar({ open: true, message, severity: 'error' })
     } finally {
       setActionDialog({ open: false, action: null })
     }
@@ -277,6 +288,21 @@ const ReportsPage = () => {
         report={conversationModal.report}
         onClose={handleConversationModalClose}
       />
+
+      {/* Snackbar feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

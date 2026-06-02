@@ -27,7 +27,7 @@ import ConversationModal from '@components/reports/ConversationModal'
 import { useReviews } from '@/hooks/useReviews'
 
 // API Imports
-import { reviewControllerDeleteReview } from '@/api/reviews'
+import { reviewControllerDeleteReview } from '@/api/review'
 import { episodeReviewControllerDeleteReview } from '@/api/episodeReviews'
 import { reportControllerBan, reportControllerUnban } from '@/api/reports'
 import { reviewReplyControllerDeleteReply } from '@/api/reviewReplies'
@@ -244,14 +244,9 @@ const ReviewsPage = () => {
     ),
     rating: review.type === 'REVIEW_REPLY' ? 'N/A' : review.rating ? `${review.rating}/5` : 'N/A',
     author: (
-      <Box>
-        <Typography variant='body2' sx={{ fontWeight: 500 }}>
-          {review.name}
-        </Typography>
-        <Typography variant='caption' color='text.secondary'>
-          ID: {review.userId}
-        </Typography>
-      </Box>
+      <Typography variant='body2' sx={{ fontWeight: 500 }}>
+        {review.name}
+      </Typography>
     ),
     status: <StatusChip status={review.status || 'ACTIVE'} />,
     createdAt: new Date(review.createdAt).toLocaleString(),
