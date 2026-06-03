@@ -315,7 +315,7 @@ const RoomDetailDialog = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {roomDetail?.moderation.banList.map(entry => {
+                      {roomDetail?.moderation?.banList.map(entry => {
                         const { name, avatar } = getUserDisplay(entry.userId)
                         return (
                           <TableRow key={entry.userId}>
@@ -360,7 +360,7 @@ const RoomDetailDialog = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {roomDetail?.moderation.muteList.map(entry => {
+                      {roomDetail?.moderation?.muteList.map(entry => {
                         const { name, avatar } = getUserDisplay(entry.userId)
                         return (
                           <TableRow key={entry.userId}>

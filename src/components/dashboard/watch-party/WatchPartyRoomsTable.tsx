@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, Box, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
+import { Avatar, Box, Chip, IconButton, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 import DataTable from '@/components/shared/DataTable'
 
@@ -96,7 +96,6 @@ const WatchPartyRoomsTable = ({
   const columns = [
     { id: 'title', label: 'Title', minWidth: 220 },
     { id: 'host', label: 'Host', minWidth: 180 },
-    { id: 'videoId', label: 'Video ID', minWidth: 130 },
     { id: 'members', label: 'Members', minWidth: 100 },
     { id: 'created', label: 'Created', minWidth: 110 },
     { id: 'actions', label: 'Actions', minWidth: 80 }
@@ -125,13 +124,6 @@ const WatchPartyRoomsTable = ({
         </Avatar>
         <Typography variant='body2'>{room.hostDisplayName}</Typography>
       </Box>
-    ),
-    videoId: (
-      <Tooltip title={room.videoId}>
-        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-          {room.videoId.length > 12 ? `${room.videoId.slice(0, 12)}…` : room.videoId}
-        </Typography>
-      </Tooltip>
     ),
     members: (
       <Typography variant='body2' sx={{ fontWeight: 500 }}>

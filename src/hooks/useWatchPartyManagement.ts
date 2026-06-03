@@ -78,14 +78,11 @@ export const useWatchPartyManagement = () => {
 
   const userBatchKey = uniqueUserIds.length > 0 ? (['users-batch', uniqueUserIds.join(',')] as const) : null
 
-  const { data: userBatchResponse, isLoading: userBatchLoading } = useSWR(
-    userBatchKey,
-    async ([, idsStr]) => {
-      const ids = idsStr.split(',').filter(Boolean)
-      const response = await userControllerGetUsersByIds({ ids })
-      return response.data
-    }
-  )
+  const { data: userBatchResponse, isLoading: userBatchLoading } = useSWR(userBatchKey, async ([, idsStr]) => {
+    const ids = idsStr.split(',').filter(Boolean)
+    const response = await userControllerGetUsersByIds({ data: { ids } })
+    return response.data
+  })
 
   // Build userId → UserDto map
   const userMap = useMemo<Map<string, API.UserDto>>(() => {
