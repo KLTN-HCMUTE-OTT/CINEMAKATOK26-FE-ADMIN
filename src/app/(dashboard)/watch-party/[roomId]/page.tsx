@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import {
   Alert,
@@ -43,6 +43,13 @@ export default function WatchPartyRoomPage() {
   const actions = useWatchPartyAdminRoom(roomId)
   const { status, error, room, members, videoState, messages, queue, mutedUserIds, bannedUserIds, bannedMemberDetails, isClosed, closeReason, closeCustomReason, isKicked, currentVideoTitle } =
     useWatchPartyRoomStore()
+
+  const handleSync = useCallback(
+    ({ isPlaying, currentTime }: { isPlaying: boolean; currentTime: number }) => {
+      actions.syncVideo(isPlaying, currentTime)
+    },
+    [actions.syncVideo],
+  )
 
   const [closedDialogDismissed, setClosedDialogDismissed] = useState(false)
   const [kickedDialogDismissed, setKickedDialogDismissed] = useState(false)
@@ -134,7 +141,7 @@ export default function WatchPartyRoomPage() {
         <Box sx={{ flex: '1 1 60%', display: 'flex', flexDirection: 'column', gap: 1 }}>
           <SyncedVideoPlayer
             videoState={videoState}
-            onSync={({ isPlaying, currentTime }) => actions.syncVideo(isPlaying, currentTime)}
+            onSync={handleSync}
             onVideoEnd={actions.videoEnded}
             onPlayNext={actions.playNext}
           />
