@@ -61,7 +61,15 @@ async function proxyRequest(request: NextRequest) {
     init.body = await request.arrayBuffer()
   }
 
-  const response = await fetch(upstreamUrl, init)
+  let response: Response
+
+  try {
+    response = await fetch(upstreamUrl, init)
+  } catch (err) {
+    // Upstream (Cloudflare tunnel / backend) unreachable — surface a clean JSON
+    // 502 instead of throwing, which would become an opaque 500 HTML page.
+    return NextResponse.json({ error: 'Bad Gateway', message: 'Upstream (tunnel) unreachable' }, { status: 502 })
+  }
 
   // Backend returned a redirect (3xx) — treat as authentication failure so the
   // client's axios interceptor can trigger token refresh and retry.
@@ -71,6 +79,17 @@ async function proxyRequest(request: NextRequest) {
 
   const responseBody = await response.arrayBuffer()
   const responseHeaders = new Headers(response.headers)
+
+  // fetch() (undici) transparently decompresses the upstream body when we call
+  // .arrayBuffer(), but the original content-encoding/length headers remain.
+  // Forwarding them with the already-decoded body makes the browser try to
+  // decompress plain bytes → net::ERR_CONTENT_DECODING_FAILED (axios "Network
+  // Error"). Cloudflare adds br/gzip even when the local origin didn't, which is
+  // why this only breaks through the tunnel. Strip the now-stale headers.
+  responseHeaders.delete('content-encoding')
+  responseHeaders.delete('content-length')
+  responseHeaders.delete('transfer-encoding')
+
   responseHeaders.set('cache-control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   responseHeaders.set('pragma', 'no-cache')
   responseHeaders.set('expires', '0')
