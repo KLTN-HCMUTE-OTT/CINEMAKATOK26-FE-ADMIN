@@ -494,6 +494,7 @@ async function mockApiRoutes(page: Page) {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
+          statusCode: 200,
           data: [
             {
               id: 'act-1',

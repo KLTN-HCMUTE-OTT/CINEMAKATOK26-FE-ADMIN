@@ -31,7 +31,7 @@ export default defineConfig({
     video: 'on-first-retry'
   },
 
-  projects: process.env.CI ? [
+  projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] }
@@ -44,20 +44,15 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] }
     }
-  ] : [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
-    }
   ],
 
   webServer: {
     command: process.env.CI ? 'pnpm start' : 'pnpm run dev',
     url: 'http://localhost:3022',
     env: {
-      PORT: '3022',
+      PORT: '3022'
     },
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+    timeout: 180_000
+  }
 })
