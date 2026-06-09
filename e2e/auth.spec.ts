@@ -30,7 +30,7 @@ test.describe('Authentication', () => {
     await page.getByLabel(/password/i).fill('wrongpassword')
     await page.getByRole('button', { name: /log in/i }).click()
 
-    await expect(page.getByRole('alert')).toBeVisible({ timeout: 10000 })
+    await expect(page.locator('.MuiAlert-root')).toBeVisible({ timeout: 10000 })
   })
 
   test('successful login redirects to dashboard', async ({ authenticatedPage }) => {
