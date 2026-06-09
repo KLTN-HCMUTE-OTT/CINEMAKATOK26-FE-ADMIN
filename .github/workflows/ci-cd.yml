@@ -44,14 +44,14 @@ jobs:
       - name: Run Vitest tests
         run: pnpm run test:run
         env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3011
+          NEXT_PUBLIC_APP_URL: http://localhost:3022
           NEXT_PUBLIC_API_URL: http://localhost:3000
 
       - name: Run test coverage
         run: pnpm run test:coverage
         continue-on-error: true
         env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3011
+          NEXT_PUBLIC_APP_URL: http://localhost:3022
           NEXT_PUBLIC_API_URL: http://localhost:3000
 
       - name: Upload coverage report
