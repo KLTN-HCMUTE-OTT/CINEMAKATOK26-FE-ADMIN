@@ -292,7 +292,7 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    needs: build
+    needs: quality
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
     steps:
@@ -313,11 +313,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: production-build
-          path: .
+      - name: Build application
+        run: NODE_ENV=production pnpm run build
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3022
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
 
       - name: Install Playwright Browsers
         run: pnpm run test:e2e:install
