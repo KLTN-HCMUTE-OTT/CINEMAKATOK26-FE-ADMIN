@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { SWRConfig } from 'swr'
 
-vi.mock('@/api/reviews', () => ({
+vi.mock('@/api/review', () => ({
   reviewControllerFindAll: vi.fn()
 }))
 vi.mock('@/api/episodeReviews', () => ({
@@ -15,7 +15,7 @@ vi.mock('@/api/reviewReplies', () => ({
 }))
 
 import { useReviews } from './useReviews'
-import { reviewControllerFindAll } from '@/api/reviews'
+import { reviewControllerFindAll } from '@/api/review'
 import { episodeReviewControllerFindAll } from '@/api/episodeReviews'
 import { reviewReplyControllerFindAll } from '@/api/reviewReplies'
 
