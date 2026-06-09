@@ -3,10 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [main, dev]
+    branches: [main, dev]
   pull_request:
     branches: [main]
 
 env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
   NODE_VERSION: "20"
   PNPM_VERSION: "9"
 
@@ -30,17 +33,34 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache: "pnpm"
 
       - name: Install dependencies
+        run: pnpm install --frozen-lockfile
         run: pnpm install --frozen-lockfile
 
       - name: Run lint
         run: pnpm run lint
+      - name: Run lint
+        run: pnpm run lint
 
+      - name: Run audit
       - name: Run audit
         run: pnpm audit --audit-level moderate
         continue-on-error: true
 
+      - name: Run Vitest tests
+        run: pnpm run test:run
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3011
+          NEXT_PUBLIC_API_URL: http://localhost:3000
+
+      - name: Run test coverage
+        run: pnpm run test:coverage
+        continue-on-error: true
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3011
+          NEXT_PUBLIC_API_URL: http://localhost:3000
       - name: Run Vitest tests
         run: pnpm run test:run
         env:
@@ -61,11 +81,13 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 14
+          retention-days: 14
 
   # Build and Test
   build:
     name: Build Application
     runs-on: ubuntu-latest
+    needs: quality
     needs: quality
 
     steps:
@@ -82,8 +104,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache: "pnpm"
 
       - name: Install dependencies
+        run: pnpm install --frozen-lockfile
         run: pnpm install --frozen-lockfile
 
       - name: Build application
@@ -91,10 +115,18 @@ jobs:
         env:
           NEXT_PUBLIC_APP_URL: ${{ secrets.PRODUCTION_URL || 'http://localhost:3022' }}
           NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
+        run: NODE_ENV=production pnpm run build
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ secrets.PRODUCTION_URL || 'http://localhost:3022' }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
 
       - name: Bundle analysis
         run: pnpm run analyze
+        run: pnpm run analyze
         continue-on-error: true
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ secrets.PRODUCTION_URL || 'http://localhost:3022' }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
         env:
           NEXT_PUBLIC_APP_URL: ${{ secrets.PRODUCTION_URL || 'http://localhost:3022' }}
           NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
@@ -128,11 +160,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Run security scan
+        run: |
+          pnpm audit --audit-level high
         run: |
           pnpm audit --audit-level high
         continue-on-error: true
@@ -158,10 +194,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: .
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -179,11 +222,23 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:3000
           CSRF_SECRET: mock-csrf-secret-for-ci-cd-pipeline-execution-only-32-chars
           SESSION_SECRET: mock-session-secret-for-ci-cd-pipeline-execution-only-32-chars
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3022
+          NEXT_PUBLIC_API_URL: http://localhost:3000
+          CSRF_SECRET: mock-csrf-secret-for-ci-cd-pipeline-execution-only-32-chars
+          SESSION_SECRET: mock-session-secret-for-ci-cd-pipeline-execution-only-32-chars
 
   # Deploy to Production
   deploy-production:
     name: Deploy to Production
+  # Deploy to Production
+  deploy-production:
+    name: Deploy to Production
     runs-on: ubuntu-latest
+    needs: [quality, build, security, performance]
+    if: github.ref == 'refs/heads/main'
+    environment: production
     needs: [quality, build, security, performance]
     if: github.ref == 'refs/heads/main'
     environment: production
@@ -193,15 +248,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to Vercel (Production)
+      - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: "--prod"
+          vercel-args: "--prod"
           scope: ${{ secrets.VERCEL_ORG_ID }}
           vercel-version: 50.0.0
+          vercel-version: 50.0.0
 
+      - name: Post-deployment verification
       - name: Post-deployment verification
         run: |
           sleep 60
@@ -218,8 +277,22 @@ jobs:
   # End-to-End Testing
   e2e:
     name: E2E Tests
+          sleep 60
+          curl -f ${{ secrets.PRODUCTION_URL }} || exit 1
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "Production deployment successful!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "Production deployment failed!"
+
+  # End-to-End Testing
+  e2e:
+    name: E2E Tests
     runs-on: ubuntu-latest
-    needs: quality
+    needs: build
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
     steps:
@@ -240,11 +313,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build application
-        run: NODE_ENV=production pnpm run build
-        env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3022
-          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: .
 
       - name: Install Playwright Browsers
         run: pnpm run test:e2e:install
@@ -267,6 +340,11 @@ jobs:
 
       - name: Upload test traces on failure
         if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces
