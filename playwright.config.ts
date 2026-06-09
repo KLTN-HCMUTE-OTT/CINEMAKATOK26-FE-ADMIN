@@ -15,25 +15,23 @@ if (existsSync(envPath)) {
   }
 }
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3022'
-
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : 2,
-  timeout: 60000,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 2 : undefined,
+  timeout: 30_000,
   reporter: process.env.CI ? 'github' : 'html',
-
+  expect: { timeout: 10_000 },
   use: {
-    baseURL: BASE_URL,
+    baseURL: 'http://localhost:3022',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry'
   },
 
-  projects: [
+  projects: process.env.CI ? [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] }
@@ -46,12 +44,20 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] }
     }
+  ] : [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] }
+    }
   ],
 
   webServer: {
-    command: process.env.CI ? 'pnpm exec next start -p 3022' : 'pnpm exec next dev -p 3022',
-    url: BASE_URL,
+    command: process.env.CI ? 'pnpm run build && pnpm start' : 'pnpm run dev',
+    url: 'http://localhost:3022',
+    env: {
+      PORT: '3022',
+    },
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000
-  }
+    timeout: 180_000,
+  },
 })
