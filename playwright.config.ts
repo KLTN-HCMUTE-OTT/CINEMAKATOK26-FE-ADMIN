@@ -52,7 +52,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: process.env.CI ? 'pnpm run build && pnpm start' : 'pnpm run dev',
+    command: process.env.CI ? 'pnpm start' : 'pnpm run dev',
     url: 'http://localhost:3022',
     env: {
       PORT: '3022',
