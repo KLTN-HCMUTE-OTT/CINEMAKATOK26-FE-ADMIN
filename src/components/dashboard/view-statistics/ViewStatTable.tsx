@@ -79,7 +79,7 @@ const ViewStatTable = ({
                 </TableCell>
                 <TableCell align='right'>
                   <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                    {row.views.toLocaleString()}
+                    {(row.views ?? 0).toLocaleString()}
                   </Typography>
                 </TableCell>
                 <TableCell align='right'>
