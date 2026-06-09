@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect } from 'react'
+
 import { useRouter as useNextRouter } from 'next/navigation'
 
 // MUI Imports
@@ -154,11 +155,13 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
   // Handle thumbnail upload
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     try {
       setThumbnailFile(file)
       const url = await uploadThumbnail(file)
+
       setThumbnail(url)
     } catch (err) {
       console.error('Error uploading thumbnail:', err)
@@ -169,11 +172,13 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
   // Handle banner upload
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     try {
       setBannerFile(file)
       const url = await uploadBanner(file)
+
       setBanner(url)
     } catch (err) {
       console.error('Error uploading banner:', err)
@@ -184,12 +189,14 @@ const MovieEditPage = ({ params }: MovieEditPageProps) => {
   // Handle video upload
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (file) {
       setVideoFile(file)
 
       // Extract video duration using HTML5 Video API
       try {
         const video = document.createElement('video')
+
         video.preload = 'metadata'
 
         video.onloadedmetadata = () => {

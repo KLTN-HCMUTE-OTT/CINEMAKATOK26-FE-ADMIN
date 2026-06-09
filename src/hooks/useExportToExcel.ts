@@ -1,10 +1,5 @@
 import { useCallback } from 'react'
 
-interface ExportOptions {
-  fileName?: string
-  sheetName?: string
-}
-
 interface SheetData {
   name: string
   headers: string[]
@@ -31,7 +26,9 @@ export const useExportToExcel = () => {
                 if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
                   return `"${cell.replace(/"/g, '""')}"`
                 }
-                return cell ?? ''
+
+                
+return cell ?? ''
               })
               .join(',')
           )
@@ -64,11 +61,13 @@ export const useExportToExcel = () => {
 
       sheetsData.forEach(sheet => {
         const ws_data = [sheet.headers, ...sheet.data.map(row => sheet.headers.map(header => row[header]))]
+
         workbookData[sheet.name] = ws_data
       })
 
       // Tạo CSV cho sheet đầu tiên (fallback cho trình duyệt không support xlsx)
       const firstSheet = sheetsData[0]
+
       const csvContent = workbookData[firstSheet.name]
         .map(row =>
           row
@@ -76,7 +75,9 @@ export const useExportToExcel = () => {
               if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
                 return `"${cell.replace(/"/g, '""')}"`
               }
-              return cell ?? ''
+
+              
+return cell ?? ''
             })
             .join(',')
         )

@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect } from 'react'
+
 import { useRouter as useNextRouter } from 'next/navigation'
 
 // MUI Imports
@@ -48,6 +49,7 @@ const ActorDetailPage = ({ params }: ActorDetailPageProps) => {
         setLoading(true)
         setError(null)
         const response = await actorsControllerGetActorById({ id: params.id })
+
         setActor(response.data.data)
       } catch (err: any) {
         console.error('Error fetching actor:', err)

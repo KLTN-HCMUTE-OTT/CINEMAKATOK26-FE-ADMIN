@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import {
   Avatar,
   Box,
@@ -82,7 +83,9 @@ const RoomDetailDialog = ({
 
   const getUserDisplay = (userId: string, fallbackDisplayName?: string) => {
     const user = userMap.get(userId)
-    return {
+
+    
+return {
       name: user?.name ?? fallbackDisplayName ?? (userId ? `user-${userId.slice(0, 6)}` : 'Unknown'),
       avatar: user?.avatar
     }
@@ -224,7 +227,9 @@ const RoomDetailDialog = ({
                 <List disablePadding sx={{ px: 1 }}>
                   {roomDetail?.members.map(member => {
                     const { name, avatar } = getUserDisplay(member.userId, member.displayName)
-                    return (
+
+                    
+return (
                       <ListItem
                         key={member.userId}
                         secondaryAction={
@@ -270,7 +275,9 @@ const RoomDetailDialog = ({
                 <Box sx={{ maxHeight: 400, overflow: 'auto', px: 3 }}>
                   {roomDetail?.chatMessages.map((msg, i) => {
                     const { name, avatar } = getUserDisplay(msg.userId)
-                    return (
+
+                    
+return (
                       <Box key={i} sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
                         <Avatar src={avatar} alt={name} sx={{ width: 30, height: 30, mt: 0.25 }}>
                           {name[0]?.toUpperCase()}
@@ -317,7 +324,9 @@ const RoomDetailDialog = ({
                     <TableBody>
                       {roomDetail?.moderation?.banList.map(entry => {
                         const { name, avatar } = getUserDisplay(entry.userId)
-                        return (
+
+                        
+return (
                           <TableRow key={entry.userId}>
                             <TableCell>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -362,7 +371,9 @@ const RoomDetailDialog = ({
                     <TableBody>
                       {roomDetail?.moderation?.muteList.map(entry => {
                         const { name, avatar } = getUserDisplay(entry.userId)
-                        return (
+
+                        
+return (
                           <TableRow key={entry.userId}>
                             <TableCell>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

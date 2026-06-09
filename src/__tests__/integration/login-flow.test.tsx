@@ -1,7 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@/test/test-utils'
-import userEvent from '@testing-library/user-event'
 import React from 'react'
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import userEvent from '@testing-library/user-event'
+
+import { render, screen, waitFor } from '@/test/test-utils'
 
 // Mock MUI with lightweight accessible stubs to avoid V8 table size OOM
 vi.mock('@mui/material/Card', () => ({
@@ -94,6 +97,7 @@ describe('Login Flow Integration', () => {
     // Arrange
     mockLogin.mockResolvedValue(undefined)
     const user = userEvent.setup()
+
     render(<Login mode="light" />)
 
     // Act
@@ -111,6 +115,7 @@ describe('Login Flow Integration', () => {
       .mockRejectedValueOnce(new Error('Server unavailable'))
       .mockResolvedValueOnce(undefined)
     const user = userEvent.setup()
+
     render(<Login mode="light" />)
 
     // Act — first attempt fails

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { useRouter } from 'next/navigation'
 
 import { useViewStatistics } from '@/hooks/useViewStatistics'
@@ -59,6 +60,7 @@ export function useViewStatisticsController({ exportToExcel }: UseViewStatistics
 
   const handleExport = () => {
     const tabName = ['Movies', 'TV Series', 'Categories'][tabValue]
+
     const headers =
       tabValue === 2
         ? ['Name', 'Views', 'Trend', 'Change', 'Percentage']

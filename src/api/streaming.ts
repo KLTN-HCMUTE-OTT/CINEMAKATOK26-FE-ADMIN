@@ -71,7 +71,6 @@ export async function streamingControllerUploadVideo(body: {}, file?: File, opti
   return request<any>('/api/v1/videos/upload', {
     method: 'POST',
     data: formData,
-    requestType: 'form',
     ...(options || {})
   })
 }

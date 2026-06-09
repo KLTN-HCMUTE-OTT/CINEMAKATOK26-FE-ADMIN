@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+
 import type { ChatMessage, QueueItem, RoomMember, RoomState, RoomSummary, VideoState } from '../types/watchPartyRoom'
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
@@ -73,6 +74,7 @@ export const useWatchPartyRoomStore = create<WatchPartyRoomState>((set) => ({
     const playingTitle = state.videoState?.videoId
       ? (state.queue.find((q) => q.videoId === state.videoState!.videoId)?.title ?? null)
       : null
+
     set({
       room: state.room,
       members: state.members,
@@ -116,12 +118,15 @@ export const useWatchPartyRoomStore = create<WatchPartyRoomState>((set) => ({
   banUser: (userId, details) =>
     set((s) => {
       const member = s.members.find((m) => m.userId === userId)
+
       const detail: BannedMemberDetail = {
         userId,
         displayName: details?.displayName ?? member?.displayName ?? `User ${userId.slice(0, 6)}`,
         avatarUrl: details?.avatarUrl ?? member?.avatarUrl,
       }
-      return {
+
+      
+return {
         bannedUserIds: s.bannedUserIds.includes(userId) ? s.bannedUserIds : [...s.bannedUserIds, userId],
         bannedMemberDetails: { ...s.bannedMemberDetails, [userId]: detail },
         members: s.members.filter((m) => m.userId !== userId),
@@ -131,7 +136,9 @@ export const useWatchPartyRoomStore = create<WatchPartyRoomState>((set) => ({
   unbanUser: (userId) =>
     set((s) => {
       const { [userId]: _, ...rest } = s.bannedMemberDetails
-      return {
+
+      
+return {
         bannedUserIds: s.bannedUserIds.filter((id) => id !== userId),
         bannedMemberDetails: rest,
       }

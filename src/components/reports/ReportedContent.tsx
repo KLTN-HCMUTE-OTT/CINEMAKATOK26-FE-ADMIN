@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
+
 import { reviewReplyControllerFindOne } from '@/api/reviewReplies'
 
 interface ReportedContentProps {
@@ -16,8 +18,10 @@ const ReportedContent = ({ report }: ReportedContentProps) => {
     const fetchReplyContent = async () => {
       if (report.type === 'REVIEW_REPLY' && report.targetId) {
         setLoading(true)
+
         try {
           const response = await reviewReplyControllerFindOne({ id: report.targetId })
+
           if (response?.data?.data) {
             setReplyContent(response.data.data.content)
           }
@@ -40,7 +44,9 @@ const ReportedContent = ({ report }: ReportedContentProps) => {
     } else if (report.type === 'REVIEW_REPLY') {
       return replyContent || 'Loading reply...'
     }
-    return 'Unknown content'
+
+    
+return 'Unknown content'
   }
 
   if (loading && report.type === 'REVIEW_REPLY') {

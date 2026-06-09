@@ -69,7 +69,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: EpisodeFormProps) => {
           thumbnailUrl: uploadedVideo.thumbnailUrl,
           videoUrl: uploadedVideo.videoUrl,
           status: uploadedVideo.status
-        }
+        } as any
 
         setVideo(videoData)
       }

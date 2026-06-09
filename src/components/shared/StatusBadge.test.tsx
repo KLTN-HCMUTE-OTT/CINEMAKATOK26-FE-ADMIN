@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { render, screen } from '@/test/test-utils'
 import StatusBadge from './StatusBadge'
 
@@ -41,12 +42,14 @@ describe('StatusBadge', () => {
   it('renders with small size by default', () => {
     const { container } = render(<StatusBadge status="active" />)
     const chip = container.querySelector('.MuiChip-sizeSmall')
+
     expect(chip).toBeInTheDocument()
   })
 
   it('renders with medium size when specified', () => {
     const { container } = render(<StatusBadge status="active" size="medium" />)
     const chip = container.querySelector('.MuiChip-sizeMedium')
+
     expect(chip).toBeInTheDocument()
   })
 

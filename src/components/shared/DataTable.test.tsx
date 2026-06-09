@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
+
 import { render, screen, fireEvent } from '@/test/test-utils'
 import DataTable from './DataTable'
 
@@ -66,6 +67,7 @@ describe('DataTable', () => {
 
     it('calls onSearchChange when typing in search', () => {
       const onSearchChange = vi.fn()
+
       render(
         <DataTable
           columns={mockColumns}
@@ -77,6 +79,7 @@ describe('DataTable', () => {
       )
 
       const searchInput = screen.getByPlaceholderText('Search...')
+
       fireEvent.change(searchInput, { target: { value: 'Alice' } })
 
       expect(onSearchChange).toHaveBeenCalledWith('Alice')
@@ -114,6 +117,7 @@ describe('DataTable', () => {
 
     it('calls onPageChange when navigating', () => {
       const onPageChange = vi.fn()
+
       render(
         <DataTable
           columns={mockColumns}
@@ -126,6 +130,7 @@ describe('DataTable', () => {
       )
 
       const nextButton = screen.getByLabelText('Go to next page')
+
       fireEvent.click(nextButton)
 
       expect(onPageChange).toHaveBeenCalledWith(1)
@@ -134,6 +139,7 @@ describe('DataTable', () => {
     it('calls onRowsPerPageChange', () => {
       const onRowsPerPageChange = vi.fn()
       const onPageChange = vi.fn()
+
       render(
         <DataTable
           columns={mockColumns}
@@ -147,9 +153,11 @@ describe('DataTable', () => {
       )
 
       const rowsSelect = screen.getByRole('combobox')
+
       fireEvent.mouseDown(rowsSelect)
 
       const option25 = screen.getByRole('option', { name: '25' })
+
       fireEvent.click(option25)
 
       expect(onRowsPerPageChange).toHaveBeenCalledWith(25)
@@ -165,6 +173,7 @@ describe('DataTable', () => {
           format: (value: number) => `$${value.toFixed(2)}`
         }
       ]
+
       const rows = [{ amount: 100 }]
 
       render(<DataTable columns={columns} rows={rows} searchable={false} />)

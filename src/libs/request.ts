@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios from 'axios'
 
 // Tạo axios instance với config
 const instance = axios.create({
@@ -67,7 +68,9 @@ instance.interceptors.request.use(
     if (process.env.NODE_ENV === 'development') {
       console.error('❌ Request Error:', error)
     }
-    return Promise.reject(error)
+
+    
+return Promise.reject(error)
   }
 )
 
@@ -85,7 +88,9 @@ instance.interceptors.response.use(
         data: response.data
       })
     }
-    return response
+
+    
+return response
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & {
@@ -117,12 +122,15 @@ instance.interceptors.response.use(
       if (typeof window !== 'undefined') {
         window.location.href = '/login'
       }
-      return Promise.reject(error)
+
+      
+return Promise.reject(error)
     }
 
     // Xử lý 403 - Forbidden
     if (error.response?.status === 403) {
       console.error('❌ Forbidden - No permission')
+
       if (typeof window !== 'undefined') {
         // Có thể redirect hoặc show toast
         // window.location.href = '/forbidden';
@@ -137,6 +145,7 @@ instance.interceptors.response.use(
     // Xử lý 500 - Internal Server Error
     if (error.response?.status === 500) {
       console.error('❌ Server Error')
+
       // Có thể show toast hoặc notification
     }
 
@@ -166,7 +175,9 @@ export default function request<T = any>(
   if (typeof url === 'string') {
     return instance.request<T>({ url, ...config })
   }
-  return instance.request<T>(url)
+
+  
+return instance.request<T>(url)
 }
 
 // Export axios instance để dùng trực tiếp nếu cần

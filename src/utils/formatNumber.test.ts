@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { formatNumber, formatCurrency, formatCompactNumber, formatPercentage } from './formatNumber'
 
 describe('formatNumber', () => {
@@ -46,11 +47,13 @@ describe('formatCurrency', () => {
 
   it('formats with custom currency', () => {
     const result = formatCurrency(1000, 'EUR')
+
     expect(result).toContain('1,000')
   })
 
   it('formats negative currency values', () => {
     const result = formatCurrency(-500)
+
     expect(result).toContain('500')
   })
 })

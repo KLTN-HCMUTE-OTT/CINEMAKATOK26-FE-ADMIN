@@ -16,7 +16,7 @@ const SeasonEmptyState = ({ titleType }: SeasonEmptyStateProps) => {
             Season management is only available for Series content
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-            This title is marked as "{titleType}". Change the content type to "Series" to enable season management.
+            This title is marked as {titleType}. Change the content type to "Series" to enable season management.
           </Typography>
         </Box>
       </CardContent>

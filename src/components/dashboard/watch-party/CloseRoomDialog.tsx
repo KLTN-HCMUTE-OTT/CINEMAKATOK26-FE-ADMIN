@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import {
   Alert,
   Button,
@@ -37,8 +38,10 @@ const CloseRoomDialog = ({ open, room, onClose, onConfirm }: CloseRoomDialogProp
     if (!room) return
     setError(null)
     setSubmitting(true)
+
     try {
       const result = await onConfirm(room.roomId, reason.trim() || undefined)
+
       if (result.success) {
         setReason('')
         onClose()

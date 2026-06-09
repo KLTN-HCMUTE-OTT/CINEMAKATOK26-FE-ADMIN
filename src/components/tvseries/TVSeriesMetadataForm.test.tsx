@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { render, screen, fireEvent } from '@/test/test-utils'
 import TVSeriesMetadataForm from './TVSeriesMetadataForm'
 
@@ -17,7 +18,7 @@ const mockHook = {
   actors: [],
   directors: [],
   loading: false,
-  error: null,
+  error: null as string | null,
   uploadingThumbnail: false,
   uploadingBanner: false,
   handleChange: vi.fn(),
@@ -72,15 +73,18 @@ describe('TVSeriesMetadataForm', () => {
   it('submit button is disabled when form is invalid', () => {
     render(<TVSeriesMetadataForm onComplete={vi.fn()} />)
     const submitBtn = screen.getByRole('button', { name: /continue to seasons & episodes/i })
+
     expect(submitBtn).toBeDisabled()
   })
 
   it('submit button is enabled and calls onComplete when valid', () => {
     mockHook.isFormValid.mockReturnValue(true)
     const onComplete = vi.fn()
+
     render(<TVSeriesMetadataForm onComplete={onComplete} />)
     
     const submitBtn = screen.getByRole('button', { name: /continue to seasons & episodes/i })
+
     expect(submitBtn).toBeEnabled()
     
     fireEvent.click(submitBtn)

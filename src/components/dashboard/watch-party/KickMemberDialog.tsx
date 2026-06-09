@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import {
   Alert,
   Avatar,
@@ -53,17 +54,21 @@ const KickMemberDialog = ({ open, roomId, member, userMap, onClose, onKick, onBa
 
     try {
       const kickResult = await onKick(roomId, member.userId)
+
       if (!kickResult.success) {
         setError(kickResult.error || 'Failed to kick member')
-        return
+        
+return
       }
 
       if (alsoBan) {
         const durationSec = banDurationDays > 0 ? banDurationDays * 86400 : undefined
         const banResult = await onBan(member.userId, durationSec)
+
         if (!banResult.success) {
           setError(banResult.error || 'Kicked but failed to ban user')
-          return
+          
+return
         }
       }
 

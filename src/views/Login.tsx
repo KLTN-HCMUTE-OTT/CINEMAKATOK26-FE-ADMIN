@@ -60,6 +60,7 @@ const Login = ({ mode }: { mode: Mode }) => {
 
     try {
       await login(email, password)
+
       // Redirect is handled in AuthContext
     } catch (err: any) {
       setError(err.message || 'Invalid email or password. Please try again.')

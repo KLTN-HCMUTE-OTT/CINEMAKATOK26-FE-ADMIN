@@ -49,11 +49,13 @@ const UserBanDialog = ({ open, user, loading, onClose, onBan, onUnban }: UserBan
   const handleSubmit = async () => {
     if (action === 'ban' && !reason.trim()) {
       setError('Please provide a ban reason')
-      return
+      
+return
     }
 
     setError(null)
     setSubmitting(true)
+
     try {
       const result = action === 'ban' ? await onBan(reason, durationDays) : await onUnban()
 

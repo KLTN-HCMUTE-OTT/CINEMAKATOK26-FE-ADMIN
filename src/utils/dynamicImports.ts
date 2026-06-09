@@ -1,6 +1,7 @@
 import { createElement, type ComponentType } from 'react'
 
 import dynamic from 'next/dynamic'
+
 import { Skeleton } from '@mui/material'
 
 /**

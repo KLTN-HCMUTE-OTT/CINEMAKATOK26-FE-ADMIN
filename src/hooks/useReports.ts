@@ -1,6 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
+
 import { reportControllerFindAll } from '@/api/reports'
 
 interface UseReportsProps {

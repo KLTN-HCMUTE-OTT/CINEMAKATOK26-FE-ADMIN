@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@/test/test-utils'
+
 import userEvent from '@testing-library/user-event'
+
+import { render, screen, fireEvent } from '@/test/test-utils'
 import PromotionModal from './PromotionModal'
 
 describe('PromotionModal', () => {
@@ -32,26 +34,32 @@ describe('PromotionModal', () => {
     render(<PromotionModal open={true} onClose={mockOnClose} onSave={mockOnSave} />)
 
     const saveButton = screen.getByRole('button', { name: /add promotion/i })
+
     expect(saveButton).toBeDisabled()
   })
 
   it('enables save button and calls onSave with data when fields are filled', async () => {
     const user = userEvent.setup()
+
     render(<PromotionModal open={true} onClose={mockOnClose} onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText(/promotion name/i), 'Summer Sale')
     
     // MUI number inputs might need clearing first or just typing
     const valueInput = screen.getByLabelText(/value/i, { selector: 'input[type="number"]' })
+
     await user.type(valueInput, '20')
 
     const startDateInput = screen.getByLabelText(/start date/i)
+
     fireEvent.change(startDateInput, { target: { value: '2024-06-01' } })
 
     const endDateInput = screen.getByLabelText(/end date/i)
+
     fireEvent.change(endDateInput, { target: { value: '2024-06-30' } })
 
     const saveButton = screen.getByRole('button', { name: /add promotion/i })
+
     expect(saveButton).toBeEnabled()
 
     fireEvent.click(saveButton)
@@ -92,6 +100,7 @@ describe('PromotionModal', () => {
     expect(screen.getByLabelText(/value/i, { selector: 'input[type="number"]' })).toHaveValue(50)
     
     const saveButton = screen.getByRole('button', { name: /update promotion/i })
+
     expect(saveButton).toBeEnabled()
   })
 })

@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect } from 'react'
+
 import { useRouter as useNextRouter } from 'next/navigation'
 
 // MUI Imports
@@ -48,6 +49,7 @@ const DirectorDetailPage = ({ params }: DirectorDetailPageProps) => {
         setLoading(true)
         setError(null)
         const response = await directorsControllerGetDirectorById({ id: params.id })
+
         setDirector(response.data.data)
       } catch (err: any) {
         console.error('Error fetching director:', err)

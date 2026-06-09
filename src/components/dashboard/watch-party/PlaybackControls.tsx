@@ -1,6 +1,7 @@
 'use client'
 
-import { Box, Button, IconButton, Slider, Tooltip, Typography } from '@mui/material'
+import { Box, IconButton, Slider, Tooltip, Typography } from '@mui/material'
+
 import type { VideoState } from '@/types/watchPartyRoom'
 
 interface PlaybackControlsProps {
@@ -14,7 +15,9 @@ interface PlaybackControlsProps {
 const formatTime = (sec: number) => {
   const m = Math.floor(sec / 60)
   const s = Math.floor(sec % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
+
+  
+return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 const PlaybackControls = ({ videoState, onPlay, onPause, onSeek, onPlayNext }: PlaybackControlsProps) => {

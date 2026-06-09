@@ -86,10 +86,12 @@ const TrendingStatistics = ({ exportToExcel }: TrendingStatisticsProps) => {
 
   // Calculate summary stats from API data
   const validEngagements = trendingData.filter(item => item.engagement != null && !isNaN(item.engagement))
+
   const avgEngagement =
     validEngagements.length > 0
       ? (validEngagements.reduce((sum, item) => sum + item.engagement, 0) / validEngagements.length).toFixed(1)
       : '0'
+
   const validViews = trendingData.filter(item => item.views != null && !isNaN(item.views))
   const topViews = validViews.length > 0 ? Math.max(...validViews.map(item => item.views)) : 0
 

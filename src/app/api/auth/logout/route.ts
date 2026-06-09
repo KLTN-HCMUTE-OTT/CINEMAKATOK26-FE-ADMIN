@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
     // Notify backend to invalidate refresh token if needed
     if (accessToken) {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
       try {
         await fetch(`${apiUrl}/api/v1/auth/logout`, {
           method: 'POST',
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     return res
   } catch (error) {
     console.error('Logout route error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    
+return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

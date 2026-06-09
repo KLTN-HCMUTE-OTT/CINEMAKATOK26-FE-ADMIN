@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect } from 'react'
+
 import { useRouter as useNextRouter } from 'next/navigation'
 
 // MUI Imports
@@ -80,6 +81,7 @@ const DirectorEditPage = ({ params }: DirectorEditPageProps) => {
   // Upload image to Cloudinary
   const uploadImageToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData()
+
     formData.append('file', file)
     formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset)
 
@@ -93,17 +95,21 @@ const DirectorEditPage = ({ params }: DirectorEditPageProps) => {
     }
 
     const data = await response.json()
-    return data.secure_url
+
+    
+return data.secure_url
   }
 
   // Handle image upload
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     try {
       setUploadingImage(true)
       const url = await uploadImageToCloudinary(file)
+
       setProfilePicture(url)
     } catch (err) {
       console.error('Error uploading image:', err)
@@ -123,7 +129,8 @@ const DirectorEditPage = ({ params }: DirectorEditPageProps) => {
       // Validation
       if (!name.trim()) {
         setError('Name is required')
-        return
+        
+return
       }
 
       const directorData: API.UpdateDirectorDto = {

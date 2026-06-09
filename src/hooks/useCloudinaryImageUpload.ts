@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { CLOUDINARY_CONFIG, CLOUDINARY_UPLOAD_URL } from '@/configs/cloudinary'
 
 export const useCloudinaryImageUpload = () => {
@@ -7,6 +8,7 @@ export const useCloudinaryImageUpload = () => {
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData()
+
     formData.append('file', file)
     formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset)
 
@@ -31,9 +33,12 @@ export const useCloudinaryImageUpload = () => {
 
   const uploadThumbnailImage = async (file: File): Promise<string> => {
     setUploadingThumbnail(true)
+
     try {
       const url = await uploadToCloudinary(file)
-      return url
+
+      
+return url
     } finally {
       setUploadingThumbnail(false)
     }
@@ -41,9 +46,12 @@ export const useCloudinaryImageUpload = () => {
 
   const uploadBannerImage = async (file: File): Promise<string> => {
     setUploadingBanner(true)
+
     try {
       const url = await uploadToCloudinary(file)
-      return url
+
+      
+return url
     } finally {
       setUploadingBanner(false)
     }

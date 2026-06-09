@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { render, screen } from '@/test/test-utils'
 import KPICard from './KPICard'
 
@@ -57,6 +58,7 @@ describe('KPICard', () => {
     const { container } = render(<KPICard {...baseProps} />)
 
     const icon = container.querySelector('.ri-group-line')
+
     expect(icon).toBeInTheDocument()
   })
 

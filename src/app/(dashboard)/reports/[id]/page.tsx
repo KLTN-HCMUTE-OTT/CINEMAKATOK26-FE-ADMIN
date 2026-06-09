@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect } from 'react'
+
 import { useParams } from 'next/navigation'
 
 // MUI Imports
@@ -11,7 +12,6 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -35,6 +35,7 @@ const ReportDetailPage = () => {
   const [report, setReport] = useState<API.ReportDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
   const [actionDialog, setActionDialog] = useState<{
     open: boolean
     action: 'approve' | 'ban' | 'delete' | null
@@ -54,6 +55,7 @@ const ReportDetailPage = () => {
       }
     } catch (err: any) {
       const errorMessage = err?.response?.data?.message || 'Failed to fetch report details'
+
       setError(errorMessage)
       console.error('Error fetching report details:', err)
     } finally {
@@ -86,6 +88,8 @@ const ReportDetailPage = () => {
           await reportControllerDelete({ id: report.id })
           break
       }
+
+
       // Refresh the report data
       fetchReportDetail()
     } catch (error) {

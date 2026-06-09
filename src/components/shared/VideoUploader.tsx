@@ -113,12 +113,14 @@ const VideoUploader = ({
 
   // Always keep a ref to the latest metadata so handleProcessVideos never reads a stale closure
   const metadataRef = useRef(metadata)
+
   useEffect(() => {
     metadataRef.current = metadata
   })
 
   const validateMetadata = (m: VideoMetadata): MetadataErrors => {
     const e: MetadataErrors = {}
+
     if (!m.title.trim()) e.title = 'Title is required'
     if (!m.description.trim()) e.description = 'Description is required'
     if (!m.releaseDate) e.releaseDate = 'Release date is required'
@@ -129,14 +131,17 @@ const VideoUploader = ({
     if (m.tags.length === 0) e.tags = 'At least one tag is required'
     if (m.actors.length === 0) e.actors = 'At least one actor is required'
     if (m.directors.length === 0) e.directors = 'At least one director is required'
-    return e
+    
+return e
   }
 
   const handleMetadataChange = (newMetadata: VideoMetadata) => {
     setMetadata(newMetadata)
+
     if (Object.keys(errors).length > 0) {
       setErrors(prev => {
         const next = { ...prev }
+
         if (newMetadata.title.trim()) delete next.title
         if (newMetadata.description.trim()) delete next.description
         if (newMetadata.releaseDate) delete next.releaseDate
@@ -147,7 +152,8 @@ const VideoUploader = ({
         if (newMetadata.tags.length > 0) delete next.tags
         if (newMetadata.actors.length > 0) delete next.actors
         if (newMetadata.directors.length > 0) delete next.directors
-        return next
+        
+return next
       })
     }
   }
@@ -215,6 +221,7 @@ const VideoUploader = ({
       setIsDragActive(false)
 
       const files = Array.from(e.dataTransfer.files)
+
       handleFiles(files)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,6 +232,7 @@ const VideoUploader = ({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files)
+
       handleFiles(files)
       e.target.value = ''
     }
@@ -255,6 +263,7 @@ const VideoUploader = ({
       try {
         // Extract duration
         const duration = await extractVideoDuration(videoFile.file!)
+
         console.log(`Video duration extracted for ${videoFile.name}:`, duration)
 
         // Update with duration
@@ -303,12 +312,18 @@ const VideoUploader = ({
   // Image upload handlers
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     try {
       const url = await uploadThumbnailImage(file)
+
       setMetadata(prev => ({ ...prev, thumbnail: url }))
-      setErrors(prev => { const next = { ...prev }; delete next.thumbnail; return next })
+      setErrors(prev => { const next = { ...prev };
+
+ delete next.thumbnail; 
+
+return next })
     } catch (error) {
       alert('Failed to upload thumbnail. Please try again.')
     }
@@ -316,12 +331,18 @@ const VideoUploader = ({
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     try {
       const url = await uploadBannerImage(file)
+
       setMetadata(prev => ({ ...prev, banner: url }))
-      setErrors(prev => { const next = { ...prev }; delete next.banner; return next })
+      setErrors(prev => { const next = { ...prev };
+
+ delete next.banner; 
+
+return next })
     } catch (error) {
       alert('Failed to upload banner. Please try again.')
     }
@@ -333,13 +354,18 @@ const VideoUploader = ({
 
   const handleProcessVideos = () => {
     const validationErrors = validateMetadata(metadataRef.current)
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
-      return
+      
+return
     }
+
     setErrors({})
+
     if (onUpload) {
       const readyFiles = existingFiles.filter(f => f.videoData)
+
       onUpload(readyFiles, metadataRef.current)
     }
   }

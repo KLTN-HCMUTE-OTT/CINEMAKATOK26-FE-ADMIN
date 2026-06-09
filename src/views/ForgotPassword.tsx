@@ -67,6 +67,7 @@ const ForgotPassword = ({ mode }: { mode: Mode }) => {
 
     try {
       const response = await authApi.forgotPassword({ email })
+
       setOtpExpiryMinutes(response.otpExpiryMinutes)
       setShowResetDialog(true)
       setSuccess(`OTP sent to ${email}. Please check your inbox.`)
@@ -102,6 +103,7 @@ const ForgotPassword = ({ mode }: { mode: Mode }) => {
 
     try {
       const response = await authApi.resendOtp(email)
+
       setOtpExpiryMinutes(response.otpExpiryMinutes)
       setSuccess('New OTP sent to your email')
     } catch (err: any) {
@@ -173,7 +175,7 @@ const ForgotPassword = ({ mode }: { mode: Mode }) => {
         <DialogTitle>Reset Your Password</DialogTitle>
         <DialogContent>
           <Typography className='mbe-4'>
-            We've sent a 6-digit verification code to <strong>{email}</strong>. The code will expire in{' '}
+            We&apos;ve sent a 6-digit verification code to <strong>{email}</strong>. The code will expire in{' '}
             {otpExpiryMinutes} minutes.
           </Typography>
           {resetError && (

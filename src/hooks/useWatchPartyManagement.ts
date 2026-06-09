@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo } from 'react'
+
 import useSWR from 'swr'
 import { toast } from 'sonner'
+
 import {
   watchPartyControllerAdminListRooms,
   watchPartyControllerAdminGetRoomDetails,
@@ -19,6 +21,7 @@ export const useWatchPartyManagement = () => {
     search: '',
     selectedRoomId: ''
   })
+
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -33,12 +36,15 @@ export const useWatchPartyManagement = () => {
     mutate: mutateRooms
   } = useSWR(roomListKey, async ([, page, limit, search]) => {
     const offset = (page - 1) * limit
+
     const response = await watchPartyControllerAdminListRooms({
       limit,
       offset,
       search: search || undefined
     })
-    return response.data
+
+    
+return response.data
   })
 
   const {
@@ -48,7 +54,9 @@ export const useWatchPartyManagement = () => {
     mutate: mutateRoomDetail
   } = useSWR(roomDetailKey, async ([, roomId]) => {
     const response = await watchPartyControllerAdminGetRoomDetails({ id: roomId })
-    return response.data as { data: API.WatchPartyRoomDetail } | undefined
+
+    
+return response.data as { data: API.WatchPartyRoomDetail } | undefined
   })
 
   const {
@@ -58,7 +66,9 @@ export const useWatchPartyManagement = () => {
     mutate: mutateStats
   } = useSWR(statsKey, async () => {
     const response = await watchPartyControllerAdminGetStats()
-    return response.data
+
+    
+return response.data
   })
 
   const rooms: API.RoomListItemDto[] = roomListResponse?.data?.items || []
@@ -68,12 +78,16 @@ export const useWatchPartyManagement = () => {
   // Collect unique user IDs from rooms (hosts) + room detail (members)
   const uniqueUserIds = useMemo(() => {
     const ids = new Set<string>()
+
     rooms.forEach(r => ids.add(r.hostId))
+
     if (roomDetail) {
       roomDetail.members.forEach(m => ids.add(m.userId))
       if (roomDetail.hostId) ids.add(roomDetail.hostId)
     }
-    return [...ids].filter(Boolean).sort()
+
+    
+return [...ids].filter(Boolean).sort()
   }, [rooms, roomDetail])
 
   const userBatchKey = uniqueUserIds.length > 0 ? (['users-batch', uniqueUserIds.join(',')] as const) : null
@@ -81,24 +95,31 @@ export const useWatchPartyManagement = () => {
   const { data: userBatchResponse, isLoading: userBatchLoading } = useSWR(userBatchKey, async ([, idsStr]) => {
     const ids = idsStr.split(',').filter(Boolean)
     const response = await userControllerGetUsersByIds({ data: { ids } })
-    return response.data
+
+    
+return response.data
   })
 
   // Build userId → UserDto map
   const userMap = useMemo<Map<string, API.UserDto>>(() => {
     const map = new Map<string, API.UserDto>()
     const users: API.UserDto[] = (userBatchResponse as any)?.data || userBatchResponse || []
+
     if (Array.isArray(users)) {
       users.forEach(u => map.set(u.id, u))
     }
-    return map
+
+    
+return map
   }, [userBatchResponse])
 
   // Rooms enriched with host display info
   const roomsWithHost = useMemo(() => {
     return rooms.map(room => {
       const host = userMap.get(room.hostId)
-      return {
+
+      
+return {
         ...room,
         hostDisplayName: host?.name ?? `user-${room.hostId.slice(0, 6)}`,
         hostAvatarUrl: host?.avatar ?? undefined
@@ -114,6 +135,7 @@ export const useWatchPartyManagement = () => {
   }
 
   const loading = roomListLoading || roomDetailLoading || statsLoading || userBatchLoading || actionLoading
+
   const error =
     actionError ||
     ((roomListError as any)?.response?.data?.message as string | undefined) ||
@@ -128,6 +150,7 @@ export const useWatchPartyManagement = () => {
   const fetchRoomDetail = useCallback(
     async (roomId: string) => {
       setQuery(prev => ({ ...prev, selectedRoomId: roomId }))
+
       if (query.selectedRoomId === roomId) {
         await mutateRoomDetail()
       }
@@ -149,8 +172,10 @@ export const useWatchPartyManagement = () => {
       await mutateRooms(
         current => {
           const typedCurrent = (current as API.RoomListResponseResponseDto | undefined) || rollback
+
           if (!typedCurrent?.data?.items) return typedCurrent
-          return {
+          
+return {
             ...typedCurrent,
             data: {
               ...typedCurrent.data,
@@ -165,13 +190,16 @@ export const useWatchPartyManagement = () => {
         await watchPartyControllerAdminCloseRoom({ id: roomId }, { reason })
         await Promise.all([mutateRooms(), mutateStats()])
         toast.success('Room closed successfully')
-        return { success: true }
+        
+return { success: true }
       } catch (err: any) {
         const errorMsg = err?.response?.data?.message || 'Failed to close room'
+
         await mutateRooms(rollback, { revalidate: false })
         setActionError(errorMsg)
         toast.error(errorMsg)
-        return { success: false, error: errorMsg }
+        
+return { success: false, error: errorMsg }
       } finally {
         setActionLoading(false)
       }
@@ -189,8 +217,10 @@ export const useWatchPartyManagement = () => {
       await mutateRoomDetail(
         current => {
           const detail = (current as any)?.data as API.WatchPartyRoomDetail | undefined
+
           if (!detail) return current
-          return {
+          
+return {
             ...(current as any),
             data: { ...detail, members: detail.members.filter(m => m.userId !== userId) }
           }
@@ -202,13 +232,16 @@ export const useWatchPartyManagement = () => {
         await watchPartyControllerAdminKickMember({ id: roomId, userId })
         await mutateRoomDetail()
         toast.success('Member kicked successfully')
-        return { success: true }
+        
+return { success: true }
       } catch (err: any) {
         const errorMsg = err?.response?.data?.message || 'Failed to kick member'
+
         await mutateRoomDetail(rollback, { revalidate: false })
         setActionError(errorMsg)
         toast.error(errorMsg)
-        return { success: false, error: errorMsg }
+        
+return { success: false, error: errorMsg }
       } finally {
         setActionLoading(false)
       }
@@ -223,12 +256,15 @@ export const useWatchPartyManagement = () => {
     try {
       await watchPartyControllerAdminBanUser({ userId }, { durationSec, reason })
       toast.success('User banned from Watch Party')
-      return { success: true }
+      
+return { success: true }
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || 'Failed to ban user'
+
       setActionError(errorMsg)
       toast.error(errorMsg)
-      return { success: false, error: errorMsg }
+      
+return { success: false, error: errorMsg }
     } finally {
       setActionLoading(false)
     }
@@ -241,12 +277,15 @@ export const useWatchPartyManagement = () => {
     try {
       await watchPartyControllerAdminUnbanUser({ userId })
       toast.success('User unbanned from Watch Party')
-      return { success: true }
+      
+return { success: true }
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || 'Failed to unban user'
+
       setActionError(errorMsg)
       toast.error(errorMsg)
-      return { success: false, error: errorMsg }
+      
+return { success: false, error: errorMsg }
     } finally {
       setActionLoading(false)
     }

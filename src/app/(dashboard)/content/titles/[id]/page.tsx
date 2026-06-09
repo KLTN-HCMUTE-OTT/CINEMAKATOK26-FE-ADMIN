@@ -56,68 +56,6 @@ const titleData = {
   poster: '/images/cards/1.png'
 }
 
-const mockSeasons = [
-  {
-    id: 1,
-    seasonNumber: 1,
-    title: 'Season 1',
-    episodes: 8,
-    releaseDate: '2024-01-15',
-    status: 'published',
-    description: 'The first season introduces the supernatural mystery.'
-  },
-  {
-    id: 2,
-    seasonNumber: 2,
-    title: 'Season 2',
-    episodes: 9,
-    releaseDate: '2024-02-15',
-    status: 'published',
-    description: 'The mystery deepens in the second season.'
-  },
-  {
-    id: 3,
-    seasonNumber: 3,
-    title: 'Season 3',
-    episodes: 8,
-    releaseDate: '2024-03-15',
-    status: 'draft',
-    description: 'The upcoming third season.'
-  }
-]
-
-const mockEpisodes = [
-  {
-    id: 1,
-    episodeNumber: 1,
-    title: 'The Vanishing of Will Byers',
-    season: 1,
-    duration: '47 min',
-    status: 'published',
-    views: '3.2M',
-    description: "A young boy vanishes on his way home from a friend's house."
-  },
-  {
-    id: 2,
-    episodeNumber: 2,
-    title: 'The Weirdo on Maple Street',
-    season: 1,
-    duration: '55 min',
-    status: 'published',
-    views: '2.8M',
-    description: 'Lucas, Dustin and Mike try to talk to the girl they found in the woods.'
-  },
-  {
-    id: 3,
-    episodeNumber: 3,
-    title: 'Holly, Jolly',
-    season: 1,
-    duration: '51 min',
-    status: 'published',
-    views: '2.6M',
-    description: 'Hopper discovers that the lab may be hiding more than one secret.'
-  }
-]
 
 const mockAssets = [
   {
@@ -164,66 +102,6 @@ const TitleDetailPage = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue)
   }
-
-  const seasonColumns = [
-    { id: 'seasonNumber', label: 'Season', minWidth: 80 },
-    { id: 'title', label: 'Title', minWidth: 150 },
-    { id: 'episodes', label: 'Episodes', minWidth: 100 },
-    { id: 'releaseDate', label: 'Release Date', minWidth: 120 },
-    {
-      id: 'status',
-      label: 'Status',
-      minWidth: 120,
-      format: (value: string) => <StatusBadge status={value as any} />
-    },
-    {
-      id: 'actions',
-      label: 'Actions',
-      minWidth: 120,
-      format: () => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <IconButton size='small'>
-            <i className='ri-edit-line' />
-          </IconButton>
-          <IconButton size='small'>
-            <i className='ri-eye-line' />
-          </IconButton>
-        </Box>
-      )
-    }
-  ]
-
-  const episodeColumns = [
-    { id: 'episodeNumber', label: 'Episode', minWidth: 80 },
-    { id: 'title', label: 'Title', minWidth: 200 },
-    { id: 'season', label: 'Season', minWidth: 80 },
-    { id: 'duration', label: 'Duration', minWidth: 100 },
-    { id: 'views', label: 'Views', minWidth: 100 },
-    {
-      id: 'status',
-      label: 'Status',
-      minWidth: 120,
-      format: (value: string) => <StatusBadge status={value as any} />
-    },
-    {
-      id: 'actions',
-      label: 'Actions',
-      minWidth: 120,
-      format: () => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <IconButton size='small'>
-            <i className='ri-edit-line' />
-          </IconButton>
-          <IconButton size='small'>
-            <i className='ri-eye-line' />
-          </IconButton>
-          <IconButton size='small' color='error'>
-            <i className='ri-delete-bin-line' />
-          </IconButton>
-        </Box>
-      )
-    }
-  ]
 
   const assetColumns = [
     { id: 'fileName', label: 'File Name', minWidth: 250 },

@@ -15,7 +15,7 @@ import {
   Button
 } from '@mui/material'
 
-import { TableSkeleton } from '@/components/ui/Skeleton'
+
 
 // Components Imports
 import CategoryTableNew from '@/components/content/CategoryTableNew'
@@ -34,14 +34,18 @@ const CategoriesPage = () => {
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 2000)
-      return () => clearTimeout(timer)
+
+      
+return () => clearTimeout(timer)
     }
   }, [error])
 
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => setSuccess(null), 2000)
-      return () => clearTimeout(timer)
+
+      
+return () => clearTimeout(timer)
     }
   }, [success])
 
@@ -91,7 +95,8 @@ const CategoriesPage = () => {
         console.error('Invalid response structure:', response)
         setCategories([])
         setTotalItems(0)
-        return
+        
+return
       }
 
       setCategories(response.data)
@@ -108,6 +113,7 @@ const CategoriesPage = () => {
 
   useEffect(() => {
     fetchCategories()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, debouncedSearchTerm])
 
   // Handlers
@@ -163,6 +169,7 @@ const CategoriesPage = () => {
 
   const handleOpenDeleteDialog = (id: string) => {
     const category = categories.find(c => c.id === id)
+
     if (category) {
       setCategoryToDelete(category)
       setDeleteDialogOpen(true)
@@ -254,7 +261,7 @@ const CategoriesPage = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the category "{categoryToDelete?.categoryName}"? This action cannot be
+            Are you sure you want to delete the category &quot;{categoryToDelete?.categoryName}&quot;? This action cannot be
             undone.
           </DialogContentText>
         </DialogContent>

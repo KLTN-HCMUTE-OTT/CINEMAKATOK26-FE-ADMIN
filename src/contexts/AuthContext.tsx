@@ -5,7 +5,9 @@
 
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import type { ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
 
 interface User {
@@ -65,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+
         throw new Error(errorData.error || 'Login failed. Please try again.')
       }
 
@@ -138,10 +141,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 // Custom hook to use auth context
 export function useAuth() {
   const context = useContext(AuthContext)
+
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context
+
+  
+return context
 }
 
 // Helper function to get access token

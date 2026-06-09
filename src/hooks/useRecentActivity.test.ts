@@ -1,7 +1,8 @@
+import React from 'react'
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { SWRConfig } from 'swr'
-import React from 'react'
 
 // Mock the API module
 vi.mock('@/api/auditLogs', () => ({

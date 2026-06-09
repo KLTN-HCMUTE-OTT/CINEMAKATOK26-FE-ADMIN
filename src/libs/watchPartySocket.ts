@@ -1,4 +1,5 @@
-import { io, Socket } from 'socket.io-client'
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client'
 
 let socket: Socket | null = null
 let currentToken: string | null = null
@@ -6,9 +7,12 @@ let currentToken: string | null = null
 async function fetchSocketToken(): Promise<string | null> {
   try {
     const res = await fetch('/api/auth/socket-token', { credentials: 'include' })
+
     if (!res.ok) return null
     const body = await res.json() as { token?: string }
-    return body.token ?? null
+
+    
+return body.token ?? null
   } catch {
     return null
   }
@@ -41,8 +45,10 @@ export async function getWatchPartySocket(): Promise<Socket> {
 
   socket.on('connect_error', async (err: Error) => {
     let isUnauthorized = false
+
     try {
       const parsed = JSON.parse(err.message) as { code?: string }
+
       isUnauthorized = parsed?.code === 'UNAUTHORIZED'
     } catch {
       isUnauthorized = err.message === 'UNAUTHORIZED'
@@ -50,8 +56,10 @@ export async function getWatchPartySocket(): Promise<Socket> {
 
     if (isUnauthorized && socket) {
       const refreshed = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' })
+
       if (refreshed.ok) {
         const newToken = await fetchSocketToken()
+
         if (newToken && socket) {
           currentToken = newToken
           socket.auth = { token: newToken }

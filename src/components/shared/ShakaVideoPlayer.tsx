@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+
 import { CircularProgress, Box, Alert } from '@mui/material'
+
 import { streamingControllerGetManifestUrl, streamingControllerGetDrmKeyInfo } from '@/api/streaming'
 
 interface ShakaVideoPlayerProps {
@@ -33,14 +35,17 @@ export default function ShakaVideoPlayer({
         // 1. Get manifest URL from streaming controller
         const manifestResult = await streamingControllerGetManifestUrl({ videoId })
         const manifestUrl = manifestResult.data?.data?.manifestUrl
+
         if (!manifestUrl) {
           throw new Error('Failed to obtain signed manifest URL')
         }
 
         // 2. Get DRM key info
         let drmKeyId: string | null = null
+
         try {
           const drmResult = await streamingControllerGetDrmKeyInfo({ videoId })
+
           drmKeyId = drmResult.data?.data?.keyId || null
         } catch (drmErr) {
           console.warn('No DRM key found or failed to fetch key info', drmErr)
@@ -48,21 +53,27 @@ export default function ShakaVideoPlayer({
 
         // 3. Dynamically import Shaka Player compiled package
         const shaka = (await import('shaka-player/dist/shaka-player.compiled')).default
+
         if (!active) return
 
         shaka.polyfill.installAll()
+
         if (!shaka.Player.isBrowserSupported()) {
           throw new Error('Browser not supported by Shaka Player')
         }
 
         const video = videoRef.current
+
         if (!video) return
 
         const player = new shaka.Player()
+
         await player.attach(video)
+
         if (!active) {
           player.destroy()
-          return
+          
+return
         }
 
         playerRef.current = player
@@ -79,15 +90,20 @@ export default function ShakaVideoPlayer({
         const getCookie = (name: string): string | null => {
           if (typeof document === 'undefined') return null
           const cookies = document.cookie.split(';')
+
           for (const cookie of cookies) {
             const [key, ...val] = cookie.trim().split('=')
+
             if (key === name) return decodeURIComponent(val.join('='))
           }
-          return null
+
+          
+return null
         }
 
         // Request Filter to inject content-type, videoId and CSRF token for license endpoint validation
         const networkingEngine = player.getNetworkingEngine()
+
         if (networkingEngine) {
           networkingEngine.registerRequestFilter((requestType: any, request: any) => {
             if (requestType === shaka.net.NetworkingEngine.RequestType.LICENSE) {
@@ -95,6 +111,7 @@ export default function ShakaVideoPlayer({
               request.allowCrossSiteCredentials = true
 
               const csrfToken = getCookie('csrf-token')
+
               if (csrfToken) {
                 request.headers['X-CSRF-Token'] = csrfToken
               }
@@ -102,6 +119,7 @@ export default function ShakaVideoPlayer({
               if (request.body) {
                 try {
                   const body = JSON.parse(new TextDecoder().decode(request.body))
+
                   body.videoId = videoId
                   request.body = new TextEncoder().encode(JSON.stringify(body))
                 } catch (e) {
@@ -115,9 +133,12 @@ export default function ShakaVideoPlayer({
         // Player error listener
         player.addEventListener('error', (event: any) => {
           const err = event.detail || event
+
           console.error('Shaka Player error details:', err)
+
           if (active) {
             let errMsg = err.message || `Playback error (Code ${err.code})`
+
             if (err.category === 6) {
               if (err.code === 6007) {
                 errMsg = 'DRM License Request Failed: You do not have permission or your session has expired.'
@@ -125,6 +146,7 @@ export default function ShakaVideoPlayer({
                 errMsg = `DRM Secure Playback Failed (Code ${err.code}).`
               }
             }
+
             setError(errMsg)
           }
         })
@@ -141,6 +163,7 @@ export default function ShakaVideoPlayer({
         }
       } catch (err: any) {
         console.error('Failed to initialize Shaka Player:', err)
+
         if (active) {
           setError(err.message || 'Failed to load video player')
           setLoading(false)
@@ -152,6 +175,7 @@ export default function ShakaVideoPlayer({
 
     return () => {
       active = false
+
       if (playerRef.current) {
         playerRef.current.destroy()
         playerRef.current = null

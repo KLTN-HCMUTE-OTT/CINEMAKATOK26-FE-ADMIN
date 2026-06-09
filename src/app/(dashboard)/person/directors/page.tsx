@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState, useEffect, useCallback } from 'react'
+
 import { useRouter as useNextRouter } from 'next/navigation'
 
 // MUI Imports
@@ -77,6 +78,7 @@ const DirectorsPage = () => {
   // Search handler
   const handleSearch = () => {
     setActiveSearch(searchQuery)
+
     if (page !== 0) {
       setPage(0) // Reset to first page, which will trigger fetchDirectors
     }

@@ -17,15 +17,13 @@ import {
   Avatar,
   IconButton,
   Chip,
-  Alert,
-  CircularProgress
+  Alert
 } from '@mui/material'
 
 import { FormSkeleton } from '@/components/ui/Skeleton'
 
 // Components Imports
 import DataTable from '@components/shared/DataTable'
-import StatusBadge from '@components/shared/StatusBadge'
 import UserEditDialog from '@/components/dashboard/users/UserEditDialog'
 import UserBanDialog from '@/components/dashboard/users/UserBanDialog'
 
@@ -149,6 +147,7 @@ const UsersPage = () => {
     banUser,
     unbanUser
   } = useUserManagement()
+
   const [searchValue, setSearchValue] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [selectedUser, setSelectedUser] = useState<any>(null)
@@ -218,23 +217,27 @@ const UsersPage = () => {
 
   const handleSubmitEdit = async (data: any) => {
     if (!userDetail) return { success: false }
-    return await updateUserInfo(userDetail.id, data)
+    
+return await updateUserInfo(userDetail.id, data)
   }
 
   const handleSubmitBan = async (reason: string, durationDays: number) => {
     if (!userDetail) return { success: false }
-    return await banUser(userDetail.id, reason, durationDays)
+    
+return await banUser(userDetail.id, reason, durationDays)
   }
 
   const handleSubmitUnban = async () => {
     if (!userDetail) return { success: false }
-    return await unbanUser(userDetail.id)
+    
+return await unbanUser(userDetail.id)
   }
 
   // Format date
   const formatDate = (date: string | undefined) => {
     if (!date) return 'N/A'
-    return new Date(date).toLocaleDateString('en-US', {
+    
+return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

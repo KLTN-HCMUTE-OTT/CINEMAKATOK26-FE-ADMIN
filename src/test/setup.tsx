@@ -85,5 +85,6 @@ console.error = (...args: any[]) => {
   ) {
     return
   }
+
   originalConsoleError.call(console, ...args)
 }
