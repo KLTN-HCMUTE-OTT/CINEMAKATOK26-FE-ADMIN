@@ -144,7 +144,7 @@ const TrendingStatistics = ({ exportToExcel }: TrendingStatisticsProps) => {
                   Top Content Views
                 </Typography>
                 <Typography variant='h6' sx={{ fontWeight: 600, mt: 0.5 }}>
-                  {topViews.toLocaleString()}
+                  {(topViews ?? 0).toLocaleString()}
                 </Typography>
               </Box>
             </Grid>
@@ -231,7 +231,7 @@ const TrendingStatistics = ({ exportToExcel }: TrendingStatisticsProps) => {
                       </Box>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography variant='body2'>{row.views.toLocaleString()}</Typography>
+                      <Typography variant='body2'>{(row.views ?? 0).toLocaleString()}</Typography>
                     </TableCell>
                     <TableCell align='center'>
                       <Chip
