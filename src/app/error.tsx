@@ -67,7 +67,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
               </Typography>
 
               <Typography variant='h6' color='text.secondary' sx={{ mb: 3 }}>
-                We encountered an unexpected error. Don't worry, our team has been notified.
+                We encountered an unexpected error. Don&apos;t worry, our team has been notified.
               </Typography>
 
               <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>

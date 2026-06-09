@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
-vi.mock('@/api/video', () => ({
-  videoControllerUploadVideo: vi.fn()
+vi.mock('@/api/streaming', () => ({
+  streamingControllerUploadVideo: vi.fn()
 }))
 
 import { useVideoUpload } from './useVideoUpload'
-import { videoControllerUploadVideo } from '@/api/video'
+import { streamingControllerUploadVideo } from '@/api/streaming'
 
-const mockedUploadApi = vi.mocked(videoControllerUploadVideo)
+const mockedUploadApi = vi.mocked(streamingControllerUploadVideo)
 
 describe('useVideoUpload', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -40,8 +40,9 @@ describe('useVideoUpload', () => {
     it('uploads file and returns video data on success', async () => {
       // Arrange
       const mockVideoData = { id: 'video-abc', status: 'transcoding', url: 'https://cdn/video.mp4' }
+
       mockedUploadApi.mockResolvedValue({
-        data: { data: { videos: mockVideoData } }
+        data: { data: { video: mockVideoData } }
       } as any)
 
       const { result } = renderHook(() => useVideoUpload())
@@ -89,7 +90,7 @@ describe('useVideoUpload', () => {
     it('returns null when API returns no video data', async () => {
       // Arrange
       mockedUploadApi.mockResolvedValue({
-        data: { data: { videos: undefined } }
+        data: { data: { video: undefined } }
       } as any)
 
       const { result } = renderHook(() => useVideoUpload())

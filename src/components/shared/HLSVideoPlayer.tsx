@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+
 import Hls from 'hls.js'
 
 interface HLSVideoPlayerProps {
@@ -25,6 +26,7 @@ export default function HLSVideoPlayer({
 
   useEffect(() => {
     const video = videoRef.current
+
     if (!video) return
 
     // Check if HLS is supported
@@ -42,6 +44,7 @@ export default function HLSVideoPlayer({
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log('HLS manifest parsed, ready to play')
+
         if (autoPlay) {
           video.play().catch(err => {
             console.error('Auto-play failed:', err)
@@ -51,6 +54,7 @@ export default function HLSVideoPlayer({
 
       hls.on(Hls.Events.ERROR, (event, data) => {
         console.error('HLS Error:', data)
+
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
@@ -79,6 +83,7 @@ export default function HLSVideoPlayer({
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Native HLS support (Safari)
       video.src = src
+
       if (autoPlay) {
         video.play().catch(err => {
           console.error('Auto-play failed:', err)

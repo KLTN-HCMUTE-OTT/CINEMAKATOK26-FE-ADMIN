@@ -1,10 +1,10 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'pnpm start',
-      startServerReadyPattern: /Ready in/i,
+      startServerCommand: 'pnpm exec next start -p 3022',
+      startServerReadyPattern: /ready|local/i,
       startServerReadyTimeout: 30000,
-      url: ['http://localhost:3011', 'http://localhost:3011/users', 'http://localhost:3011/analytics'],
+      url: ['http://localhost:3022', 'http://localhost:3022/users', 'http://localhost:3022/analytics'],
       budgetPath: './lighthouse-budget.json',
       numberOfRuns: 3,
       settings: {

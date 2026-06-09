@@ -31,6 +31,7 @@ const EditTVSeriesPageContent = () => {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
+
   const {
     activeStep,
     metadata,
@@ -118,7 +119,7 @@ const EditTVSeriesPageContent = () => {
             thumbnailUrl: episode.video.thumbnailUrl,
             sprites: episode.video.sprites,
             vttFiles: episode.video.vttFiles
-          }
+          } as any
         }))
       }))
 

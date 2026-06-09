@@ -1,7 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
+
 import type { Socket } from 'socket.io-client'
+
 import { disconnectWatchPartySocket, getWatchPartySocket } from '../libs/watchPartySocket'
 import { useWatchPartyRoomStore } from '../store/watchPartyRoomStore'
 import type { ChatMessage, QueueItem, RoomMember, RoomState, VideoState } from '../types/watchPartyRoom'
@@ -28,6 +30,7 @@ export function useWatchPartyAdminRoom(roomId: string) {
   const store = useWatchPartyRoomStore()
   const socketRef = useRef<Socket | null>(null)
   const joinedRef = useRef(false)
+
   // Cache videoId → title as items flow through the queue
   const titleCacheRef = useRef<Map<string, string>>(new Map())
 
@@ -108,6 +111,7 @@ export function useWatchPartyAdminRoom(roomId: string) {
         if (!mounted) return
         store.updateVideoState(videoState)
         const title = titleCacheRef.current.get(videoState.videoId) ?? null
+
         store.setCurrentVideoTitle(title)
       })
 
@@ -140,6 +144,7 @@ export function useWatchPartyAdminRoom(roomId: string) {
     return () => {
       mounted = false
       const socket = socketRef.current
+
       if (socket) {
         socket.emit('room:leave')
         Object.values(EVENTS).forEach((ev) => socket.off(ev))
@@ -147,6 +152,7 @@ export function useWatchPartyAdminRoom(roomId: string) {
         socket.off('reconnect')
         socket.off('connect_error')
       }
+
       disconnectWatchPartySocket()
       store.reset()
     }
@@ -214,6 +220,7 @@ export function useWatchPartyAdminRoom(roomId: string) {
   return {
     // state (read from store directly in components via useWatchPartyRoomStore)
     ...store,
+
     // emit helpers
     sendMessage,
     syncVideo,

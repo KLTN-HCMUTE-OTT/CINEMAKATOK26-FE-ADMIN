@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import {
   Dialog,
   DialogTitle,
@@ -11,6 +12,7 @@ import {
   Box,
   CircularProgress
 } from '@mui/material'
+
 import type { Tag, CreateTagDto, UpdateTagDto } from '@/services'
 
 interface TagModalNewProps {
@@ -34,6 +36,7 @@ const TagModalNew = ({ open, onClose, onSave, tag, mode }: TagModalNewProps) => 
       } else {
         setTagName('')
       }
+
       setError('')
     }
   }, [open, tag, mode])
@@ -42,7 +45,8 @@ const TagModalNew = ({ open, onClose, onSave, tag, mode }: TagModalNewProps) => 
     // Validation
     if (!tagName.trim()) {
       setError('Tag name is required')
-      return
+      
+return
     }
 
     try {

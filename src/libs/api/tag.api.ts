@@ -76,6 +76,8 @@ export const tagApi = {
   // Get all tags with pagination
   getAll: async (query?: PaginationQuery): Promise<PaginatedResponse<Tag>> => {
     const response = await apiCall<PaginatedResponse<Tag>>('/api/v1/tags', 'GET', undefined, query)
+
+
     // Backend returns { data: PaginatedResponse }
     // apiCall already extracts response.data, so we return it directly
     return response as any as PaginatedResponse<Tag>
@@ -84,19 +86,25 @@ export const tagApi = {
   // Get tag by ID
   getById: async (id: string): Promise<Tag> => {
     const response = await apiCall<Tag>(`/api/v1/tags/${id}`, 'GET')
-    return response.data
+
+    
+return response.data
   },
 
   // Create new tag
   create: async (data: CreateTagDto): Promise<Tag> => {
     const response = await apiCall<Tag>('/api/v1/tags', 'POST', data)
-    return response.data
+
+    
+return response.data
   },
 
   // Update tag
   update: async (id: string, data: UpdateTagDto): Promise<Tag> => {
     const response = await apiCall<Tag>(`/api/v1/tags/${id}`, 'PUT', data)
-    return response.data
+
+    
+return response.data
   },
 
   // Delete tag

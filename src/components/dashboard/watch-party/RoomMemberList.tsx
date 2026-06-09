@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import {
   Avatar,
   Box,
@@ -22,7 +24,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { useState } from 'react'
+
 import type { RoomMember } from '@/types/watchPartyRoom'
 import type { BannedMemberDetail } from '@/store/watchPartyRoomStore'
 
@@ -148,7 +150,9 @@ const RoomMemberList = ({
 }: RoomMemberListProps) => {
   const sorted = [...members].sort((a, b) => {
     const order: Record<string, number> = { host: 0, admin: 1, member: 2 }
-    return (order[a.role ?? 'member'] ?? 2) - (order[b.role ?? 'member'] ?? 2)
+
+    
+return (order[a.role ?? 'member'] ?? 2) - (order[b.role ?? 'member'] ?? 2)
   })
 
   const bannedList = Object.values(bannedMemberDetails)

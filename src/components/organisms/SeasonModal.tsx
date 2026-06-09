@@ -20,10 +20,12 @@ import {
   Box,
   Avatar
 } from '@mui/material'
+
 import { useSeason } from '@/features/content/tvseries/contexts/SeasonContext'
 
 const SeasonModal = () => {
   const { modalOpen, selectedSeason, closeModal, saveSeason } = useSeason()
+
   const [seasonData, setSeasonData] = useState({
     title: '',
     description: '',

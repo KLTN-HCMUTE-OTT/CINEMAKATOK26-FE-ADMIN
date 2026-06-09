@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@/test/test-utils'
+
 import userEvent from '@testing-library/user-event'
+
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils'
 import EpisodeForm from './EpisodeForm'
 
 // Mock useVideoUpload hook
@@ -27,6 +29,7 @@ describe('EpisodeForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+
     // By default mock successful extraction and upload
     mockExtractVideoDuration.mockResolvedValue({ minutes: 45 })
     mockUploadVideoToAPI.mockResolvedValue({
@@ -59,7 +62,7 @@ describe('EpisodeForm', () => {
     const episodeWithVideo = {
       ...defaultEpisode,
       episodeTitle: '',
-      video: { id: 'v1', thumbnailUrl: '', videoUrl: 'v.mp4', status: 'ready' }
+      video: { id: 'v1', thumbnailUrl: '', videoUrl: 'v.mp4', status: 'ready' } as any
     }
 
     render(<EpisodeForm episode={episodeWithVideo} onSave={mockOnSave} onCancel={mockOnCancel} />)
@@ -74,11 +77,13 @@ describe('EpisodeForm', () => {
     render(<EpisodeForm episode={defaultEpisode} onSave={mockOnSave} onCancel={mockOnCancel} />)
 
     const saveButton = screen.getByRole('button', { name: /save episode/i })
+
     expect(saveButton).toBeDisabled()
   })
 
   it('handles video upload and updates duration', async () => {
     const user = userEvent.setup()
+
     render(<EpisodeForm episode={defaultEpisode} onSave={mockOnSave} onCancel={mockOnCancel} />)
     
     // Create a mock file

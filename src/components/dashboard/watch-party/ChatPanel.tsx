@@ -1,7 +1,9 @@
 'use client'
 
-import { Box, Chip, Divider, IconButton, InputAdornment, OutlinedInput, Typography } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { Box, Chip, Divider, IconButton, InputAdornment, OutlinedInput, Typography } from '@mui/material'
+
 import type { ChatMessage } from '@/types/watchPartyRoom'
 
 const SYSTEM_USER_ID = 'system'
@@ -21,6 +23,7 @@ const ChatPanel = ({ messages, onSend }: ChatPanelProps) => {
 
   const handleSend = useCallback(() => {
     const text = draft.trim()
+
     if (!text) return
     onSend(text)
     setDraft('')
@@ -44,7 +47,9 @@ const ChatPanel = ({ messages, onSend }: ChatPanelProps) => {
         ) : (
           messages.map(msg => {
             const isSystem = msg.userId === SYSTEM_USER_ID
-            return (
+
+            
+return (
               <Box key={msg.id} sx={{ mb: 1 }}>
                 {isSystem ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', my: 0.5 }}>

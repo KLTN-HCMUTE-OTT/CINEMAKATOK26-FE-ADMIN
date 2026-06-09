@@ -105,7 +105,8 @@ export function SeasonProvider({ children }: SeasonProviderProps) {
           )
           setModalOpen(false)
           setSelectedSeason(null)
-          return
+          
+return
         }
 
         const newSeason: SeasonItem = {
@@ -130,7 +131,8 @@ export function SeasonProvider({ children }: SeasonProviderProps) {
 
         if (season && season.episodes > 0) {
           alert('Cannot delete season with episodes. Please remove all episodes first.')
-          return
+          
+return
         }
 
         setSeasons(prev => prev.filter(seasonItem => seasonItem.id !== id))

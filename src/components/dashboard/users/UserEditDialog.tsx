@@ -39,6 +39,7 @@ const UserEditDialog = ({ open, user, loading, onClose, onSubmit }: UserEditDial
     gender: '',
     isAdmin: false
   })
+
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -68,6 +69,7 @@ const UserEditDialog = ({ open, user, loading, onClose, onSubmit }: UserEditDial
   const handleSubmit = async () => {
     setError(null)
     setSubmitting(true)
+
     try {
       // Only send fields that have values
       const dataToSend: any = {}
@@ -77,11 +79,13 @@ const UserEditDialog = ({ open, user, loading, onClose, onSubmit }: UserEditDial
       if (formData.address) dataToSend.address = formData.address
       if (formData.dateOfBirth) dataToSend.dateOfBirth = formData.dateOfBirth
       if (formData.gender) dataToSend.gender = formData.gender
+
       // Always send email (current email) and isAdmin status
       dataToSend.email = user?.email
       dataToSend.isAdmin = formData.isAdmin
 
       const result = await onSubmit(dataToSend)
+
       if (result.success) {
         onClose()
       } else {

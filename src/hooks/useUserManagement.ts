@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react'
+
 import useSWR from 'swr'
+
 import {
   userControllerFindAll,
   userControllerGetUserDetail,
@@ -8,7 +10,6 @@ import {
   userControllerUnbanUser
 } from '@/api/users'
 
-type User = API.UserDto
 type UserDetail = API.UserDetailDto
 
 export const useUserManagement = () => {
@@ -18,6 +19,7 @@ export const useUserManagement = () => {
     search: '',
     selectedUserId: ''
   })
+
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -61,6 +63,7 @@ export const useUserManagement = () => {
   const users = usersResponse?.data || []
   const userDetail = (userDetailResponse?.data as UserDetail | undefined) || null
   const loading = usersLoading || userDetailLoading || actionLoading
+
   const error =
     actionError ||
     ((usersError as any)?.response?.data?.message as string | undefined) ||
@@ -95,7 +98,8 @@ export const useUserManagement = () => {
 
         if (response.data?.data) {
           await Promise.all([mutateUsers(), mutateUserDetail()])
-          return { success: true, data: response.data.data }
+          
+return { success: true, data: response.data.data }
         }
 
         return { success: false, error: 'Failed to update user' }
@@ -103,7 +107,8 @@ export const useUserManagement = () => {
         const errorMsg = err?.response?.data?.message || 'Failed to update user'
 
         setActionError(errorMsg)
-        return { success: false, error: errorMsg }
+        
+return { success: false, error: errorMsg }
       } finally {
         setActionLoading(false)
       }
@@ -123,6 +128,7 @@ export const useUserManagement = () => {
       await mutateUsers(
         current => {
           const typedCurrent = (current as API.UserDtoPaginatedResponseDto | undefined) || rollbackUsers
+
           if (!typedCurrent?.data) return typedCurrent
 
           return {
@@ -137,6 +143,7 @@ export const useUserManagement = () => {
         await mutateUserDetail(
           current => {
             const typedCurrent = (current as any) || rollbackUserDetail
+
             if (!typedCurrent?.data) return typedCurrent
 
             return {
@@ -156,7 +163,8 @@ export const useUserManagement = () => {
 
         if (response.data?.data) {
           await Promise.all([mutateUsers(), mutateUserDetail()])
-          return { success: true, data: response.data.data }
+          
+return { success: true, data: response.data.data }
         }
 
         return { success: false, error: 'Failed to ban user' }
@@ -164,12 +172,14 @@ export const useUserManagement = () => {
         const errorMsg = err?.response?.data?.message || 'Failed to ban user'
 
         await mutateUsers(rollbackUsers, { revalidate: false })
+
         if (query.selectedUserId === userId) {
           await mutateUserDetail(rollbackUserDetail, { revalidate: false })
         }
 
         setActionError(errorMsg)
-        return { success: false, error: errorMsg }
+        
+return { success: false, error: errorMsg }
       } finally {
         setActionLoading(false)
       }
@@ -189,6 +199,7 @@ export const useUserManagement = () => {
       await mutateUsers(
         current => {
           const typedCurrent = (current as API.UserDtoPaginatedResponseDto | undefined) || rollbackUsers
+
           if (!typedCurrent?.data) return typedCurrent
 
           return {
@@ -203,6 +214,7 @@ export const useUserManagement = () => {
         await mutateUserDetail(
           current => {
             const typedCurrent = (current as any) || rollbackUserDetail
+
             if (!typedCurrent?.data) return typedCurrent
 
             return {
@@ -222,7 +234,8 @@ export const useUserManagement = () => {
 
         if (response.data?.data) {
           await Promise.all([mutateUsers(), mutateUserDetail()])
-          return { success: true, data: response.data.data }
+          
+return { success: true, data: response.data.data }
         }
 
         return { success: false, error: 'Failed to unban user' }
@@ -230,12 +243,14 @@ export const useUserManagement = () => {
         const errorMsg = err?.response?.data?.message || 'Failed to unban user'
 
         await mutateUsers(rollbackUsers, { revalidate: false })
+
         if (query.selectedUserId === userId) {
           await mutateUserDetail(rollbackUserDetail, { revalidate: false })
         }
 
         setActionError(errorMsg)
-        return { success: false, error: errorMsg }
+        
+return { success: false, error: errorMsg }
       } finally {
         setActionLoading(false)
       }

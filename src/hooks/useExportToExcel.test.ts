@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
+
 import { useExportToExcel } from './useExportToExcel'
 
 describe('useExportToExcel', () => {
@@ -21,7 +22,8 @@ describe('useExportToExcel', () => {
     // Only intercept 'a' elements, pass through everything else
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string, options?: ElementCreationOptions) => {
       if (tagName === 'a') return mockLink as any
-      return originalCreateElement(tagName, options)
+      
+return originalCreateElement(tagName, options)
     })
     vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node)
     vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node)
@@ -35,6 +37,7 @@ describe('useExportToExcel', () => {
   describe('exportToExcel', () => {
     it('creates a downloadable CSV file', () => {
       const { result } = renderHook(() => useExportToExcel())
+
       const data = [
         { name: 'Movie A', genre: 'Action' },
         { name: 'Movie B', genre: 'Drama' }
@@ -78,6 +81,7 @@ describe('useExportToExcel', () => {
   describe('exportMultipleSheets', () => {
     it('exports first sheet as CSV fallback', () => {
       const { result } = renderHook(() => useExportToExcel())
+
       const sheetsData = [
         {
           name: 'Users',
@@ -99,6 +103,7 @@ describe('useExportToExcel', () => {
 
     it('handles sheets with values containing commas', () => {
       const { result } = renderHook(() => useExportToExcel())
+
       const sheetsData = [
         {
           name: 'Data',

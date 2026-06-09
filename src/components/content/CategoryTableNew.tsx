@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
+
 import {
   Card,
   Table,
@@ -18,6 +19,7 @@ import {
   TextField,
   InputAdornment
 } from '@mui/material'
+
 import type { Category } from '@/services'
 import { TableSkeleton } from '@/components/ui/Skeleton'
 

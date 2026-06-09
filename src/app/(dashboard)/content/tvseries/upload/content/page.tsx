@@ -24,6 +24,7 @@ const steps = ['Series Metadata', 'Seasons & Episodes', 'Review & Publish']
 const UploadTVSeriesPageContent = () => {
   const router = useRouter()
   const [isPublishing, setIsPublishing] = useState(false)
+
   const {
     activeStep,
     metadata,

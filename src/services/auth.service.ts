@@ -76,6 +76,7 @@ async function apiCall<T>(endpoint: string, method: string, data?: any): Promise
     if (error.code && ERROR_MESSAGES[error.code]) {
       error.message = ERROR_MESSAGES[error.code]
     }
+
     throw error
   }
 }
@@ -85,13 +86,17 @@ export const authService = {
   // Login
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await apiCall<LoginResponse>('/api/v1/auth/login', 'POST', credentials)
-    return response.data
+
+    
+return response.data
   },
 
   // Forgot Password - Send OTP
   forgotPassword: async (data: ForgotPasswordRequest): Promise<OTPResponse> => {
     const response = await apiCall<OTPResponse>('/api/v1/auth/forgot-password', 'POST', data)
-    return response.data
+
+    
+return response.data
   },
 
   // Reset Password with OTP
@@ -102,13 +107,17 @@ export const authService = {
   // Resend OTP for password reset
   resendOtp: async (email: string): Promise<OTPResponse> => {
     const response = await apiCall<OTPResponse>(`/api/v1/auth/resend-otp?email=${encodeURIComponent(email)}`, 'POST')
-    return response.data
+
+    
+return response.data
   },
 
   // Refresh token
   refreshToken: async (refreshToken: string): Promise<TokenResponse> => {
     const response = await apiCall<TokenResponse>('/api/v1/auth/refresh', 'POST', { refreshToken })
-    return response.data
+
+    
+return response.data
   },
 
   // Logout

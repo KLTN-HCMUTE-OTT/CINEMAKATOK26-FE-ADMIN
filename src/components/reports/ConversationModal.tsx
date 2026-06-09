@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -8,6 +9,7 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
+
 import {
   reviewReplyControllerGetRepliesForReview,
   reviewReplyControllerGetRepliesForEpisodeReview,
@@ -61,8 +63,10 @@ const ConversationModal = ({
         } else if (report.type === 'REVIEW_REPLY') {
           // Fetch reply để lấy reviewId hoặc episodeReviewId
           const replyResponse = await reviewReplyControllerFindOne({ id: report.targetId })
+
           if (replyResponse?.data?.data) {
             const replyData = replyResponse.data.data
+
             console.log('Reply data:', replyData)
 
             // Xác định và lấy reviewId
@@ -77,6 +81,7 @@ const ConversationModal = ({
               if (reviewId) {
                 try {
                   const reviewResponse = await reviewControllerFindOne({ id: reviewId })
+
                   if (reviewResponse?.data?.data) {
                     fetchedReview = reviewResponse.data.data
                     console.log('Fetched review:', fetchedReview)
@@ -99,6 +104,7 @@ const ConversationModal = ({
               if (episodeReviewId) {
                 try {
                   const episodeReviewResponse = await episodeReviewControllerFindOne({ id: episodeReviewId })
+
                   if (episodeReviewResponse?.data?.data) {
                     fetchedReview = episodeReviewResponse.data.data
                     console.log('Fetched episode review:', fetchedReview)
@@ -115,20 +121,23 @@ const ConversationModal = ({
 
         // Fetch conversation dựa trên review type (cả ACTIVE và BANNED)
         let allReplies: any[] = []
+
         if (reviewId) {
           const [activeRes, bannedRes] = await Promise.all([
-            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'ACTIVE' as any }),
-            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'BANNED' as any })
+            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'ACTIVE' as any } as any),
+            reviewReplyControllerGetRepliesForReview({ reviewId, limit: 1000, page: 1, status: 'BANNED' as any } as any)
           ])
+
           allReplies = [
             ...(activeRes?.data?.data || []),
             ...(bannedRes?.data?.data || [])
           ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         } else if (episodeReviewId) {
           const [activeRes, bannedRes] = await Promise.all([
-            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'ACTIVE' as any }),
-            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'BANNED' as any })
+            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'ACTIVE' as any } as any),
+            reviewReplyControllerGetRepliesForEpisodeReview({ episodeReviewId, limit: 1000, page: 1, status: 'BANNED' as any } as any)
           ])
+
           allReplies = [
             ...(activeRes?.data?.data || []),
             ...(bannedRes?.data?.data || [])

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -8,6 +9,7 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import CircularProgress from '@mui/material/CircularProgress'
+
 import StatusChip from './StatusChip'
 import TypeChip from './TypeChip'
 import { reviewReplyControllerFindOne } from '@/api/reviewReplies'
@@ -28,8 +30,10 @@ const ViewReportModal = ({ open, report, onClose, onAction, onViewConversation }
     const fetchReplyData = async () => {
       if (report && report.type === 'REVIEW_REPLY' && report.targetId) {
         setLoadingReply(true)
+
         try {
           const response = await reviewReplyControllerFindOne({ id: report.targetId })
+
           if (response?.data?.data) {
             setReplyData(response.data.data)
           }
@@ -54,7 +58,9 @@ const ViewReportModal = ({ open, report, onClose, onAction, onViewConversation }
     } else if (report.type === 'REVIEW_REPLY' && replyData) {
       return replyData.content || 'Reply content'
     }
-    return 'Unknown content'
+
+    
+return 'Unknown content'
   }
 
   const getReviewStatus = () => {
@@ -65,7 +71,9 @@ const ViewReportModal = ({ open, report, onClose, onAction, onViewConversation }
     } else if (report.type === 'REVIEW_REPLY' && replyData) {
       return replyData.status
     }
-    return 'Unknown'
+
+    
+return 'Unknown'
   }
 
   return (

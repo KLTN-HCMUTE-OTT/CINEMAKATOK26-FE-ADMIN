@@ -31,6 +31,7 @@ export const useViewStatistics = ({ tabValue, page, rowsPerPage, searchQuery }: 
     key,
     async ([, params]) => {
       const searchField = params.tabValue === 2 ? 'categoryName' : 'title'
+
       const requestParams = {
         page: params.page + 1,
         limit: params.rowsPerPage,

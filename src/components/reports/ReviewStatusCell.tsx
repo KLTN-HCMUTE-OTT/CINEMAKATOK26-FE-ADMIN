@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+
 import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
+
 import { reviewReplyControllerFindOne } from '@/api/reviewReplies'
 
 interface ReviewStatusCellProps {
@@ -17,8 +19,10 @@ const ReviewStatusCell = ({ report }: ReviewStatusCellProps) => {
     const fetchReplyStatus = async () => {
       if (report.type === 'REVIEW_REPLY' && report.targetId) {
         setLoading(true)
+
         try {
           const response = await reviewReplyControllerFindOne({ id: report.targetId })
+
           if (response?.data?.data) {
             setReplyStatus(response.data.data.status)
           }

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { render, screen, fireEvent } from '@/test/test-utils'
 import EpisodeModal from './EpisodeModal'
 
@@ -48,6 +49,7 @@ describe('EpisodeModal', () => {
     render(<EpisodeModal open={true} onClose={mockOnClose} onSave={mockOnSave} />)
     
     const saveButton = screen.getByRole('button', { name: /add episode/i })
+
     expect(saveButton).toBeDisabled()
   })
 
@@ -75,6 +77,7 @@ describe('EpisodeModal', () => {
 
     // The button text mirrors the title when it contains "Update"
     const saveButton = screen.getByRole('button', { name: /update episode/i })
+
     expect(saveButton).toBeEnabled()
     
     fireEvent.click(saveButton)

@@ -34,9 +34,6 @@ const TooltipContent = () => {
         <Typography color='textSecondary'>Click on below button to explore the PRO version.</Typography>
       </CardContent>
       <CardActions>
-        <Button variant='contained' href={process.env.NEXT_PUBLIC_PRO_URL as string} target='_blank'>
-          Demo
-        </Button>
         <Button
           variant='outlined'
           href='https://themeselection.com/item/materio-mui-nextjs-admin-template'

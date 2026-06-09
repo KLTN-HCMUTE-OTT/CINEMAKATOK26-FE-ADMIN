@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
+
 import { Alert, Box, Button, Typography } from '@mui/material'
 
 import { useWatchPartyManagement } from '@/hooks/useWatchPartyManagement'
@@ -14,6 +16,7 @@ import BanUserDialog from '@/components/dashboard/watch-party/BanUserDialog'
 
 const WatchPartyPage = () => {
   const router = useRouter()
+
   const {
     roomsWithHost,
     roomDetail,
@@ -56,6 +59,7 @@ const WatchPartyPage = () => {
     setCurrentPage(1)
     if (searchTimeout) clearTimeout(searchTimeout)
     const t = setTimeout(() => fetchRooms(1, rowsPerPage, value), 300)
+
     setSearchTimeout(t)
   }
 
@@ -98,12 +102,15 @@ const WatchPartyPage = () => {
 
   const handleCloseRoom = async (roomId: string, reason?: string) => {
     const result = await closeRoom(roomId, reason)
+
     if (result.success) {
       setDetailOpen(false)
       setCloseDialogOpen(false)
       await refreshStats()
     }
-    return result
+
+    
+return result
   }
 
   return (

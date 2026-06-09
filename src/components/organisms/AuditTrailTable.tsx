@@ -4,7 +4,7 @@
 import { useState } from 'react'
 
 // MUI Imports
-import { Box, Typography, Button, IconButton, Chip } from '@mui/material'
+import { Box, Typography, Button, Chip } from '@mui/material'
 
 // Components Imports
 import DataTable from '@components/shared/DataTable'

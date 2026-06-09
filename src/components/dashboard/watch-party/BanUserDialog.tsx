@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import {
   Alert,
   Box,
@@ -49,9 +50,11 @@ const BanUserDialog = ({ open, userId, displayName, onClose, onBan, onUnban }: B
 
   const handleSubmit = async () => {
     const targetUserId = inputUserId.trim()
+
     if (!targetUserId) {
       setError('User ID is required')
-      return
+      
+return
     }
 
     setError(null)
@@ -59,8 +62,10 @@ const BanUserDialog = ({ open, userId, displayName, onClose, onBan, onUnban }: B
 
     try {
       let result: { success: boolean; error?: string }
+
       if (action === 'ban') {
         const durationSec = durationDays > 0 ? durationDays * 86400 : undefined
+
         result = await onBan(targetUserId, durationSec, reason.trim() || undefined)
       } else {
         result = await onUnban(targetUserId)

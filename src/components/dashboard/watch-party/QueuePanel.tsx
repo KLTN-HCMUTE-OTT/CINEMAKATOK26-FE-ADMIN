@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material'
+
 import type { QueueItem } from '@/types/watchPartyRoom'
 
 interface QueuePanelProps {

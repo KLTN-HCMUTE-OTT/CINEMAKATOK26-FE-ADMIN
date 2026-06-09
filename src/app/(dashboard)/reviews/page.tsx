@@ -81,6 +81,7 @@ const ReviewsPage = () => {
   })
 
   const [selectedReview, setSelectedReview] = useState<any>(null)
+
   const [actionDialog, setActionDialog] = useState<{
     open: boolean
     action: 'ban' | 'unban' | 'delete' | null
@@ -122,16 +123,6 @@ const ReviewsPage = () => {
     setPage(0) // Reset to first page when filtering
   }
 
-  const handleActionClick = (action: 'ban' | 'unban' | 'delete', review: any) => {
-    setSelectedReview(review)
-    setActionDialog({
-      open: true,
-      action,
-      type: review.type,
-      id: review.id
-    })
-  }
-
   const handleActionConfirm = async () => {
     if (!actionDialog.action || !actionDialog.type || !actionDialog.id) return
 
@@ -155,8 +146,10 @@ const ReviewsPage = () => {
           } else {
             await reviewControllerDeleteReview({ id: actionDialog.id })
           }
+
           break
       }
+
       refetch() // Refresh the data
     } catch (error) {
       console.error('Error performing action:', error)
@@ -187,6 +180,7 @@ const ReviewsPage = () => {
       review: review.type === 'REVIEW' ? review : undefined,
       episodeReview: review.type === 'EPISODE_REVIEW' ? review : undefined
     }
+
     setConversationModal({ open: true, review: reportLikeObject })
   }
 
@@ -207,6 +201,7 @@ const ReviewsPage = () => {
           id: replyId
         })
       }
+
       refetch()
     } catch (error) {
       console.error(`Error ${action}ning reply:`, error)
@@ -559,6 +554,7 @@ const ReviewsPage = () => {
                     } else {
                       await reviewControllerDeleteReview({ id: viewModal.review.id })
                     }
+
                     refetch()
                     handleViewModalClose()
                   } catch (error) {

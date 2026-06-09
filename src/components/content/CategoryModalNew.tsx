@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import {
   Dialog,
   DialogTitle,
@@ -11,6 +12,7 @@ import {
   Box,
   CircularProgress
 } from '@mui/material'
+
 import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/services'
 
 interface CategoryModalNewProps {
@@ -34,6 +36,7 @@ const CategoryModalNew = ({ open, onClose, onSave, category, mode }: CategoryMod
       } else {
         setCategoryName('')
       }
+
       setError('')
     }
   }, [open, category, mode])
@@ -42,7 +45,8 @@ const CategoryModalNew = ({ open, onClose, onSave, category, mode }: CategoryMod
     // Validation
     if (!categoryName.trim()) {
       setError('Category name is required')
-      return
+      
+return
     }
 
     try {

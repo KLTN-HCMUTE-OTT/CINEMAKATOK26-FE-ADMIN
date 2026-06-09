@@ -56,12 +56,14 @@ export async function middleware(request: NextRequest) {
   // Generate per-request nonce for CSP (moved up so all response paths can use it)
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const requestHeaders = new Headers(request.headers)
+
   requestHeaders.set('x-nonce', nonce)
 
   const applySecurityHeaders = (res: NextResponse) => {
     Object.entries(STATIC_SECURITY_HEADERS).forEach(([key, value]) => res.headers.set(key, value))
     res.headers.set('Content-Security-Policy', buildCsp(nonce))
-    return res
+    
+return res
   }
 
   // Authentication check for protected routes
@@ -75,6 +77,7 @@ export async function middleware(request: NextRequest) {
       if (refreshToken) {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+
           const refreshRes = await fetch(`${apiUrl}/api/v1/auth/refresh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -104,7 +107,8 @@ export async function middleware(request: NextRequest) {
             }
 
             if (IS_DEV) console.log(`[Security] Silent token refresh for ${pathname}`)
-            return response
+            
+return response
           }
         } catch {
           // Refresh failed, fall through to redirect
@@ -112,9 +116,11 @@ export async function middleware(request: NextRequest) {
       }
 
       const url = request.nextUrl.clone()
+
       url.pathname = '/login'
       url.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(url)
+      
+return NextResponse.redirect(url)
     }
   }
 

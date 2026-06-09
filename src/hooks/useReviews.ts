@@ -1,6 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
+
 import { reviewControllerFindAll } from '@/api/review'
 import { episodeReviewControllerFindAll } from '@/api/episodeReviews'
 import { reviewReplyControllerFindAll } from '@/api/reviewReplies'
@@ -23,7 +24,7 @@ interface ReviewItem {
   status: 'ACTIVE' | 'BANNED'
   name: string
   avatar?: any
-  userId: string
+  userId?: string
   createdAt: string
   updatedAt: string
   contentId?: string

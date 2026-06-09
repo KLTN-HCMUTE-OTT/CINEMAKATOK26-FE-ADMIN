@@ -28,6 +28,7 @@ describe('authApi', () => {
           }
         }
       }
+
       mockedAxios.request.mockResolvedValue(mockResponse)
 
       // Act
@@ -47,6 +48,7 @@ describe('authApi', () => {
     it('maps INVALID_PASSWORD error code to user-friendly message', async () => {
       // Arrange
       const apiError = new Error('Original') as any
+
       apiError.code = 'INVALID_PASSWORD'
       mockedAxios.request.mockRejectedValue(apiError)
 
@@ -58,6 +60,7 @@ describe('authApi', () => {
 
     it('maps USER_NOT_FOUND error code', async () => {
       const apiError = new Error('') as any
+
       apiError.code = 'USER_NOT_FOUND'
       mockedAxios.request.mockRejectedValue(apiError)
 
@@ -68,6 +71,7 @@ describe('authApi', () => {
 
     it('maps ACCOUNT_DEACTIVATED error code', async () => {
       const apiError = new Error('') as any
+
       apiError.code = 'ACCOUNT_DEACTIVATED'
       mockedAxios.request.mockRejectedValue(apiError)
 
@@ -78,6 +82,7 @@ describe('authApi', () => {
 
     it('passes through unknown errors unchanged', async () => {
       const apiError = new Error('Network timeout')
+
       mockedAxios.request.mockRejectedValue(apiError)
 
       await expect(authApi.login({ email: 'x', password: 'y' })).rejects.toThrow('Network timeout')
@@ -142,6 +147,7 @@ describe('authApi', () => {
 
     it('maps OTP_REQUEST_LIMIT_EXCEEDED error', async () => {
       const apiError = new Error('') as any
+
       apiError.code = 'OTP_REQUEST_LIMIT_EXCEEDED'
       mockedAxios.request.mockRejectedValue(apiError)
 
@@ -172,6 +178,7 @@ describe('authApi', () => {
 
     it('maps INVALID_OTP error', async () => {
       const apiError = new Error('') as any
+
       apiError.code = 'INVALID_OTP'
       mockedAxios.request.mockRejectedValue(apiError)
 
@@ -182,6 +189,7 @@ describe('authApi', () => {
 
     it('maps OTP_EXPIRED error', async () => {
       const apiError = new Error('') as any
+
       apiError.code = 'OTP_EXPIRED'
       mockedAxios.request.mockRejectedValue(apiError)
 

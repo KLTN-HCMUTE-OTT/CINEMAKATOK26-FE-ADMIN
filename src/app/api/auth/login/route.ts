@@ -4,9 +4,10 @@
  * Tokens are stored as httpOnly cookies instead of localStorage
  */
 
+import { randomBytes } from 'crypto'
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { randomBytes } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Call backend auth API
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
     const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
@@ -29,7 +31,9 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      return NextResponse.json(errorData || { error: 'Authentication failed' }, { status: response.status })
+
+      
+return NextResponse.json(errorData || { error: 'Authentication failed' }, { status: response.status })
     }
 
     const data = await response.json()
@@ -80,6 +84,7 @@ export async function POST(request: NextRequest) {
     return res
   } catch (error) {
     console.error('Login route error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    
+return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

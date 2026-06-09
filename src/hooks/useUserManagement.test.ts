@@ -1,7 +1,8 @@
+import React from 'react'
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { SWRConfig } from 'swr'
-import React from 'react'
 
 vi.mock('@/api/users', () => ({
   userControllerFindAll: vi.fn(),
@@ -110,6 +111,7 @@ describe('useUserManagement', () => {
     })
 
     let banResult: any
+
     await act(async () => {
       banResult = await result.current.banUser('u1', 'spamming', 30)
     })
@@ -133,6 +135,7 @@ describe('useUserManagement', () => {
     })
 
     let banResult: any
+
     await act(async () => {
       banResult = await result.current.banUser('u1', 'test', 0)
     })
@@ -154,6 +157,7 @@ describe('useUserManagement', () => {
     })
 
     let unbanResult: any
+
     await act(async () => {
       unbanResult = await result.current.unbanUser('u2')
     })
@@ -174,6 +178,7 @@ describe('useUserManagement', () => {
     })
 
     let updateResult: any
+
     await act(async () => {
       updateResult = await result.current.updateUserInfo('u1', { name: 'Updated Name' })
     })

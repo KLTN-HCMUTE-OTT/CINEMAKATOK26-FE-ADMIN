@@ -1,7 +1,9 @@
 'use client'
 
 import { useRef, useEffect, useCallback, useState } from 'react'
+
 import { Box, IconButton, Slider, Tooltip, Typography, CircularProgress, Alert } from '@mui/material'
+
 import { streamingControllerGetManifestUrl, streamingControllerGetDrmKeyInfo } from '@/api/streaming'
 import type { VideoState } from '@/types/watchPartyRoom'
 
@@ -13,17 +15,23 @@ function formatTime(s: number): string {
   if (!s || isNaN(s)) return '0:00'
   const m = Math.floor(s / 60)
   const sec = Math.floor(s % 60)
-  return `${m}:${String(sec).padStart(2, '0')}`
+
+  
+return `${m}:${String(sec).padStart(2, '0')}`
 }
 
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null
   const cookies = document.cookie.split(';')
+
   for (const cookie of cookies) {
     const [key, ...val] = cookie.trim().split('=')
+
     if (key === name) return decodeURIComponent(val.join('='))
   }
-  return null
+
+  
+return null
 }
 
 interface SyncedVideoPlayerProps {
@@ -42,6 +50,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const shakaPlayerRef = useRef<any>(null)
   const destroyPromiseRef = useRef<Promise<void> | null>(null)
+
   // Tracks when apply-server-state is the one calling play/pause so the emit
   // effect's handlers don't echo the change back to the server.
   const applyingServerStateRef = useRef(false)
@@ -62,6 +71,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Secure source: signed manifest + ClearKey DRM via Shaka ───────────────
   useEffect(() => {
     const video = videoRef.current
+
     if (!video || !activeVideoId) return
 
     let active = true
@@ -80,20 +90,24 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
         } catch {
           /* ignore */
         }
+
         destroyPromiseRef.current = null
       }
+
       if (shakaPlayerRef.current) {
         try {
           await shakaPlayerRef.current.destroy()
         } catch {
           /* ignore */
         }
+
         shakaPlayerRef.current = null
       }
 
       try {
         const manifestResult = await streamingControllerGetManifestUrl({ videoId })
         const manifestUrl = manifestResult.data?.data?.manifestUrl
+
         if (!manifestUrl) throw new Error('Failed to obtain signed manifest URL')
 
         // Best-effort DRM key info (ClearKey uses the license server, not the keyId directly).
@@ -104,19 +118,25 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
         }
 
         const shaka = (await import('shaka-player/dist/shaka-player.compiled')).default
+
         if (!active) return
 
         shaka.polyfill.installAll()
+
         if (!shaka.Player.isBrowserSupported()) {
           throw new Error('Browser not supported by Shaka Player')
         }
 
         const player = new shaka.Player()
+
         await player.attach(video)
+
         if (!active) {
           player.destroy()
-          return
+          
+return
         }
+
         shakaPlayerRef.current = player
         shakaPlayer = player
 
@@ -131,6 +151,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
 
         // Inject Content-Type, CSRF token and videoId into the license request.
         const networkingEngine = player.getNetworkingEngine()
+
         if (networkingEngine) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           networkingEngine.registerRequestFilter((requestType: any, request: any) => {
@@ -139,6 +160,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
               request.allowCrossSiteCredentials = true
 
               const csrfToken = getCookie('csrf-token')
+
               if (csrfToken) {
                 request.headers['X-CSRF-Token'] = csrfToken
               }
@@ -146,6 +168,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
               if (request.body) {
                 try {
                   const body = JSON.parse(new TextDecoder().decode(request.body))
+
                   body.videoId = videoId
                   request.body = new TextEncoder().encode(JSON.stringify(body))
                 } catch (e) {
@@ -159,24 +182,29 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         player.addEventListener('error', (event: any) => {
           const err = event.detail || event
+
           console.error('Shaka Player error details:', err)
           if (!active) return
           let errMsg = err?.message || `Playback error (Code ${err?.code})`
+
           if (err?.category === 6) {
             errMsg =
               err?.code === 6007
                 ? 'DRM License Request Failed: You do not have permission or your session has expired.'
                 : `DRM Secure Playback Failed (Code ${err?.code}).`
           }
+
           setError(errMsg)
         })
 
         await player.load(manifestUrl)
         if (!active) return
         setLoading(false)
+
         // No autoplay: the host drives playback; the sync effect follows server state.
       } catch (err) {
         console.error('[SyncedVideoPlayer] Shaka init failed:', err)
+
         if (active) {
           setError(
             (err as { message?: string })?.message || 'Failed to load secure video player'
@@ -190,6 +218,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
 
     return () => {
       active = false
+
       if (shakaPlayer) {
         destroyPromiseRef.current = shakaPlayer.destroy()
       } else if (shakaPlayerRef.current) {
@@ -202,6 +231,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Reset to a clean paused state on video change ────────────────────────
   useEffect(() => {
     const video = videoRef.current
+
     if (video && !video.paused) video.pause()
     setIsPlaying(false)
     setCurrentTime(0)
@@ -222,6 +252,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   const throttledSync = useCallback(
     (state: { isPlaying: boolean; currentTime: number }) => {
       const now = Date.now()
+
       if (now - lastSyncRef.current < SYNC_THROTTLE_MS) return
       lastSyncRef.current = now
       onSync(state)
@@ -232,24 +263,36 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Broadcast host events (admin = always host) ──────────────────────────
   useEffect(() => {
     const video = videoRef.current
+
     if (!video) return
 
     const onPlay = () => {
-      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; return }
+      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; 
+
+return }
+
       emitSync({ isPlaying: true, currentTime: video.currentTime })
     }
+
     const onPause = () => {
-      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; return }
+      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; 
+
+return }
+
       emitSync({ isPlaying: false, currentTime: video.currentTime })
     }
+
     const onSeeked = () => emitSync({ isPlaying: !video.paused, currentTime: video.currentTime })
+
     const onEnded = () => {
       const vid = videoState?.videoId
+
       if (vid && videoEndSentRef.current !== vid) {
         videoEndSentRef.current = vid
         onVideoEnd(vid)
       }
     }
+
     const onTimeUpdate = () => {
       if (!video.paused) throttledSync({ isPlaying: true, currentTime: video.currentTime })
     }
@@ -272,6 +315,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Apply server state (drift correction) ────────────────────────────────
   useEffect(() => {
     const video = videoRef.current
+
     if (!video || !videoState) return
 
     // Server timestamps are milliseconds; convert the elapsed delta to seconds.
@@ -296,12 +340,14 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Drive UI state from video element ───────────────────────────────────
   useEffect(() => {
     const video = videoRef.current
+
     if (!video) return
 
     const onPlay = () => setIsPlaying(true)
     const onPause = () => setIsPlaying(false)
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
     const onDurationChange = () => setDuration(video.duration || 0)
+
     const onVolumeChange = () => {
       setVolume(video.volume)
       setIsMuted(video.muted)
@@ -325,8 +371,10 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // Fullscreen change detection
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+
     document.addEventListener('fullscreenchange', onFsChange)
-    return () => document.removeEventListener('fullscreenchange', onFsChange)
+    
+return () => document.removeEventListener('fullscreenchange', onFsChange)
   }, [])
 
   // ── Controls auto-hide ───────────────────────────────────────────────────
@@ -338,7 +386,9 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
 
   useEffect(() => {
     resetHideTimer()
-    return () => {
+
+    
+return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
     }
   }, [resetHideTimer])
@@ -346,6 +396,7 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   // ── Control handlers ─────────────────────────────────────────────────────
   const handleTogglePlay = useCallback(() => {
     const video = videoRef.current
+
     if (!video) return
     if (video.paused) video.play().catch(() => {})
     else video.pause()
@@ -353,24 +404,28 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
 
   const handleSeek = useCallback((_: Event, value: number | number[]) => {
     const video = videoRef.current
+
     if (!video) return
     video.currentTime = value as number
   }, [])
 
   const handleSkip = useCallback((seconds: number) => {
     const video = videoRef.current
+
     if (!video) return
     video.currentTime = Math.max(0, Math.min(video.currentTime + seconds, video.duration || Infinity))
   }, [])
 
   const handleToggleMute = useCallback(() => {
     const video = videoRef.current
+
     if (!video) return
     video.muted = !video.muted
   }, [])
 
   const handleToggleFullscreen = useCallback(() => {
     const container = containerRef.current
+
     if (!container) return
     if (!document.fullscreenElement) container.requestFullscreen().catch(() => {})
     else document.exitFullscreen().catch(() => {})
@@ -380,14 +435,17 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const video = videoRef.current
+
       if (!video) return
       const target = e.target as HTMLElement | null
+
       if (
         target &&
         (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
       ) {
         return
       }
+
       switch (e.key) {
         case ' ':
         case 'k':
@@ -421,8 +479,10 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
           break
       }
     }
+
     window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    
+return () => window.removeEventListener('keydown', onKeyDown)
   }, [handleTogglePlay, handleSkip, handleToggleMute, handleToggleFullscreen])
 
   return (

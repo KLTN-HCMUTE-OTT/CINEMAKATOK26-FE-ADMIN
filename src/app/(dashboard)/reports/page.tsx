@@ -128,6 +128,7 @@ const ReportsPage = () => {
         case 'approve':
           await reportControllerApprove({ id: actionDialog.id })
           break
+
         case 'ban': {
           const targetId = viewModal.report?.targetId
 
@@ -136,6 +137,7 @@ const ReportsPage = () => {
           await reportControllerBan({ type: actionDialog.type, id: targetId })
           break
         }
+
         case 'reject':
           await reportControllerReject({ id: actionDialog.id })
           break
@@ -143,12 +145,14 @@ const ReportsPage = () => {
           await reportControllerDelete({ id: actionDialog.id })
           break
       }
+
       refetch() // Refresh the data
       handleViewModalClose()
       setSnackbar({ open: true, message: 'Action completed successfully', severity: 'success' })
     } catch (error: any) {
       console.error('Error performing action:', error)
       const message = error?.response?.data?.message || error?.message || 'Action failed'
+
       setSnackbar({ open: true, message, severity: 'error' })
     } finally {
       setActionDialog({ open: false, action: null })
@@ -161,6 +165,7 @@ const ReportsPage = () => {
 
   const handleViewReport = (reportId: string) => {
     const report = reportsData.find(r => r.id === reportId)
+
     if (report) {
       setViewModal({ open: true, report })
     }

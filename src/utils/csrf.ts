@@ -39,7 +39,7 @@ export class CSRFProtection {
   /**
    * Client-side hook for CSRF protection
    */
-  static useCSRFToken() {
+  static getCSRFToken() {
     if (typeof window === 'undefined') {
       return { token: null, getHeaders: () => ({}) }
     }
@@ -77,14 +77,14 @@ export class CSRFProtection {
  * React hook for CSRF protection in components
  */
 export const useCSRF = () => {
-  return CSRFProtection.useCSRFToken()
+  return CSRFProtection.getCSRFToken()
 }
 
 /**
  * Fetch wrapper with automatic CSRF protection
  */
 export const securityFetch = async (url: string, options: RequestInit = {}) => {
-  const { getHeaders } = CSRFProtection.useCSRFToken()
+  const { getHeaders } = CSRFProtection.getCSRFToken()
 
   const secureOptions: RequestInit = {
     ...options,

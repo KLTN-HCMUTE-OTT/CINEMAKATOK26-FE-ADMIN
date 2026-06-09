@@ -23,18 +23,23 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
     const actorPromises = selectedActors.map((a: any) =>
       actorsControllerGetActorById({ id: a.id }).catch(err => {
         console.error(`Failed to fetch actor ${a.id}:`, err)
-        return null
+        
+return null
       })
     )
+
     const actorResponses = await Promise.all(actorPromises)
 
     return actorResponses
       .filter(res => {
         if (!res || !res.data?.data) {
           console.warn('Actor data not found, skipping...')
-          return false
+          
+return false
         }
-        return true
+
+        
+return true
       })
       .map(res => {
         const actor = res!.data.data
@@ -55,18 +60,23 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
     const directorPromises = selectedDirectors.map((d: any) =>
       directorsControllerGetDirectorById({ id: d.id }).catch(err => {
         console.error(`Failed to fetch director ${d.id}:`, err)
-        return null
+        
+return null
       })
     )
+
     const directorResponses = await Promise.all(directorPromises)
 
     return directorResponses
       .filter(res => {
         if (!res || !res.data?.data) {
           console.warn('Director data not found, skipping...')
-          return false
+          
+return false
         }
-        return true
+
+        
+return true
       })
       .map(res => {
         const director = res!.data.data
@@ -85,11 +95,13 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
 
   const uploadVideo = async (videoFile: File): Promise<API.VideoDto> => {
     setUploadingVideo(true)
+
     try {
       const uploadResponse = await streamingControllerUploadVideo({}, videoFile, {
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+
             setVideoUploadProgress(percentCompleted)
           }
         }
@@ -132,7 +144,10 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
       // Fetch full actor and director data
       const fullActors = await fetchFullActors(formData.selectedActors)
       const fullDirectors = await fetchFullDirectors(formData.selectedDirectors)
+
       console.log('ratings: ', formData.imdbRating, formData.avgRating)
+
+
       // Update content
       const contentData: any = {
         title: formData.title,
@@ -161,10 +176,12 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
       const contentResponse = await contentsControllerUpdateContent({ id: movie!.metaData!.id }, contentData)
 
       const { deletedAt, rating, viewCount, ...cleanMetaData } = contentResponse.data.data as any
+
       cleanMetaData.accessTier = formData.accessTier || 'BASIC'
 
       // Upload video if provided
       let finalVideoDto = movie?.video
+
       if (formData.videoFile) {
         finalVideoDto = await uploadVideo(formData.videoFile)
       }

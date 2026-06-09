@@ -23,7 +23,7 @@ export class SecurityUtils {
       ALLOWED_ATTR: ['class'],
       REMOVE_DATA_ATTRIBUTES: true,
       REMOVE_UNKNOWN_PROTOCOLS: true
-    })
+    } as any) as unknown as string
   }
 
   /**
@@ -150,7 +150,6 @@ return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
     windowMs: number = 60000 // 1 minute
   ): { allowed: boolean; remaining: number; resetTime: number } {
     const now = Date.now()
-    const windowStart = now - windowMs
 
     // Clean up old entries
     for (const [key, value] of this.requestCounts.entries()) {

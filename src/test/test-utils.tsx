@@ -1,5 +1,8 @@
-import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
+import type { ReactElement } from 'react';
+import React from 'react'
+
+import type { RenderOptions } from '@testing-library/react';
+import { render } from '@testing-library/react'
 import { SWRConfig } from 'swr'
 
 /**

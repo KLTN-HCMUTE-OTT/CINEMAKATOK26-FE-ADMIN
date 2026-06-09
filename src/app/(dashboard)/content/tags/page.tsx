@@ -15,7 +15,7 @@ import {
   Button
 } from '@mui/material'
 
-import { TableSkeleton } from '@/components/ui/Skeleton'
+
 
 // Components Imports
 import TagTableNew from '@/components/content/TagTableNew'
@@ -52,14 +52,18 @@ const TagsPage = () => {
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 2000)
-      return () => clearTimeout(timer)
+
+      
+return () => clearTimeout(timer)
     }
   }, [error])
 
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => setSuccess(null), 2000)
-      return () => clearTimeout(timer)
+
+      
+return () => clearTimeout(timer)
     }
   }, [success])
 
@@ -91,7 +95,8 @@ const TagsPage = () => {
         console.error('Invalid response structure:', response)
         setTags([])
         setTotalItems(0)
-        return
+        
+return
       }
 
       setTags(response.data)
@@ -108,6 +113,7 @@ const TagsPage = () => {
 
   useEffect(() => {
     fetchTags()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, debouncedSearchTerm])
 
   // Handlers
@@ -163,6 +169,7 @@ const TagsPage = () => {
 
   const handleOpenDeleteDialog = (id: string) => {
     const tag = tags.find(t => t.id === id)
+
     if (tag) {
       setTagToDelete(tag)
       setDeleteDialogOpen(true)
@@ -254,7 +261,7 @@ const TagsPage = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the tag "{tagToDelete?.tagName}"? This action cannot be undone.
+            Are you sure you want to delete the tag &quot;{tagToDelete?.tagName}&quot;? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

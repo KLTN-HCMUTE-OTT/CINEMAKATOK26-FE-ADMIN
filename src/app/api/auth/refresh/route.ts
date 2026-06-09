@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
 
     // Call backend refresh endpoint
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
     const response = await fetch(`${apiUrl}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: {
@@ -26,11 +27,14 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+
       // If refresh fails, clear cookies
       const res = NextResponse.json(errorData || { error: 'Token refresh failed' }, { status: response.status })
+
       res.cookies.delete('accessToken')
       res.cookies.delete('refreshToken')
-      return res
+      
+return res
     }
 
     const data = await response.json()
@@ -62,8 +66,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Refresh route error:', error)
     const res = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
     res.cookies.delete('accessToken')
     res.cookies.delete('refreshToken')
-    return res
+    
+return res
   }
 }

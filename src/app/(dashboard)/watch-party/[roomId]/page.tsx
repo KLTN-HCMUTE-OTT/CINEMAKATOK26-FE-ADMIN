@@ -1,7 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+
 import { useParams, useRouter } from 'next/navigation'
+
 import {
   Alert,
   Box,
@@ -41,6 +43,7 @@ export default function WatchPartyRoomPage() {
   const [closeReasonInput, setCloseReasonInput] = useState('')
 
   const actions = useWatchPartyAdminRoom(roomId)
+
   const { status, error, room, members, videoState, messages, queue, mutedUserIds, bannedUserIds, bannedMemberDetails, isClosed, closeReason, closeCustomReason, isKicked, currentVideoTitle } =
     useWatchPartyRoomStore()
 
@@ -57,7 +60,11 @@ export default function WatchPartyRoomPage() {
 
   useEffect(() => {
     const vid = videoState?.videoId
-    if (!vid) { setParentContent(null); return }
+
+    if (!vid) { setParentContent(null); 
+
+return }
+
     videosControllerGetVideoParentContent({ id: vid })
       .then(res => setParentContent(res.data?.data ?? null))
       .catch(() => setParentContent(null))
@@ -71,6 +78,7 @@ export default function WatchPartyRoomPage() {
 
   const handleAdminCloseRoom = async () => {
     setClosing(true)
+
     try {
       await watchPartyControllerAdminCloseRoom({ id: roomId }, { reason: closeReasonInput.trim() || undefined })
     } catch { /* server will emit room:closed */ } finally {

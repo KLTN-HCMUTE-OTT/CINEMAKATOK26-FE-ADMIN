@@ -1,2 +1,4 @@
 // Fallback components for failed dynamic imports
-export default null
+const fallback = null
+
+export default fallback

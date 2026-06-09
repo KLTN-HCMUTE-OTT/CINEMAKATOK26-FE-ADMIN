@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { usePathname, useSearchParams } from 'next/navigation'
-import { CircularProgress, Box, Backdrop } from '@mui/material'
+
+import { CircularProgress, Backdrop } from '@mui/material'
 
 /**
  * Global page loading indicator

@@ -15,7 +15,7 @@ if (existsSync(envPath)) {
   }
 }
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3011'
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3022'
 
 export default defineConfig({
   testDir: './e2e',
@@ -48,12 +48,10 @@ export default defineConfig({
     }
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'pnpm dev',
-        url: BASE_URL,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120 * 1000
-      }
+  webServer: {
+    command: process.env.CI ? 'pnpm exec next start -p 3022' : 'pnpm exec next dev -p 3022',
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000
+  }
 })

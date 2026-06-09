@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { streamingControllerUploadVideo } from '@/api/streaming'
 
 interface VideoFile {
@@ -20,6 +19,7 @@ export const useVideoUpload = () => {
   const extractVideoDuration = (file: File): Promise<{ minutes: number; formatted: string }> => {
     return new Promise(resolve => {
       const video = document.createElement('video')
+
       video.preload = 'metadata'
 
       video.onloadedmetadata = () => {
@@ -36,6 +36,7 @@ export const useVideoUpload = () => {
 
         // Format for display
         let formatted = ''
+
         if (durationInSeconds < 60) {
           formatted = `${seconds}s`
         } else if (hours > 0) {
@@ -73,6 +74,7 @@ export const useVideoUpload = () => {
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+
             onProgressUpdate(videoFile.id, percentCompleted, 'uploading')
           }
         }
@@ -89,6 +91,7 @@ export const useVideoUpload = () => {
       onProgressUpdate(videoFile.id, 0, 'error')
 
       const errorMessage = error.response?.data?.message || error.message || `Failed to upload ${videoFile.name}`
+
       throw new Error(errorMessage)
     }
   }

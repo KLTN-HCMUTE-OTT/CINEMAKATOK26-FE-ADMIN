@@ -66,25 +66,33 @@ export const categoryService = {
   // Get all categories with pagination
   getAll: async (query?: PaginationQuery): Promise<PaginatedResponse<Category>> => {
     const response = await apiCall<PaginatedResponse<Category>>('/api/v1/categories', 'GET', undefined, query)
-    return response as any as PaginatedResponse<Category>
+
+    
+return response as any as PaginatedResponse<Category>
   },
 
   // Get category by ID
   getById: async (id: string): Promise<Category> => {
     const response = await apiCall<Category>(`/api/v1/categories/${id}`, 'GET')
-    return response.data
+
+    
+return response.data
   },
 
   // Create new category
   create: async (data: CreateCategoryDto): Promise<Category> => {
     const response = await apiCall<Category>('/api/v1/categories', 'POST', data)
-    return response.data
+
+    
+return response.data
   },
 
   // Update category
   update: async (id: string, data: UpdateCategoryDto): Promise<Category> => {
     const response = await apiCall<Category>(`/api/v1/categories/${id}`, 'PUT', data)
-    return response.data
+
+    
+return response.data
   },
 
   // Delete category
