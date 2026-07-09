@@ -6,6 +6,12 @@ import { CircularProgress, Box, Alert } from '@mui/material'
 
 import { streamingControllerGetManifestUrl, streamingControllerGetDrmKeyInfo } from '@/api/streaming'
 
+async function loadShakaPlayer() {
+  const shakaModule = await import('shaka-player/dist/shaka-player.compiled.js')
+
+  return shakaModule.default ?? shakaModule
+}
+
 interface ShakaVideoPlayerProps {
   videoId: string
   poster?: string
@@ -13,12 +19,7 @@ interface ShakaVideoPlayerProps {
   className?: string
 }
 
-export default function ShakaVideoPlayer({
-  videoId,
-  poster,
-  controls = true,
-  className = ''
-}: ShakaVideoPlayerProps) {
+export default function ShakaVideoPlayer({ videoId, poster, controls = true, className = '' }: ShakaVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const playerRef = useRef<any>(null)
   const [loading, setLoading] = useState(true)
@@ -41,18 +42,18 @@ export default function ShakaVideoPlayer({
         }
 
         // 2. Get DRM key info
-        let drmKeyId: string | null = null
-
         try {
-          const drmResult = await streamingControllerGetDrmKeyInfo({ videoId })
-
-          drmKeyId = drmResult.data?.data?.keyId || null
+          await streamingControllerGetDrmKeyInfo({ videoId })
         } catch (drmErr) {
           console.warn('No DRM key found or failed to fetch key info', drmErr)
         }
 
         // 3. Dynamically import Shaka Player compiled package
-        const shaka = (await import('shaka-player/dist/shaka-player.compiled')).default
+        const shaka = await loadShakaPlayer()
+
+        if (!shaka?.Player) {
+          throw new Error('Failed to load Shaka Player')
+        }
 
         if (!active) return
 
@@ -72,8 +73,8 @@ export default function ShakaVideoPlayer({
 
         if (!active) {
           player.destroy()
-          
-return
+
+          return
         }
 
         playerRef.current = player
@@ -97,8 +98,7 @@ return
             if (key === name) return decodeURIComponent(val.join('='))
           }
 
-          
-return null
+          return null
         }
 
         // Request Filter to inject content-type, videoId and CSRF token for license endpoint validation
@@ -186,13 +186,35 @@ return null
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }} className={className}>
       {loading && (
-        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1
+          }}
+        >
           <CircularProgress />
         </Box>
       )}
       {error && (
-        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3, zIndex: 2, backgroundColor: 'rgba(0,0,0,0.8)' }}>
-          <Alert severity='error' sx={{ maxWidth: '80%' }}>{error}</Alert>
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 3,
+            zIndex: 2,
+            backgroundColor: 'rgba(0,0,0,0.8)'
+          }}
+        >
+          <Alert severity='error' sx={{ maxWidth: '80%' }}>
+            {error}
+          </Alert>
         </Box>
       )}
       <video
