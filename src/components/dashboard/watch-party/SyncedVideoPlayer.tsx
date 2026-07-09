@@ -7,6 +7,12 @@ import { Box, IconButton, Slider, Tooltip, Typography, CircularProgress, Alert }
 import { streamingControllerGetManifestUrl, streamingControllerGetDrmKeyInfo } from '@/api/streaming'
 import type { VideoState } from '@/types/watchPartyRoom'
 
+async function loadShakaPlayer() {
+  const shakaModule = await import('shaka-player/dist/shaka-player.compiled.js')
+
+  return shakaModule.default ?? shakaModule
+}
+
 const SYNC_THROTTLE_MS = 500
 const DRIFT_TOLERANCE_SEC = 1.5
 const CONTROLS_HIDE_DELAY = 3000
@@ -16,8 +22,7 @@ function formatTime(s: number): string {
   const m = Math.floor(s / 60)
   const sec = Math.floor(s % 60)
 
-  
-return `${m}:${String(sec).padStart(2, '0')}`
+  return `${m}:${String(sec).padStart(2, '0')}`
 }
 
 function getCookie(name: string): string | null {
@@ -30,8 +35,7 @@ function getCookie(name: string): string | null {
     if (key === name) return decodeURIComponent(val.join('='))
   }
 
-  
-return null
+  return null
 }
 
 interface SyncedVideoPlayerProps {
@@ -117,7 +121,11 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
           console.warn('No DRM key found or failed to fetch key info', drmErr)
         }
 
-        const shaka = (await import('shaka-player/dist/shaka-player.compiled')).default
+        const shaka = await loadShakaPlayer()
+
+        if (!shaka?.Player) {
+          throw new Error('Failed to load Shaka Player')
+        }
 
         if (!active) return
 
@@ -133,8 +141,8 @@ export default function SyncedVideoPlayer({ videoState, onSync, onVideoEnd, onPl
 
         if (!active) {
           player.destroy()
-          
-return
+
+          return
         }
 
         shakaPlayerRef.current = player
@@ -206,9 +214,7 @@ return
         console.error('[SyncedVideoPlayer] Shaka init failed:', err)
 
         if (active) {
-          setError(
-            (err as { message?: string })?.message || 'Failed to load secure video player'
-          )
+          setError((err as { message?: string })?.message || 'Failed to load secure video player')
           setLoading(false)
         }
       }
@@ -267,17 +273,21 @@ return
     if (!video) return
 
     const onPlay = () => {
-      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; 
+      if (applyingServerStateRef.current) {
+        applyingServerStateRef.current = false
 
-return }
+        return
+      }
 
       emitSync({ isPlaying: true, currentTime: video.currentTime })
     }
 
     const onPause = () => {
-      if (applyingServerStateRef.current) { applyingServerStateRef.current = false; 
+      if (applyingServerStateRef.current) {
+        applyingServerStateRef.current = false
 
-return }
+        return
+      }
 
       emitSync({ isPlaying: false, currentTime: video.currentTime })
     }
@@ -330,7 +340,9 @@ return }
 
     if (videoState.isPlaying && video.paused) {
       applyingServerStateRef.current = true
-      video.play().catch(() => { applyingServerStateRef.current = false })
+      video.play().catch(() => {
+        applyingServerStateRef.current = false
+      })
     } else if (!videoState.isPlaying && !video.paused) {
       applyingServerStateRef.current = true
       video.pause()
@@ -373,8 +385,8 @@ return }
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
 
     document.addEventListener('fullscreenchange', onFsChange)
-    
-return () => document.removeEventListener('fullscreenchange', onFsChange)
+
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
   }, [])
 
   // ── Controls auto-hide ───────────────────────────────────────────────────
@@ -387,8 +399,7 @@ return () => document.removeEventListener('fullscreenchange', onFsChange)
   useEffect(() => {
     resetHideTimer()
 
-    
-return () => {
+    return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
     }
   }, [resetHideTimer])
@@ -439,10 +450,7 @@ return () => {
       if (!video) return
       const target = e.target as HTMLElement | null
 
-      if (
-        target &&
-        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-      ) {
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
         return
       }
 
@@ -481,14 +489,21 @@ return () => {
     }
 
     window.addEventListener('keydown', onKeyDown)
-    
-return () => window.removeEventListener('keydown', onKeyDown)
+
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [handleTogglePlay, handleSkip, handleToggleMute, handleToggleFullscreen])
 
   return (
     <Box
       ref={containerRef}
-      sx={{ position: 'relative', width: '100%', aspectRatio: '16/9', bgcolor: '#000', borderRadius: 1, overflow: 'hidden' }}
+      sx={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '16/9',
+        bgcolor: '#000',
+        borderRadius: 1,
+        overflow: 'hidden'
+      }}
       onMouseMove={resetHideTimer}
       onMouseEnter={resetHideTimer}
     >
