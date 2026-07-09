@@ -80,17 +80,11 @@ const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectSc
             <MenuItem href='/person/actors'>Actors</MenuItem>
             <MenuItem href='/person/directors'>Directors</MenuItem>
           </SubMenu>
-          <MenuItem href='/live-streams' icon={<i className='ri-live-line' />}>
-            Live Streaming
-          </MenuItem>
         </MenuSection>
 
         <MenuSection label='User Management'>
           <MenuItem href='/users' icon={<i className='ri-group-line' />}>
             Users
-          </MenuItem>
-          <MenuItem href='/subscriptions' icon={<i className='ri-vip-crown-line' />}>
-            Subscriptions
           </MenuItem>
           <MenuItem href='/reports' icon={<i className='ri-flag-line' />}>
             Reports
@@ -100,36 +94,9 @@ const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectSc
           </MenuItem>
         </MenuSection>
 
-        <MenuSection label='Marketing & Engagement'>
-          <MenuItem href='/marketing' icon={<i className='ri-megaphone-line' />}>
-            Marketing & Promotions
-          </MenuItem>
-          <MenuItem href='/notifications' icon={<i className='ri-notification-3-line' />}>
-            Notifications
-          </MenuItem>
-        </MenuSection>
-
         <MenuSection label='Analytics & Reports'>
-          <MenuItem href='/analytics' icon={<i className='ri-bar-chart-box-line' />}>
-            Analytics
-          </MenuItem>
-          <MenuItem href='/moderation' icon={<i className='ri-shield-check-line' />}>
-            Moderation
-          </MenuItem>
           <MenuItem href='/reviews' icon={<i className='ri-star-line' />}>
             Reviews
-          </MenuItem>
-        </MenuSection>
-
-        <MenuSection label='System'>
-          <MenuItem href='/settings' icon={<i className='ri-settings-3-line' />}>
-            Settings
-          </MenuItem>
-          <MenuItem href='/system/logs' icon={<i className='ri-file-list-2-line' />}>
-            System Logs
-          </MenuItem>
-          <MenuItem href='/account-settings' icon={<i className='ri-user-settings-line' />}>
-            Account Settings
           </MenuItem>
         </MenuSection>
       </Menu>
