@@ -5,7 +5,7 @@ import { actorsControllerGetActorById } from '@/api/actors'
 import { directorsControllerGetDirectorById } from '@/api/directors'
 import { contentsControllerUpdateContent } from '@/api/contents'
 import { moviesControllerUpdateMovie } from '@/api/movies'
-import { streamingControllerUploadVideo } from '@/api/streaming'
+import { uploadVideoDirect } from '@/utils/uploadVideoDirect'
 
 interface UseMovieUpdateProps {
   movieId: string
@@ -95,6 +95,7 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
     setUploadingVideo(true)
 
     try {
+
       const uploadResponse = await streamingControllerUploadVideo({}, videoFile, {
         timeout: 30 * 60 * 1000,
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {

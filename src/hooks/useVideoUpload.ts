@@ -1,4 +1,4 @@
-import { streamingControllerUploadVideo } from '@/api/streaming'
+import { uploadVideoDirect } from '@/utils/uploadVideoDirect'
 
 interface VideoFile {
   id: string
@@ -70,7 +70,7 @@ export const useVideoUpload = () => {
       onProgressUpdate(videoFile.id, 0, 'uploading')
 
       // Upload video
-      const response = await streamingControllerUploadVideo({}, videoFile.file, {
+      const response = await uploadVideoDirect(videoFile.file, {
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
