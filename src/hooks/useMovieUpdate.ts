@@ -96,11 +96,12 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
 
     try {
 
-      const uploadResponse = await streamingControllerUploadVideo({}, videoFile, {
+      const uploadResponse = await uploadVideoDirect(videoFile, {
         timeout: 30 * 60 * 1000,
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+
             setVideoUploadProgress(percentCompleted)
           }
         }
