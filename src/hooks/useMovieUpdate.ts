@@ -5,7 +5,7 @@ import { actorsControllerGetActorById } from '@/api/actors'
 import { directorsControllerGetDirectorById } from '@/api/directors'
 import { contentsControllerUpdateContent } from '@/api/contents'
 import { moviesControllerUpdateMovie } from '@/api/movies'
-import { streamingControllerUploadVideo } from '@/api/streaming'
+import { uploadVideoDirect } from '@/utils/uploadVideoDirect'
 
 interface UseMovieUpdateProps {
   movieId: string
@@ -23,8 +23,8 @@ export const useMovieUpdate = ({ movieId, movie, onSuccess, onError }: UseMovieU
     const actorPromises = selectedActors.map((a: any) =>
       actorsControllerGetActorById({ id: a.id }).catch(err => {
         console.error(`Failed to fetch actor ${a.id}:`, err)
-        
-return null
+
+        return null
       })
     )
 
@@ -34,12 +34,11 @@ return null
       .filter(res => {
         if (!res || !res.data?.data) {
           console.warn('Actor data not found, skipping...')
-          
-return false
+
+          return false
         }
 
-        
-return true
+        return true
       })
       .map(res => {
         const actor = res!.data.data
@@ -60,8 +59,8 @@ return true
     const directorPromises = selectedDirectors.map((d: any) =>
       directorsControllerGetDirectorById({ id: d.id }).catch(err => {
         console.error(`Failed to fetch director ${d.id}:`, err)
-        
-return null
+
+        return null
       })
     )
 
@@ -71,12 +70,11 @@ return null
       .filter(res => {
         if (!res || !res.data?.data) {
           console.warn('Director data not found, skipping...')
-          
-return false
+
+          return false
         }
 
-        
-return true
+        return true
       })
       .map(res => {
         const director = res!.data.data
@@ -97,11 +95,11 @@ return true
     setUploadingVideo(true)
 
     try {
-      const uploadResponse = await streamingControllerUploadVideo({}, videoFile, {
+      const uploadResponse = await uploadVideoDirect(videoFile, {
+        timeout: 30 * 60 * 1000,
         onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-
             setVideoUploadProgress(percentCompleted)
           }
         }
@@ -146,7 +144,6 @@ return true
       const fullDirectors = await fetchFullDirectors(formData.selectedDirectors)
 
       console.log('ratings: ', formData.imdbRating, formData.avgRating)
-
 
       // Update content
       const contentData: any = {
