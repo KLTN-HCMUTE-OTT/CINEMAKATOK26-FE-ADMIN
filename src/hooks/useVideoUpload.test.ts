@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
-vi.mock('@/api/streaming', () => ({
-  streamingControllerUploadVideo: vi.fn()
+vi.mock('@/utils/uploadVideoDirect', () => ({
+  uploadVideoDirect: vi.fn()
 }))
 
 import { useVideoUpload } from './useVideoUpload'
-import { streamingControllerUploadVideo } from '@/api/streaming'
+import { uploadVideoDirect } from '@/utils/uploadVideoDirect'
 
-const mockedUploadApi = vi.mocked(streamingControllerUploadVideo)
+const mockedUploadApi = vi.mocked(uploadVideoDirect)
 
 describe('useVideoUpload', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -55,7 +55,7 @@ describe('useVideoUpload', () => {
       // Assert
       expect(response).toEqual(mockVideoData)
       expect(onProgress).toHaveBeenCalledWith('v1', 0, 'uploading')
-      expect(mockedUploadApi).toHaveBeenCalledWith({}, file, expect.objectContaining({ onUploadProgress: expect.any(Function) }))
+      expect(mockedUploadApi).toHaveBeenCalledWith(file, expect.objectContaining({ onUploadProgress: expect.any(Function) }))
     })
 
     it('sets error status and throws on upload failure with API message', async () => {
